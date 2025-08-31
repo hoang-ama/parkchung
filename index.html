@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />   
+    <meta name="description" content="Parkchung - Your online parking platform for easy and eco-friendly parking solutions." />  
+    <title>Parkchung, online parking platform</title>
+    <link rel="icon" type="image/png" href="logo/favicon.png" />
+    <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+<header>
+    <div class="logo">
+        <img src="logo/logo.svg" alt="Parkchung Logo" />
+        <div>
+            <h1>PARKCHUNG</h1>
+            <p class="tagline">Save time. Save money. Save Earth</p>
+        </div>
+    </div>
+    <nav>
+        <a href="#">Find Parking</a>
+        <a href="#">Become a Host</a>
+        <a href="#">Login</a>
+    </nav>
+</header>
+
+<section class="search-section">
+    <div class="search-box">
+        <h2>Parking made easy, wherever you go</h2>
+        <form id="searchForm">
+            <div class="form-group">
+                <label>Park at</label>
+                <input type="text" id="location" placeholder="Enter a place" required />
+            </div>
+             <div class="form-group"> 
+                <label for="start-datetime">From</label>
+                <input type="datetime-local" id="start-datetime" name="startDateTime" required />
+            </div>
+            <div class="form-group">
+                <label for="end-datetime">Until</label>
+                <input type="datetime-local" id="end-datetime"  name="endDateTime" required />
+            </div>
+
+            <button type="submit">Search</button>
+        </form>
+    </div>
+</section>
+
+<section class="benefits">
+    <div class="benefit-item">
+        <img src="https://img.icons8.com/fluency/48/000000/time.png" alt="Save Time" />
+        <h3>Save Time</h3>
+        <p>Book your parking spot in advance, no more endless searching.</p>
+    </div>
+    <div class="benefit-item">
+        <img src="https://img.icons8.com/fluency/48/000000/money-bag.png" alt="Transparent Pricing" />
+        <h3>Transparent Pricing</h3>
+        <p>Clear pricing, no surprises when you book.</p>
+    </div>
+    <div class="benefit-item">
+        <img src="https://img.icons8.com/fluency/48/000000/security-checked.png" alt="Safe Parking" />
+        <h3>Safe Parking</h3>
+        <p>Secure spots monitored with security systems.</p>
+    </div>
+</section>
+
+<section class="locations">
+    <h2>Featured Locations</h2>
+    <div class="location-cards">
+        <div class="location-card">
+            <img src="image/airport.png" alt="Airports" />
+            <div class="caption">Airports</div>
+        </div>
+        <div class="location-card">
+            <img src="image/city_centre.jpg" alt="City Centers" />
+            <div class="caption">City Centers</div>
+        </div>
+        <div class="location-card">
+            <img src="image/home_parking.jpg" alt="Private Homes" />
+            <div class="caption">Private Homes</div>
+        </div>
+    </div>
+</section>
+
+<footer>
+    <div class="footer-links"> 
+        <a href="#">Terms of Service</a> | <a href="#">Privacy Policy</a> | <a href="#">Contact Us</a>
+    </div>    
+    <div class="footer-copy"> &copy; 2025 Parkchung. </div>
+</footer>
+
+<script src="scripts.js"></script>
+
+</body>
+</html>
