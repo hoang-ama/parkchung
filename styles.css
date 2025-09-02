@@ -108,30 +108,48 @@ header nav a {
 .search-box button:hover {
     background-color: #1f6f35;
 }
+
 .benefits {
-    max-width: 1200px;
-    margin: 40px auto 20px;
-    display: flex;
-    justify-content: space-around;
-    text-align: center;
-    gap: 20px;
+   max-width: 1200px;
+    margin: 20px auto 50px;
     padding: 0 20px;
 }
+.benefits h2 {
+    text-align: center;
+    color: #13b47e;
+    margin-bottom: 25px;
+}
+.benefit-items {
+    display: flex;
+    justify-content: center;
+    gap: 25px;
+    flex-wrap: wrap;
+}
+
 .benefit-item {
     background: white;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 6px 12px rgba(0,0,0,0.1);
-    flex: 1;
+    width: 300px;
+    /* height: 250px; */
+    border-radius: 10px;
+    box-shadow: 0 8px 16px rgb(0 0 0 / 0.1);
+    cursor: pointer;
+    overflow: hidden;
+    transition: transform 0.3s;
+
 }
 .benefit-item img {
-    width: 60px;
-    margin-bottom: 12px;
+    width: 100px;
+    margin: 10px 15px;
 }
+
 .benefit-item h3 {
-    margin: 10px 0 8px;
+    margin: 10px 15px;
     color: #2a9d48;
 }
+.benefit-item p {
+    margin: 10px 15px;
+}
+
 .locations {
     max-width: 1200px;
     margin: 20px auto 50px;
@@ -173,14 +191,16 @@ header nav a {
     text-align: center;
 }
 
+/* New section for car park management */
+
 .car-park-section {
   display: flex;
   align-items: center;
   justify-content: flex-start; /* Adjust to align content as needed */
-  min-height: 500px; /* Set a minimum height for the section */
+  min-height: 800px; /* Set a minimum height for the section */
   background-color: #f9f9f9; /* Light background color */
   padding: 50px;
-  background-image: url('parking_image.jpg'); /* Replace with your actual image URL */
+  background-image: url('image/parking_management_background.jpg'); /* Replace with your actual image URL */
   background-size: cover;
   background-position: center right; /* Position the image to the right */
   background-repeat: no-repeat;
@@ -189,13 +209,13 @@ header nav a {
 .content-container {
   max-width: 500px; /* Limit the width of the content */
   padding: 30px;
-  background-color: rgba(255, 255, 255, 0.9); /* Slightly transparent white background */
+  background-color: rgba(255, 255, 255, 0.7); /* Slightly transparent white background */
   border-radius: 5px;
 }
 
 .car-park-section h1 {
   font-size: 2.5em;
-  color: #008000; /* Green color for the heading */
+  color: #13b47e; /* Green color for the heading */
   margin-bottom: 20px;
 }
 
@@ -209,7 +229,7 @@ header nav a {
 .cta-button {
   display: inline-block;
   padding: 12px 25px;
-  background-color: #008000; /* Green color for the button */
+  background-color: #13b47e; /* Green color for the button */
   color: #fff;
   text-decoration: none;
   border-radius: 5px;
@@ -219,9 +239,40 @@ header nav a {
 }
 
 .cta-button:hover {
-  background-color: #006400; /* Darker green on hover */
+  background-color: #1f6f35; /* Darker green on hover */
 }
 
+/* New section for car rent space */
+
+.rent-space-section {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start; /* Adjust to align content as needed */
+  min-height: 800px; /* Set a minimum height for the section */
+  background-color: #f9f9f9; /* Light background color */
+  padding: 50px;
+  background-image: url('image/rent_space_background.jpg'); /* Replace with your actual image URL */
+  background-size: cover;
+  background-position: center right; /* Position the image to the right */
+  background-repeat: no-repeat;
+}
+
+.rent-space-section h1 {
+  font-size: 2.5em;
+  color: #13b47e; /* Green color for the heading */
+  margin-bottom: 20px;
+}
+
+.rent-space-section p {
+  font-size: 1.1em;
+  color: #333;
+  line-height: 1.6;
+  margin-bottom: 30px;
+}
+
+
+
+/* Footer styles */
 footer {
     background-color: #222;
     color: #ccc;
@@ -244,7 +295,7 @@ footer a {
         flex-direction: column;
         gap: 15px;
     }
-    .benefits, .location-cards {
+    .benefits, .location {
         flex-direction: column;
     }
 }
