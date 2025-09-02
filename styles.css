@@ -172,6 +172,56 @@ header nav a {
     color: #13b47e;
     text-align: center;
 }
+
+.car-park-section {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start; /* Adjust to align content as needed */
+  min-height: 500px; /* Set a minimum height for the section */
+  background-color: #f9f9f9; /* Light background color */
+  padding: 50px;
+  background-image: url('parking_image.jpg'); /* Replace with your actual image URL */
+  background-size: cover;
+  background-position: center right; /* Position the image to the right */
+  background-repeat: no-repeat;
+}
+
+.content-container {
+  max-width: 500px; /* Limit the width of the content */
+  padding: 30px;
+  background-color: rgba(255, 255, 255, 0.9); /* Slightly transparent white background */
+  border-radius: 5px;
+}
+
+.car-park-section h1 {
+  font-size: 2.5em;
+  color: #008000; /* Green color for the heading */
+  margin-bottom: 20px;
+}
+
+.car-park-section p {
+  font-size: 1.1em;
+  color: #333;
+  line-height: 1.6;
+  margin-bottom: 30px;
+}
+
+.cta-button {
+  display: inline-block;
+  padding: 12px 25px;
+  background-color: #008000; /* Green color for the button */
+  color: #fff;
+  text-decoration: none;
+  border-radius: 5px;
+  font-size: 1.1em;
+  font-weight: bold;
+  transition: background-color 0.3s ease;
+}
+
+.cta-button:hover {
+  background-color: #006400; /* Darker green on hover */
+}
+
 footer {
     background-color: #222;
     color: #ccc;
