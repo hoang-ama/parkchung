@@ -28,25 +28,34 @@
 </header>
 
 <section class="search-section">
-    <div class="search-box">
-        <h2>Parking made easy, wherever you go</h2>
-        <form id="searchForm">
-            <div class="form-group">
-                <label>Park at</label>
-                <input type="text" id="location" placeholder="Enter a place" required />
-            </div>
-             <div class="form-group"> 
-                <label for="start-datetime">From</label>
-                <input type="datetime-local" id="start-datetime" name="startDateTime" required />
-            </div>
-            <div class="form-group">
-                <label for="end-datetime">Until</label>
-                <input type="datetime-local" id="end-datetime"  name="endDateTime" required />
-            </div>
-
-            <button type="submit">Search</button>
-        </form>
-    </div>
+  <div class="search-box">
+    <form id="searchForm">
+      <div class="search-tabs">
+        <button type="button" class="tab active">Hourly/Daily</button>
+        <button type="button" class="tab">Monthly</button>
+        <button type="button" class="tab"><i class="fa-solid fa-plane"></i> Airport</button>
+      </div>
+      <div class="search-row">
+        <label for="location" class="search-label">Park at</label>
+        <div class="search-input-wrapper">
+          <input type="text" id="location" placeholder="Enter a place or postcode" required />
+          <span class="search-icon"><i class="fa fa-search"></i></span>
+        </div>
+      </div>
+      <div class="search-row date-row">
+        <div class="date-group">
+          <label for="start-datetime" class="search-label">From</label>
+          <input type="datetime-local" id="start-datetime" name="startDateTime" required />
+        </div>
+        <span class="arrow-icon"><i class="fa fa-arrow-right"></i></span>
+        <div class="date-group">
+          <label for="end-datetime" class="search-label">Until</label>
+          <input type="datetime-local" id="end-datetime" name="endDateTime" required />
+        </div>
+      </div>
+      <button type="submit" class="search-btn">Show parking spaces</button>
+    </form>
+  </div>
 </section>
 
 <section class="benefits">
@@ -116,7 +125,7 @@
             <p>
               <b><i>Parkchung, online parking platform</i></b>
             </p>
-            <p>Location: BK Alumni House </p>
+            <p>Add: BK Alumni House <br> Hanoi University of Science and Technology (HUST) <br> No. 1 Dai Co Viet street, Hanoi</p> 
             <p class="contact-line">
               <i class="fas fa-envelope"></i>&nbsp;<a
                 href="mailto:contact@parkchung.com"

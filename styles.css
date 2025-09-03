@@ -44,71 +44,157 @@ header nav a {
     text-decoration: none;
     font-weight: 500;
 }
+
 .search-section {
     background: url('image/Parking_slider.jpg') center/cover no-repeat;
     height: 700px; /* Changed */
     display: block;
-    align-items: center;
-    justify-content: center;
     padding: 20px;
+    position: relative;
 }
+
+/* Search Box */
+
 .search-box {
-    background: rgba(255,255,255,0.95);
-    padding: 25px;
-    border-radius: 8px;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.2);
-    max-width: 700px;
-    width: 100%;
-}
-.search-box h2 {
-    margin: 0 0 15px;
-    font-size: 28px;
-    color: #13b47e;
-}
-.search-box form {
-    display: flex;
-    gap: 15px;
-    flex-wrap: wrap;
+  background: #fff; /* White with slight transparency */
+  padding: 20px;
+  border-radius: 16px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+  max-width: 600px;
+  width: 100%;
+
+  position: absolute;
+  top: 30px;    /* Adjust as needed */
+  left: 40px;   /* Adjust as needed */
+  margin: 0;
 }
 
+.search-tabs {
+  display: flex;
+  gap: 0;
+  margin-bottom: 20px;
+}
 
-.form-group {
-  margin-bottom: 18px; /* Khoảng cách giữa các nhóm form */
+.search-tabs .tab {
+  flex: 1;
+  background: #f5faf6;
+  border: none;
+  padding: 15px 0;
+  font-size: 1.2em;
   font-family: 'Montserrat', sans-serif;
+  color: #222;
+  cursor: pointer;
+  border-radius: 10px 10px 0 0;
+  border-bottom: 3px solid transparent;
+  transition: background 0.2s, border-bottom 0.2s;
+  font-weight: 500;
 }
-.form-group input {
-  width: 100%;    
-  font-size: 1em;
+
+.search-tabs .tab.active {
+  background: #eaf7ec;
+  border-bottom: 3px solid #13b47e;
+  color: #222;
+}
+
+.search-tabs .tab i {
+  margin-right: 8px;
+  color: #13b47e;
+}
+
+.search-row {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 15px;
+}
+
+.search-label {
+  color: #13b47e;
+  font-size: 1.1em;
+  font-weight: 500;
+  margin-bottom: 5px;
+}
+
+.search-input-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.search-input-wrapper input[type="text"] {
+  width: 100%;
+  font-size: 1.3em;
   padding: 10px;
+  border: 1.5px solid #ddd;
+  border-radius: 8px;
   font-family: 'Montserrat', sans-serif;
-  border: 1px solid #bbb;
-  border-radius: 4px;
+  color: #222;
+  background: #fff;
+  box-sizing: border-box;
 }
 
-.form-group label {
-  font-weight: 500; /* Đậm hơn */
-  margin-bottom: 6px;
-  font-size: 1em;
-  display: block; /* Đảm bảo label luôn trên một dòng riêng */
-  color: #343a40;
+.search-icon {
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #13b47e;
+  font-size: 1.2em;
+  opacity: 0.7;
 }
 
-.search-box button {
-    background-color: #13b47e;
-    border: none;
-     width: 100%;    
-    color: white;
-    cursor: pointer;
-    padding: 5px 25px;
-    font-size: 1.2em;
-    border-radius: 4px;
-    transition: background-color 0.3s;
-    flex: 0 0 150px;
-}
-.search-box button:hover {
-    background-color: #1f6f35;
+.date-row {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 15px;
+  flex-direction: row; /* Ensure horizontal layout */
 }
 
+
+.date-group {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.date-group input[type="datetime-local"] {
+  width: 100%;
+  font-size: 1.1em;
+  padding: 10px 15px;
+  border: 1.5px solid #ddd;
+  border-radius: 8px;
+  font-family: 'Montserrat', sans-serif;
+  color: #222;
+  background: #fff;
+  box-sizing: border-box;
+}
+
+.arrow-icon {
+  font-size: 1.1em;
+  color: #bbb;
+  margin: 0px 0px;
+  padding-top: 25px; /* Align arrow vertically */
+}
+
+.search-btn {
+  width: 100%;
+  background: #13b47e;
+  color: #fff;
+  font-size: 1.1em;
+  font-family: 'Montserrat', sans-serif;
+  border: none;
+  border-radius: 10px;
+  padding: 12px 0;
+  margin-top: 10px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background 0.2s;
+}
+
+.search-btn:hover {
+  background: #1f6f35;
+}
+
+/* Benefits */
 .benefits {
    max-width: 1200px;
     margin: 20px auto 50px;
@@ -425,6 +511,38 @@ header nav a {
         flex-direction: column;
         gap: 15px;
     }
+    
+/* Responsive_Search box */
+  .search-box {
+    padding: 15px;
+    max-width: 85%; 
+  }
+  .search-tabs .tab {
+    font-size: 1em;
+    padding: 12px 0;
+  }
+  .search-row,
+  .date-row {
+    flex-direction: column;
+    gap: 10px;
+    align-items: stretch; /* Ensure full width inputs */
+    font-size: 1em;
+  }
+
+  .search-input-wrapper input[type="text"] {
+  font-size: 1em;
+}
+
+  .arrow-icon {
+    display: none;
+  }
+  .search-btn {
+    font-size: 1em;
+    padding: 12px 0;
+  }
+
+/* Benefits, Location */
+
     .benefits, .location {
         flex-direction: column;
     }
