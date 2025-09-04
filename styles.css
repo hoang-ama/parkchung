@@ -45,6 +45,13 @@ header nav a {
     font-weight: 500;
 }
 
+h2 {
+    text-align: center;
+    color: #13b47e;
+    padding: 25px 0 10px 0;
+    margin-bottom: 25px;
+}
+
 .search-section {
     background: url('image/Parking_slider.jpg') center/cover no-repeat;
     height: 700px; /* Changed */
@@ -200,11 +207,7 @@ header nav a {
     margin: 20px auto 50px;
     padding: 0 20px;
 }
-.benefits h2 {
-    text-align: center;
-    color: #13b47e;
-    margin-bottom: 25px;
-}
+
 .benefit-items {
     display: flex;
     justify-content: center;
@@ -241,11 +244,7 @@ header nav a {
     margin: 20px auto 50px;
     padding: 0 20px;
 }
-.locations h2 {
-    text-align: center;
-    color: #13b47e;
-    margin-bottom: 25px;
-}
+
 .location-cards {
     display: flex;
     justify-content: center;
@@ -300,7 +299,7 @@ header nav a {
 }
 
 .car-park-section h1 {
-  font-size: 2.5em;
+  font-size: 2em;
   color: #13b47e; /* Green color for the heading */
   margin-bottom: 20px;
 }
@@ -344,7 +343,7 @@ header nav a {
 }
 
 .rent-space-section h1 {
-  font-size: 2.5em;
+  font-size: 2em;
   color: #13b47e; /* Green color for the heading */
   margin-bottom: 20px;
 }
@@ -357,6 +356,168 @@ header nav a {
 }
 
 
+/* 7.Testimonials Section */
+.testimonials {
+  text-align: center;
+}
+
+.testimonials-slider {
+  /* Styles for your chosen slider library */
+  /* Example (for a basic flexbox slider): */
+  display: flex;
+  height: 300px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+  gap: 20px;
+}
+
+.testimonial-item {
+  width: 100%; /* Or a specific width */
+  min-width: 300px;
+  height: auto;
+  scroll-snap-align: start;
+  position: relative; /* Thêm dòng này */
+}
+
+.testimonial-image {
+  width: 100%;
+  height: 70%; /* Chiều cao cho phần ảnh */
+  overflow: hidden; /* Ẩn phần ảnh thừa */
+  background-color: rgb(145, 133, 131); /* Phủ cho phần Youtube */
+}
+
+.testimonial-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* Đảm bảo ảnh vừa vặn và không bị méo */
+}
+
+.testimonial-title {
+  font-size: 1em;
+  color: #333;
+  text-align: center;
+  position: absolute; /* Thêm dòng này */
+  left: 0;
+  right: 0;
+  padding: 10px; /* Khoảng cách bên trong */
+  /* background-color: rgba(255, 255, 255, 0.8); /* Màu nền trong suốt */
+  word-wrap: break-word; /* Cho phép xuống dòng */
+  overflow-wrap: anywhere; /* Thêm dòng này */
+  white-space: normal; /* Thêm dòng này để cho phép xuống dòng */
+  overflow: hidden; /* Ẩn phần chữ bị tràn */
+  max-height: 30%; /* Giới hạn chiều cao (tùy chỉnh) */
+}
+.testimonial-item iframe {
+  width: 100%; /* Chiều rộng 100% của khung */
+  height: auto; /* Chiều cao tự động */
+  aspect-ratio: 16 / 9; /* Tỉ lệ khung hình (tùy chọn) */
+}
+
+/* Thêm hiệu ứng hover (tùy chọn) */
+.testimonial-item:hover {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+  transition: all 0.2s ease-in-out;
+}
+
+/* Popup Styles */
+
+#popup-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
+    z-index: 9999;
+    justify-content: center;
+    align-items: center;
+}
+
+#popup {
+  display: flex;
+  background-color: white;
+  width: 90%;
+  max-width: 960px;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+  position: relative;
+  font-family: 'Montserrat', sans-serif;
+}
+
+#close-popup  {
+  position: absolute;
+  top: 12px;
+  right: 16px;
+  font-size: 24px;
+  color: black;
+  cursor: pointer;
+}
+
+/* Form Styles */
+
+.popup-left {
+  /* background-color: #0a686b; */
+  background: url('image/popup_background.png') no-repeat bottom/cover;
+  color: white;
+  width: 40%;
+  padding: 30px;
+}
+
+.popup-left h2 {
+  margin-top: 0;
+  color: white;
+}
+
+.popup-left ul {
+  padding: 0px 0px 20px 20px;
+}
+
+.popup-right {
+  width: 60%;
+  padding: 30px;
+  background-color: #fff;
+}
+.popup-right p {
+  margin-bottom: 12px;
+}
+.popup-right form {
+  display: flex;
+  flex-direction: column;
+}
+
+.popup-right input,
+.popup-right textarea {
+  margin-bottom: 12px;
+  padding: 10px;
+  font-size: 15px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-family: 'Montserrat', sans-serif;
+}
+
+.popup-right textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+.popup-right button {
+  background-color: #127d82;
+  color: white;
+  padding: 12px;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  border-radius: 4px;
+}
+.popup-right button:hover {
+  background-color: #0c5a5f; /* Màu nền nút khi hover */
+}
+
+
 /* --- Footer --- */
 .footer {
   background-color: #212529;
@@ -366,9 +527,9 @@ header nav a {
 }
 .footer-container {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
   gap: 30px;
-  max-width: 1200px;
+  max-width: 1500px;
   margin: 0 auto;
 }
 .footer-column h3 {
@@ -556,6 +717,19 @@ header nav a {
     justify-content: flex-start;
     margin-left: 0;
   }
+/* 7. Testimonials Section */
+    .testimonials-grid {
+    grid-template-columns: 1fr;
+  }
+
+  /* Popup Styles */
+    .popup-left {
+    display: none;
+  }
+  .popup-right {
+    width: 100%;
+  }
+
 }
 
 

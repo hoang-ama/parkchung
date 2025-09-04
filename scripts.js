@@ -1,26 +1,54 @@
+// File: scripts.js
 const googleSheetScriptURL = 'https://script.google.com/macros/s/AKfycbw3v7HA2uQ5anB9WByDtgZe2fa7cRm3WGG5ZFmblTwd8MyHg4nv5u7POLVZ4ZrdGcMLdg/exec'; 
+
+document.addEventListener('DOMContentLoaded', () => {
+    console.log("Parkchung Script Initializing... DOMContentLoaded.");
+
 
 document.getElementById('searchForm').addEventListener('submit', function(event) {
     event.preventDefault();
+    
     const location = document.getElementById('location').value.trim();
-    const startDate = document.getElementById('startDate').value;
-    const startTime = document.getElementById('startTime').value;
-    const endDate = document.getElementById('endDate').value;
-    const endTime = document.getElementById('endTime').value;
-
+    const startDateTime = document.getElementById('start-datetime').value;
+    const endDateTime = document.getElementById('end-datetime').value;
+  
     if (!location) {
         alert('Please enter a location.');
         return;
     }
 
-    if (new Date(startDate + 'T' + startTime) >= new Date(endDate + 'T' + endTime)) {
+    if (new Date(startDateTime) >= new Date(endDateTime)) {
         alert('End time must be after start time.');
         return;
     }
 
-    alert(`Searching parking spots at "${location}" from ${startDate} ${startTime} to ${endDate} ${endTime}.`);
+    alert(`Searching parking spots at "${location}" from ${startDateTime} to ${endDateTime}.`);
     // TODO: Redirect or make API call with search parameters
-        const subscribeForm = document.forms['email-subscription-form'];
+      // Thiết lập ngày mặc định start-datetime  end-datetime
+
+  if (startDateTime) {
+    startDateTime.value = getTomorrowDate();
+  }
+
+  function getTomorrowDate() {
+    const today = new Date();
+    const tomorrow = new Date(today);
+    tomorrow.setDate(today.getDate() + 1);
+    const year = tomorrow.getFullYear();
+    const month = String(tomorrow.getMonth() + 1).padStart(2, '0');
+    const day = String(tomorrow.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  }
+
+
+    // Nhập thông tin subscription và kiểm tra định dạnh email trong footer (email-subscription-form)
+
+     function validateEmail(email) {
+    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return re.test(email);
+  }
+     
+      const subscribeForm = document.forms['email-subscription-form'];
     if (subscribeForm) {
         subscribeForm.addEventListener('submit', e => { 
             e.preventDefault();
@@ -36,7 +64,7 @@ document.getElementById('searchForm').addEventListener('submit', function(event)
         });
     }
 
-     function sendSubscriptionEmailToGoogleSheet(email, form, button) { 
+    function sendSubscriptionEmailToGoogleSheet(email, form, button) { 
         const data = new FormData(); 
         data.append('timestamp', new Date().toISOString()); data.append('email', email); data.append('sheetName', 'Email'); 
         fetch(googleSheetScriptURL, { method: 'POST', body: data }) 
@@ -48,4 +76,18 @@ document.getElementById('searchForm').addEventListener('submit', function(event)
             .finally(() => { if(button) { button.disabled = false; button.textContent = "Sign-up"; }});
     }
     
+
+    // Testimonials slider
+  $(function () {
+    $('.testimonials-slider').slick({
+      slidesToShow: 1,
+      slidesToScroll: 1,
+      autoplay: true,
+      dots: true,
+      arrows: false
+    });
+  });
+    
+});
+
 });
