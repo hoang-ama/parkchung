@@ -276,7 +276,36 @@ h2 {
     text-align: center;
 }
 
-/* New section for car park management */
+/* New section for car rent space */
+
+.rent-space-section {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start; /* Adjust to align content as needed */
+  min-height: 800px; /* Set a minimum height for the section */
+  background-color: #f9f9f9; /* Light background color */
+  padding: 50px;
+  background-image: url('image/4_charging_Electrify_America.jpeg'); /* Replace with your actual image URL */
+  background-size: cover;
+  background-position: center right; /* Position the image to the right */
+  background-repeat: no-repeat;
+}
+
+.rent-space-section h1 {
+  font-size: 2em;
+  color: #13b47e; /* Green color for the heading */
+  margin-bottom: 20px;
+}
+
+.rent-space-section p {
+  font-size: 1.1em;
+  color: #333;
+  line-height: 1.6;
+  margin-bottom: 30px;
+}
+
+
+/* car park management */
 
 .car-park-section {
   display: flex;
@@ -285,7 +314,7 @@ h2 {
   min-height: 800px; /* Set a minimum height for the section */
   background-color: #f9f9f9; /* Light background color */
   padding: 50px;
-  background-image: url('image/parking_management_background.jpg'); /* Replace with your actual image URL */
+  background-image: url('image/vw-skyscraper-tower.jpg'); /* Replace with your actual image URL */
   background-size: cover;
   background-position: center right; /* Position the image to the right */
   background-repeat: no-repeat;
@@ -325,34 +354,6 @@ h2 {
 
 .cta-button:hover {
   background-color: #1f6f35; /* Darker green on hover */
-}
-
-/* New section for car rent space */
-
-.rent-space-section {
-  display: flex;
-  align-items: center;
-  justify-content: flex-start; /* Adjust to align content as needed */
-  min-height: 800px; /* Set a minimum height for the section */
-  background-color: #f9f9f9; /* Light background color */
-  padding: 50px;
-  background-image: url('image/rent_space_background.jpg'); /* Replace with your actual image URL */
-  background-size: cover;
-  background-position: center right; /* Position the image to the right */
-  background-repeat: no-repeat;
-}
-
-.rent-space-section h1 {
-  font-size: 2em;
-  color: #13b47e; /* Green color for the heading */
-  margin-bottom: 20px;
-}
-
-.rent-space-section p {
-  font-size: 1.1em;
-  color: #333;
-  line-height: 1.6;
-  margin-bottom: 30px;
 }
 
 
