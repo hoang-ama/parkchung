@@ -1,0 +1,65 @@
+[
+  {
+    "id": "spot-001",
+    "address": "Hanoi University of Science and Technology",
+    "details": "Spacious, covered and 24/7 camera surveillance. Suitable for both cars and motorbikes.",
+    "price": 30.000,
+    "available": true,
+    "image": "https://mediaen.vietnamplus.vn/images/ab05b313df53ef729df9a0e355ddf3cf8fcf7e4bf7e56c9080d13119994e8b1d/dhbk.jpg",
+    "googleMapUrl": "https://maps.app.goo.gl/9zS6P8zB2nK8m9m36"
+  },
+  {
+    "id": "spot-002",
+    "address": "Hoan Kiem Lake, Hanoi",
+    "details": "Located near Hoan Kiem Lake, convenient for moving to the city center.",
+    "price": 60.000,
+    "available": true,
+    "image": "image/parking-area_1.jpg",
+    "googleMapUrl": "https://maps.app.goo.gl/4Pj9sY1xQ7k6r7y8A"
+  },
+  {
+    "id": "spot-003",
+    "address": "Vincom Center",
+    "details": "Prime location in the commercial center. Equipped with EV charging station.",
+    "price": 50.000,
+    "available": false,
+    "image": "image/4_charging_Electrify_America.jpeg",
+    "googleMapUrl": "https://maps.app.goo.gl/f7h8j9kL2m3n4o5p6"
+  },
+  {
+    "id": "spot-004",
+    "address": "Noi Bai International Airport",
+    "details": "Parking at Noi Bai airport, just 5 minutes walk from the terminal. Door-to-door shuttle service.",
+    "price": 70.000,
+    "available": true,
+    "image": "image/airport.png",
+    "googleMapUrl": "https://maps.app.goo.gl/yY3wWz1xXy4vU6aB7"
+  },
+  {
+    "id": "spot-005",
+    "address": "Private Home Parking, Tay Ho",
+    "details": "Safe, quiet parking in private grounds. Security guard and private entrance.",
+    "price": 30.000,
+    "available": true,
+    "image": "image/home_parking.jpg",
+    "googleMapUrl": "https://maps.app.goo.gl/qR8tY6uL8m9oK2j3p"
+  },
+  {
+    "id": "spot-006",
+    "address": "Keangnam Hanoi Landmark Tower",
+    "details": "Modern parking at central office buildings. Convenient, clean.",
+    "price": 50.000,
+    "available": true,
+    "image": "image/city_centre.jpg",
+    "googleMapUrl": "https://maps.app.goo.gl/pL2n3m4k5j6h7f8d"
+  },
+   { 
+    "id": "spot-007",
+    "address": "Hanoi University of Science and Technology",
+    "details": "Near university main gate, convenient for students.",
+    "price": 50.000,
+    "available": false,
+    "image": "image/city_centre.jpg",
+    "googleMapUrl": "https://maps.app.goo.gl/pL2n3m4k5j6h7f8d"
+}
+]
