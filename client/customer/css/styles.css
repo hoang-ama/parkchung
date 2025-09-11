@@ -314,7 +314,7 @@ h2 {
   min-height: 800px; /* Set a minimum height for the section */
   background-color: #f9f9f9; /* Light background color */
   padding: 50px;
-  background-image: url('../../assets/image/vw-skyscraper-tower.jpg'); /* Replace with your actual image URL */
+  background-image: url('../..//image/vw-skyscraper-tower.jpg'); /* Replace with your actual image URL */
   background-size: cover;
   background-position: center right; /* Position the image to the right */
   background-repeat: no-repeat;
