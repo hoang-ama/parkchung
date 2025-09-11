@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />   
+    <meta name="description" content="Parkchung - Your online parking platform for easy and eco-friendly parking solutions." />  
+    <title>Parking Details - Parkchung</title>
+    <link rel="icon" type="image/png" href="logo/favicon.png" />
+    <link rel="stylesheet" href="styles.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"/>
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <a href="index.html"> <img src="logo/logo.svg" alt="Parkchung Logo" /> </a>
+            <div>
+                <h1>PARKCHUNG</h1>
+                <p class="tagline">Save time. Save money. Save Earth</p>
+            </div>
+        </div>
+        <nav>
+            <a href="#">Find Parking</a>
+            <a href="#">Become a Host</a>
+            <a href="#">Login</a>
+        </nav>
+    </header>
+
+
+    <main>
+        <section class="spot-details-section">
+            <div class="container">
+                <div id="spot-info">
+                    </div>
+
+                <div class="booking-form">
+                    <h3>Book this space now</h3>
+                    <form id="bookingForm">
+                        <label for="name">Full name:</label>
+                        <input type="text" id="name" name="name" required>
+
+                        <label for="email">Email:</label>
+                        <input type="email" id="email" name="email" required>
+
+                        <button type="submit">Submit</button>
+                    </form>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script src="spot-details-script.js"></script>
+</body>
+</html>

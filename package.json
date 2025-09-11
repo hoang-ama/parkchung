@@ -1,0 +1,26 @@
+{
+  "name": "parkchung",
+  "version": "1.0.0",
+  "description": "ParkChung is the online parking space marketplace (platform) where individuals or businesses can list and rent out their available parking spots.",
+  "main": "popup-script.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hoang-ama/parkchung.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/hoang-ama/parkchung/issues"
+  },
+  "homepage": "https://github.com/hoang-ama/parkchung#readme",
+  "dependencies": {
+    "express": "^5.1.0",
+    "nodemon": "^3.1.10"
+  }
+}

@@ -1,9 +1,9 @@
 // File: scripts.js
 const googleSheetScriptURL = 'https://script.google.com/macros/s/AKfycbw3v7HA2uQ5anB9WByDtgZe2fa7cRm3WGG5ZFmblTwd8MyHg4nv5u7POLVZ4ZrdGcMLdg/exec'; 
+const API_BASE_URL = 'http://localhost:3000/api'; // Đường dẫn đến backend của bạn
 
 document.addEventListener('DOMContentLoaded', () => {
     console.log("Parkchung Script Initializing... DOMContentLoaded.");
-
 
 document.getElementById('searchForm').addEventListener('submit', function(event) {
     event.preventDefault();
@@ -22,26 +22,12 @@ document.getElementById('searchForm').addEventListener('submit', function(event)
         return;
     }
 
-    alert(`Searching parking spots at "${location}" from ${startDateTime} to ${endDateTime}.`);
-    // TODO: Redirect or make API call with search parameters
-      // Thiết lập ngày mặc định start-datetime  end-datetime
-
-  if (startDateTime) {
-    startDateTime.value = getTomorrowDate();
-  }
-
-  function getTomorrowDate() {
-    const today = new Date();
-    const tomorrow = new Date(today);
-    tomorrow.setDate(today.getDate() + 1);
-    const year = tomorrow.getFullYear();
-    const month = String(tomorrow.getMonth() + 1).padStart(2, '0');
-    const day = String(tomorrow.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
-  }
+    // Redirect to results page with search parameters
+    window.location.href = `results.html?location=${encodeURIComponent(location)}&startDateTime=${startDateTime}&endDateTime=${endDateTime}`;
+});
 
 
-    // Nhập thông tin subscription và kiểm tra định dạnh email trong footer (email-subscription-form)
+// Nhập thông tin subscription và kiểm tra định dạnh email trong footer (email-subscription-form)
 
      function validateEmail(email) {
     const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -88,6 +74,4 @@ document.getElementById('searchForm').addEventListener('submit', function(event)
     });
   });
     
-});
-
 });
