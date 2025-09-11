@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />   
+    <meta name="description" content="Parkchung - Your online parking platform for easy and eco-friendly parking solutions." />  
+    <title>Parkchung, online parking platform</title>
+    <link rel="icon" type="image/png" href="client/assets/logo/favicon.png" />
+    <link rel="stylesheet" href="css/styles.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"/>
+</head>
+<body>
+
+      <!-- Add Popup sau 60s nếu ko có action thì hiện ra form popup -->
+    <div id="popup-overlay">     <!-- Add Popup overlay -->
+        <div id="popup">
+            <span id="close-popup">&times;</span>    <!-- &times = Dau X-->
+        </div>    
+    </div>    
+
+ <!-- 1.Header Section -->    
+<header>
+    <div class="logo">
+        <img src="../../client/assets/logo/logo.svg" alt="Parkchung Logo" />
+        <div>
+            <h1>PARKCHUNG</h1>
+            <p class="tagline">Save time. Save money. Save Earth</p>
+        </div>
+    </div>
+    <nav>
+        <a href="#">Find Parking</a>
+        <a href="#">Become a Host</a>
+        <a href="#">Login</a>
+    </nav>
+</header>
+
+<!-- 2.Slider/ Search Section -->    
+<section class="search-section">
+  <div class="search-box">
+    <form id="searchForm">
+      <div class="search-tabs">
+        <button type="button" class="tab active">Hourly/Daily</button>
+        <button type="button" class="tab">Monthly</button>
+        <button type="button" class="tab"><i class="fa-solid fa-plane"></i> Airport</button>
+      </div>
+      <div class="search-row">
+        <label for="location" class="search-label">Park at</label>
+        <div class="search-input-wrapper">
+          <input type="text" id="location" placeholder="Enter a place or postcode" required />
+          <span class="search-icon"><i class="fa fa-search"></i></span>
+        </div>
+      </div>
+      <div class="search-row date-row">
+        <div class="date-group">
+          <label for="start-datetime" class="search-label">From</label>
+          <input type="datetime-local" id="start-datetime" name="startDateTime" required />
+        </div>
+        <span class="arrow-icon"><i class="fa fa-arrow-right"></i></span>
+        <div class="date-group">
+          <label for="end-datetime" class="search-label">Until</label>
+          <input type="datetime-local" id="end-datetime" name="endDateTime" required />
+        </div>
+      </div>
+      <button type="submit" class="search-btn">Show parking spaces</button>
+    </form>
+  </div>
+</section>
+
+<!-- 3. Benifits Section -->   
+
+<section class="benefits">
+    <h2>Why Parkchung</h2>
+    <div class="benefit-items"> 
+        <div class="benefit-item">
+            <!-- <img src="https://img.icons8.com/fluency/48/000000/time.png" alt="Save Time" /> -->
+            <img src="../assets/image/save_time.jpg" alt="Save Time" />
+            <h3>Save Time</h3>
+            <p>Book your parking spot in advance, no more endless searching.</p>
+        </div>
+        <div class="benefit-item">
+            <!--   <img src="https://img.icons8.com/fluency/48/000000/money-bag.png" alt="Transparent Pricing" />  -->
+            <img src="../../client/assets/image/price-tag.png" alt="Transparent Pricing" />
+            <h3>Transparent Pricing</h3>
+            <p>Clear pricing, no surprises when you book.</p>
+        </div>
+        <div class="benefit-item">
+              <!--   <img src="https://img.icons8.com/fluency/48/000000/security-checked.png" alt="Safe Parking" />  -->
+            <img src="../assets/image/parking-area.jpg" alt="Safe Parking" />
+            <h3>Safe Parking</h3>
+            <p>Secure spots monitored with security systems.</p>
+        </div>
+    </div>
+</section>
+
+<!-- 4. Location Section -->   
+
+<section class="locations">
+    <h2>Featured Locations</h2>
+    <div class="location-cards">
+        <div class="location-card">
+            <img src="../assets/image/airport.png" alt="Airports" />
+            <div class="caption">Airports</div>
+        </div>
+        <div class="location-card">
+            <img src="../assets/image/city_centre.jpg" alt="City Centers" />
+            <div class="caption">City Centers</div>
+        </div>
+        <div class="location-card">
+            <img src="../assets/image/home_parking.jpg" alt="Private Homes" />
+            <div class="caption">Private Homes</div>
+        </div>
+    </div>
+</section>
+
+<!-- 5. Private Park Section -->   
+
+<section class="rent-space-section">
+  <div class="content-container">
+    <h1>Rent out your parking or EV charging space</h1>
+    <p>Make easy tax free money by renting out your parking or EV charging space. It‘s free to list and only takes a few minutes to get up and running.</p>
+    <a href="#" class="cta-button">Learn how to earn today</a>
+  </div>
+</section>
+
+<!-- 6. Park Management Section -->   
+
+<section class="car-park-section">
+  <div class="content-container">
+    <h1>Car park management</h1>
+    <p>Maximise yield from underused car parks and vacant land, or transform payments with the favourite parking app.</p>
+    <a href="#" class="cta-button">Learn about our solutions</a>
+  </div>
+</section>
+
+ <!--7. Testimonials Section -->
+
+    <section class="testimonials">
+        <h2 style="text-align: center;">The press talks about us</h2>
+        <div class="testimonials-slider">
+            <div class="testimonial-item">
+                <a href="https://congthuong.vn/7-startup-viet-xuat-sac-tranh-tai-tai-vong-chung-ket-quoc-gia-vietchallenge-2019-121720-121720.html" target="_blank">
+                    <div class="testimonial-image">
+                        <img src="../assets/image/vietchallange.jpg" alt="Chungxe in Vietchallenge 2019 Finals">
+                    </div>    
+                    <p class="testimonial-title">Chungxe in Vietchallenge 2019 Finals</p>
+                </a>   
+            </div>
+            <div class="testimonial-item">
+                <a href="https://startup.vnexpress.net/tin-tuc/y-tuong-moi/doanh-nhan-8x-va-nen-tang-truc-tuyen-chia-se-xe-tu-lai-3833028.html" target="_blank">
+                    <div class="testimonial-image">
+                        <img src="../assets/image/vnexpress.jpg" alt="8x Entrepreneur and car-sharing platform_Startup VnExpress">
+                    </div>    
+                    <p class="testimonial-title">8x Entrepreneur and car-sharing platform_Startup VnExpress</p>
+                </a>
+            </div>
+            <div class="testimonial-item">
+                <a href="https://cafebiz.vn/y-tuong-bookingcom-trong-linh-vuc-cho-thue-xe-o-to-dat-giai-nhat-cuoc-thi-lap-trinh-ve-giao-thong-thong-minh-20180717153509249.chn" target="_blank">
+                    <div class="testimonial-image"> 
+                        <img src="../assets/image/cafebiz.jpg" alt="Booking.com idea on car rental">
+                    </div>       
+                    <p class="testimonial-title">Booking.com idea on car rental</p>
+                </a>
+            </div>
+            <div class="testimonial-item">
+                <a href="https://en.lightup.vn/chungxe-lot-vao-vong-chung-ket-hist-2018/" target="_blank">
+                    <div class="testimonial-image"> 
+                        <img src="../assets/image/HIST.png" alt="Chungxe in HIST 2018 Finals">
+                    </div>    
+                    <p class="testimonial-title">Chungxe in HIST 2018 Finals</p>
+                </a>
+            </div>
+            <div class="testimonial-item">
+                <a href="https://startup.vnexpress.net/tin-tuc/hanh-trinh-khoi-nghiep/cong-bo-top-15-du-an-vao-vong-thuyet-trinh-startup-viet-2018-3834533-p2.html" target="_blank">
+                    <div class="testimonial-image"> 
+                        <img src="../assets/image/startupviet.jpg" alt="Chungxe in Top 15 Startup Vietnam 2018">
+                    </div>    
+                    <p class="testimonial-title">Chungxe in Top 15 Startup Vietnam 2018</p>
+                </a>
+            </div>
+            <div class="testimonial-item">
+                <a href="https://youtu.be/bSPLLnOvPEs" target="_blank">
+                    <div class="testimonial-image"> 
+                        <iframe src="https://www.youtube.com/embed/bSPLLnOvPEs" title="Startup Coffee VTV1 - Chungxe car-sharing App" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+                    </div>    
+                    <p class="testimonial-title">Chungxe, car-sharing platform</p>
+                </a>
+            </div>
+        </div> 
+    </section>
+
+
+<!-- Footer Section -->   
+
+   <footer class="footer">
+        <div class="footer-container">
+          <div class="footer-column">
+            <h3>CONTACT</h3>
+            <p>
+              <b><i>Parkchung, online parking platform</i></b>
+            </p>
+            <p>Add: BK Alumni House, <br> Hanoi University of Science and Technology, <br> No. 1 Dai Co Viet street, Hanoi</p> 
+            <p class="contact-line">
+              <i class="fas fa-envelope"></i>&nbsp;<a
+                href="mailto:contact@parkchung.com"
+                >contact@parkchung.com</a
+              >
+            </p>
+            <p class="contact-line">
+              <i class="fas fa-phone"></i>&nbsp;<a href="tel:0903229906"
+                >0903.229.906 (8:00 AM - 9:00 PM)</a
+              >
+            </p>
+            <div class="social-icons">
+              <a href="#" target="_blank"
+                ><img src="../assets/image/facebookicon.png" alt="Facebook"
+              /></a>
+              <a href="#" target="_blank"
+                ><img
+                  src="../assets/image/youtube-20200619043955.png"
+                  alt="Youtube"
+              /></a>
+              <a href="#" target="_blank"
+                ><img src="../assets/image/linkedin.png" alt="Linkedin"
+              /></a>
+              <a href="#" target="_blank"
+                ><img src="../assets/image/twitter.png" alt="Twitter"
+              /></a>
+            </div>
+          </div>
+          <div class="footer-column">
+            <h3>INTRODUCTION</h3>
+            <a href="#">About Us</a>
+            <div class="email-subscription">
+              <form name="email-subscription-form" class="subscribe-form">
+                <p>Subscribe to receive promotions</p>
+                <div class="subscribe-wrapper">
+                  <input
+                    type="email"
+                    id="subscriber-email"
+                    name="email"
+                    placeholder="Enter your email..."
+                    class="subscribe-input"
+                    required
+                  />
+                  <button type="submit" class="subscribe-button">
+                    Sign-up
+                  </button>
+                </div>
+              </form>
+            </div>
+            <a
+              href="http://online.gov.vn/Home/WebDetails/80805?AspxAutoDetectCookieSupport=1"
+              target="_blank"
+              style="margin-top: 15px; display: inline-block"
+            >
+              <img
+                src="../../client/assets/image/tmdtlogo.png"
+                alt="E-commerce Registered"
+                style="height: 50px"
+              />
+            </a>
+          </div>
+          <div class="footer-column">
+            <h3>POLICIES</h3>
+            <a href="#">Privacy Policy</a>
+            <a href="#">Service Regulations</a>
+            <a href="#">Incidents & Complaints</a>
+            <a href="#">Become a Host</a>
+          </div>
+          <div class="footer-column">
+            <h3>SUPPORT</h3>
+            <a href="#">Parking Booking Guide</a>
+            <a href="#">Parking Listing Guide</a>
+            <a href="#">FAQs</a>
+            <a href="#">Blog</a>
+          </div>
+        </div>
+        <div class="footer-bottom">
+          <p>Copyright &copy; 2025 by Parkchung. All rights reserved.</p>
+        </div>
+      </footer>
+
+<!-- ANNEX: FLOATING BUTTONS -->    
+
+    <div class="floating-buttons">
+      <a
+        href="tel:0903229906"
+        class="floating-button call-button"
+        title="Call now"
+      >
+        <img src="../assets/image/phone-icon.svg" alt="Call now" />
+      </a>
+      <a
+        href="https://zalo.me/0903229906"
+        class="floating-button zalo-button"
+        title="Chat with us via Zalo"
+      >
+        <img src="../assets/image/zalo-icon.svg" alt="Chat with us via Zalo" />
+      </a>
+    </div>
+
+<script src="../customer/js/scripts.js"></script>
+<script src="../customer/js/popup-script.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ParkChung Admin Dashboard</title>
+    <link rel="stylesheet" href="../css/admin.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"/>
+</head>
+<body>
+    <div class="admin-panel">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2><i class="fas fa-shield-alt"></i> ParkChung Admin</h2>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="#" class="nav-item active" data-section="dashboard"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+                <a href="#" class="nav-item" data-section="users"><i class="fas fa-users"></i> Users</a>
+                <a href="#" class="nav-item" data-section="spots"><i class="fas fa-parking"></i> Parking Spots</a>
+                <a href="#" class="nav-item" data-section="bookings"><i class="fas fa-book"></i> Bookings</a>
+                <a href="#" id="logout-btn" class="nav-item"><i class="fas fa-sign-out-alt"></i> Logout</a>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <header class="main-header">
+                <h1>Welcome, Admin!</h1>
+            </header>
+            <div id="content-area">
+                </div>
+        </main>
+    </div>
+
+    <script src="../js/admin-scripts.js"></script>
+</body>
+</html>
