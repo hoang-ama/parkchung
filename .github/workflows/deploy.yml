@@ -3,7 +3,7 @@ name: Deploy to Google Cloud Storage
 on:
   push:
     branches:
-      - development
+    - main
 
 jobs:
   deploy:
