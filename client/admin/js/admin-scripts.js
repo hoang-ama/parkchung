@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const API_URL = 'http://localhost:5000/api'; // URL của backend
+    const API_URL = 'http://localhost:3001/api'; // URL của backend
     const token = localStorage.getItem('adminToken');
 
     // Kiểm tra xem đang ở trang nào

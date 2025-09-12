@@ -1,4 +1,3 @@
-// Tải các biến môi trường từ file .env
 require('dotenv').config();
 
 const config = {
