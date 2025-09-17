@@ -1,10 +1,8 @@
-// File: client/customer/js/create-spot.js
 import { api } from './apiService.js';
 
 document.addEventListener('DOMContentLoaded', () => {
-    // --- Lấy các phần tử DOM ---
+   // --- Get DOM elements ---
     const createSpotForm = document.getElementById('create-spot-form');
-    // Kiểm tra xem có đúng là trang create-spot không
     if (!createSpotForm) {
         return;
     }
@@ -15,14 +13,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const longitudeInput = document.getElementById('longitude');
     const latitudeInput = document.getElementById('latitude');
 
-    // --- 1. KIỂM TRA ĐĂNG NHẬP ---
+   // check login
     if (!localStorage.getItem('userToken')) {
         alert('You must be logged in to list a spot.');
         window.location.href = `login.html?redirect=create-spot.html`;
         return;
     }
 
-    // --- 2. LOGIC LẤY VỊ TRÍ HIỆN TẠI ---
+    // logic get current location
     if (getLocationBtn) {
         getLocationBtn.addEventListener('click', () => {
             if (!("geolocation" in navigator)) {
@@ -51,8 +49,7 @@ document.addEventListener('DOMContentLoaded', () => {
             );
         });
     }
-
-    // --- 3. LOGIC XỬ LÝ SUBMIT FORM ---
+    // --- 3. SUBMIT FORM PROCESSING LOGIC ---
     createSpotForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         errorMessage.textContent = '';
@@ -60,7 +57,7 @@ document.addEventListener('DOMContentLoaded', () => {
         submitButton.textContent = 'Submitting...';
 
         try {
-            // Tạo đối tượng FormData để gửi cả text và file
+            // Create a FormData object to send both text and file
             const formData = new FormData();
             formData.append('address', document.getElementById('address').value);
             formData.append('longitude', longitudeInput.value);
@@ -73,7 +70,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             formData.append('spotImage', imageFile);
 
-            // Gọi API
+            // call API
             await api.createSpot(formData);
             
             alert('Spot submitted successfully! It will be visible after admin approval.');
@@ -81,7 +78,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
         } catch (error) {
             errorMessage.textContent = `Error: ${error.message}`;
-            // Kích hoạt lại nút nếu có lỗi
             submitButton.disabled = false;
             submitButton.textContent = 'Submit for Review';
         }

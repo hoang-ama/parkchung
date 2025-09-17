@@ -1,10 +1,9 @@
-// File: client/customer/js/app.js
 document.addEventListener('DOMContentLoaded', () => {
     const nav = document.querySelector('header nav');
     const userData = JSON.parse(localStorage.getItem('userData'));
 
     if (userData) {
-        // Nếu người dùng đã đăng nhập, hiển thị menu đầy đủ
+        // If the user is logged in, show the full menu
         nav.innerHTML = `
             <a href="create-spot.html" style="text-decoration: none; color: #13b47e; font-weight: 500;">Become a Host</a>
             <a href="my-bookings.html" style="text-decoration: none; color: #13b47e; font-weight: 500; margin-left: 15px;">My Bookings</a>
@@ -22,7 +21,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         });
     } else {
-        // Nếu chưa đăng nhập, hiển thị menu mặc định
+       // If not logged in, show default menu
         nav.innerHTML = `
             <a href="register.html">Become a Host / Register</a>
             <a href="login.html">Login</a>

@@ -1,72 +1,128 @@
-ParkChung is the online parking space marketplace (platform) where individuals or businesses can list and rent out their available parking spots.
+Chắc chắn rồi\! Dựa trên toàn bộ hành trình xây dựng dự án ParkChung của chúng ta, từ ý tưởng ban đầu đến một ứng dụng full-stack hoàn chỉnh, tôi đã tạo ra một tệp `README.md` chi tiết, chuyên nghiệp và đẹp mắt.
 
-📋 Cấu trúc file và thư mục đầy đủ:
+Bạn có thể sao chép toàn bộ nội dung dưới đây và dán vào tệp `README.md` ở thư mục gốc của dự án.
+
+-----
+
+# 🅿️ ParkChung - Nền tảng Chia sẻ & Đặt chỗ Bãi đỗ xe
+
+**ParkChung** là một ứng dụng web full-stack được xây dựng để giải quyết vấn đề tìm kiếm và quản lý bãi đỗ xe tại các đô thị Việt Nam. Nền tảng cho phép các chủ xe (host) đăng ký và cho thuê các điểm đỗ xe chưa sử dụng, đồng thời giúp người lái xe (user) dễ dàng tìm kiếm, đặt chỗ và thanh toán một cách nhanh chóng.
+
+*Khẩu hiệu: Save time. Save money. Save Earth.*
+
+## ✨ Tính năng nổi bật
+
+### Cho Người tìm chỗ đỗ (User)
+
+  * **Tìm kiếm thông minh:** Tìm kiếm bãi đỗ theo địa chỉ với danh sách gợi ý tự động.
+  * **Kết quả trực quan:** Xem danh sách các bãi đỗ có sẵn với hình ảnh, địa chỉ và giá cả rõ ràng.
+  * **Đặt chỗ dễ dàng:** Chọn thời gian và xác nhận đặt chỗ chỉ trong vài cú nhấp chuột.
+  * **Quản lý lịch sử:** Xem lại tất cả các lượt đặt chỗ đã và đang diễn ra trong trang "My Bookings".
+  * **Xác thực an toàn:** Hệ thống đăng ký, đăng nhập bảo mật bằng JWT.
+
+### Cho Chủ xe (Host)
+
+  * **Đăng ký bãi đỗ:** Dễ dàng đăng thông tin bãi đỗ của bạn qua một biểu mẫu thông minh.
+  * **Lấy vị trí tự động:** Tự động lấy tọa độ chính xác bằng Geolocation API của trình duyệt.
+  * **Tải ảnh:** Tải ảnh bãi đỗ trực tiếp lên dịch vụ cloud (Cloudinary) để tăng tính tin cậy.
+
+### Cho Quản trị viên (Admin)
+
+  * **Dashboard tổng quan:** Theo dõi các chỉ số quan trọng của hệ thống (tổng số người dùng, bãi đỗ, lượt đặt chỗ).
+  * **Quản lý toàn diện:** Xem, quản lý danh sách người dùng, bãi đỗ và lịch sử đặt chỗ.
+  * **Phê duyệt nội dung:** Kiểm duyệt và phê duyệt các bãi đỗ xe mới do chủ xe đăng lên để đảm bảo chất lượng.
+
+## 🚀 Công nghệ sử dụng
+
+| Hạng mục | Công nghệ |
+| :--- | :--- |
+| **Frontend** | HTML5, CSS3, JavaScript (ES6+), Flatpickr.js |
+| **Backend** | Node.js, Express.js |
+| **Database** | MongoDB (với Mongoose ODM) |
+| **Xác thực** | JSON Web Token (JWT) |
+| **Upload Ảnh** | Multer, Cloudinary |
+
+## 🏗️ Cấu trúc Thư mục
+
+Dự án được tổ chức theo cấu trúc client-server rõ ràng, dễ dàng bảo trì và mở rộng.
+
+```
 parkchung/
-├── client/                     # Thư mục chứa toàn bộ code frontend
-│   ├── assets/                 # Các file tĩnh như hình ảnh, font, v.v.
-│   │   ├── images/
-│   │   ├── logos/
-│   │   └── fonts/
-│   │
-│   ├── customer/               # Code frontend cho trang khách hàng
-│   │   ├── css/                # Style sheets
-│   │   │   └── main.css
-│   │   │
-│   │   ├── js/                 # JavaScript logic
-│   │   │   ├── scripts.js
-│   │   │   └── popup-script.js
-│   │   │
-│   │   └── html/               # Các trang HTML
-│   │       ├── index.html
-│   │       ├── results.html        # Trang hiển thị kết quả tìm kiếm
-│   │       └── spot-details.html   # Trang chi tiết chỗ đậu xe
-│   │
-│   └── admin/                  # Code frontend cho trang admin
+├── client/                     # Mã nguồn Frontend
+│   ├── admin/                  # Giao diện trang quản trị
+│   └── customer/               # Giao diện cho khách hàng
 │       ├── css/
-│       │   └── admin.css
-│       │
 │       ├── js/
-│       │   └── admin-scripts.js
-│       │
-│       └── html/
-│           ├── login.html
-│           └── dashboard.html      # Trang chính của Admin
-│
-├── server/                     # Thư mục chứa toàn bộ code backend (Node.js)
-│   ├── src/                    # Thư mục chính của source code
-│   │   ├── config/             # Cấu hình dự án
-│   │   │   └── index.js
-│   │   │
-│   │   ├── controllers/        # Logic xử lý chính cho các routes
-│   │   │   ├── adminController.js
-│   │   │   ├── authController.js
-│   │   │   ├── bookingsController.js
-│   │   │   └── spotsController.js
-│   │   │
-│   │   ├── models/             # Định nghĩa các schema cho cơ sở dữ liệu
-│   │   │   ├── Booking.js
-│   │   │   ├── ParkingSpot.js
-│   │   │   └── User.js
-│   │   │
-│   │   ├── routes/             # Định nghĩa các API endpoints
-│   │   │   ├── adminRoutes.js
-│   │   │   ├── authRoutes.js
-│   │   │   ├── bookingsRoutes.js
-│   │   │   └── spotsRoutes.js
-│   │   │
-│   │   ├── services/           # Logic nghiệp vụ phức tạp
-│   │   │   ├── emailService.js
-│   │   │   └── paymentService.js
-│   │   │
-│   │   ├── utils/              # Các hàm tiện ích dùng chung
-│   │   │   └── helpers.js
-│   │   │
-│   │   └── app.js              # File chính để khởi tạo ứng dụng Express
-│   │
-│   ├── .env                    # File chứa các biến môi trường
-│   ├── .gitignore              # File để bỏ qua các thư mục và file không cần thiết
-│   ├── package.json            # Danh sách các dependencies và scripts
-│   └── server.js               # File khởi động server
-│
-├── .gitignore                  # File .gitignore ở root để bỏ qua cả node_modules của frontend và backend
+│       └── *.html
+│   └── assets/                 # Tài nguyên tĩnh (ảnh, logo)
+├── server/                     # Mã nguồn Backend (Node.js)
+│   ├── src/
+│   │   ├── config/
+│   │   ├── controllers/
+│   │   ├── middlewares/
+│   │   ├── models/
+│   │   ├── routes/
+│   │   └── services/
+│   ├── .env                    # File biến môi trường
+│   └── package.json
+├── .github/
+│   └── workflows/
+│       └── deploy.yml          # Cấu hình GitHub Actions cho Frontend
+├── .gitignore
 └── README.md
+```
+
+*(Để xem chi tiết, hãy tham khảo các file trong repo)*
+
+## 🛠️ Hướng dẫn Cài đặt & Chạy Local
+
+**Yêu cầu:**
+
+  * Node.js (v16 trở lên)
+  * npm
+  * MongoDB (Cài đặt local hoặc sử dụng tài khoản MongoDB Atlas)
+  * VS Code với tiện ích "Live Server"
+
+### 1\. Backend
+
+```bash
+# 1. Đi đến thư mục server
+cd server/
+
+# 2. Cài đặt các gói phụ thuộc
+npm install
+
+# 3. Tạo file .env và điền thông tin
+# (Xem lại các hướng dẫn trước để có cấu trúc file .env hoàn chỉnh)
+PORT=3001
+MONGODB_URI=your_mongodb_connection_string
+JWT_SECRET=your_jwt_secret
+CLOUDINARY_CLOUD_NAME=your_cloudinary_name
+CLOUDINARY_API_KEY=your_cloudinary_api_key
+CLOUDINARY_API_SECRET=your_cloudinary_api_secret
+
+# 4. Chạy server ở chế độ development
+npm run dev
+```
+
+Server sẽ chạy tại `http://localhost:3001`.
+
+### 2\. Frontend
+
+1.  Mở toàn bộ thư mục `parkchung/` bằng VS Code.
+2.  Đi đến tệp `client/customer/index.html`.
+3.  Nhấp chuột phải và chọn **"Open with Live Server"**.
+4.  Trang web sẽ được mở trong trình duyệt, thường ở địa chỉ `http://127.0.0.1:5500`.
+
+## 🔮 Lộ trình Phát triển Tương lai
+
+  * **v1.1:**
+      * [ ] Tích hợp Cổng thanh toán (MoMo, VnPay).
+      * [ ] Hiển thị kết quả tìm kiếm trên Bản đồ tương tác (Google Maps API).
+      * [ ] Xây dựng hệ thống Đánh giá & Bình luận cho các bãi đỗ.
+  * **v1.2:**
+      * [ ] Cho phép Host quản lý Lịch trống (Availability Calendar).
+      * [ ] Thêm Bộ lọc Tìm kiếm Nâng cao (có mái che, loại xe,...).
+  * **v2.0:**
+      * [ ] Xây dựng Dashboard báo cáo Doanh thu cho Host.
+      * [ ] Hoàn thiện quy trình CI/CD để tự động deploy cả backend.

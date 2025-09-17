@@ -47,7 +47,7 @@ function renderTable(headers, rows) {
     tableHTML += '</tr></thead><tbody>';
     rows.forEach(row => {
         tableHTML += '<tr>';
-        // mỗi cell đều được chuyển thành chuỗi an toàn
+        // each cell is converted to a safe string
         row.forEach(cell => tableHTML += `<td>${String(cell || '')}</td>`);
         tableHTML += '</tr>';
     });
@@ -70,9 +70,9 @@ function handleDashboardPage(API_URL, token) {
         }
         return response.json();
     }
-
+// ... (Logic để gọi API approve/reject)
     async function updateSpotStatus(spotId, status) {
-        // ... (Logic để gọi API approve/reject)
+        
     }
     async function loadSection(sectionName) {
     const contentArea = document.getElementById('content-area');
@@ -107,7 +107,7 @@ function handleDashboardPage(API_URL, token) {
                 s.status === 'pending' ? `<button onclick="approveSpot('${s._id}')">Approve</button>` : 'Handled'
             ]);
             html += renderTable(headers, rows);
-        } else if (sectionName === 'bookings') { // <-- PHẦN MỚI
+        } else if (sectionName === 'bookings') { 
             const bookings = await fetchAdminData('bookings');
             const headers = ['Spot Address', 'User', 'Start Time', 'End Time', 'Total Price', 'Status'];
             const rows = bookings.map(b => [
@@ -127,10 +127,10 @@ function handleDashboardPage(API_URL, token) {
     }
 }
     
-    // Gán hàm approveSpot ra global scope để inline onclick có thể gọi
+   // approveSpot function to global scope so that inline onclick can be called
     window.approveSpot = async (spotId) => {
-    // Lấy API_URL và token từ scope của hàm handleDashboardPage
-    const API_URL = 'http://localhost:3001/api'; // Hoặc port của bạn
+   // Get API_URL and token from the scope of the handleDashboardPage function
+    const API_URL = 'http://localhost:3001/api';
     const token = localStorage.getItem('adminToken');
 
     if (confirm('Are you sure you want to approve this spot?')) {
@@ -149,7 +149,7 @@ function handleDashboardPage(API_URL, token) {
 
             alert('Spot approved successfully!');
             
-            // Tự động tải lại danh sách các điểm đỗ xe để cập nhật trạng thái
+            // Automatically reload the list of parking spots to update the status
             const dashboardHandler = document.querySelector('.sidebar-nav .nav-item[data-section="spots"]');
             if(dashboardHandler) dashboardHandler.click();
 

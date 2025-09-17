@@ -1,8 +1,7 @@
-// File: client/customer/js/auth.js
 import { api } from './apiService.js';
 
 document.addEventListener('DOMContentLoaded', () => {
-    // Xử lý đăng ký
+   //register
     const registerForm = document.getElementById('register-form');
     if (registerForm) {
         registerForm.addEventListener('submit', async (e) => {
@@ -21,7 +20,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Xử lý đăng nhập
+    //login
     const loginForm = document.getElementById('login-form');
     if (loginForm) {
         loginForm.addEventListener('submit', async (e) => {

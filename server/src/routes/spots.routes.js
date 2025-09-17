@@ -1,11 +1,10 @@
-// File: server/src/routes/spots.routes.js
 const express = require('express');
 const router = express.Router();
 const spotController = require('../controllers/spot.controller');
 const authMiddleware = require('../middlewares/auth.middleware');
 const upload = require('../middlewares/upload.middleware');
 
-// Route để tạo một điểm đỗ xe mới (chỉ user đã đăng nhập)
+// Route to create a new parking spot (logged in users only)
 router.post(
     '/', 
     authMiddleware.protect, 
@@ -13,13 +12,13 @@ router.post(
     spotController.createSpot
 );
 
-// Route để lấy gợi ý địa chỉ (autocomplete)
+// Route to get address suggestions (autocomplete)
 router.get('/autocomplete', spotController.getAutocompleteSuggestions);
 
-// Route để tìm kiếm các điểm đỗ xe
+// Route to find parking spots
 router.get('/search', spotController.searchSpots);
 
-// Route để lấy thông tin chi tiết của một điểm đỗ xe cụ thể
+// Route to get details of a specific parking spot
 router.get('/:id', spotController.getSpotById);
 
 module.exports = router;

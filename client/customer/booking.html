@@ -22,7 +22,6 @@
 
     <main class="booking-page-main">
         <div id="booking-panel" class="booking-panel">
-            <!-- Phần ảnh sẽ được JS cập nhật -->
             <div id="booking-panel-image" class="booking-panel__image"></div>
             
             <div class="booking-panel__details">
@@ -79,12 +78,11 @@
             try {
                 const spot = await api.getSpotById(spotId);
                 
-                // Cập nhật thông tin và ảnh
                 document.getElementById('spot-address').textContent = spot.address;
                 const imageUrl = spot.images && spot.images.length > 0 ? spot.images[0] : '../assets/image/parking-area.jpg';
                 document.getElementById('booking-panel-image').style.backgroundImage = `url('${imageUrl}')`;
 
-                // Logic tính tiền
+                // Logic prepare the bill
                 const start = new Date(startTime);
                 const end = new Date(endTime);
                 const totalHours = Math.ceil(Math.abs(end - start) / 36e5);
@@ -96,7 +94,7 @@
                 }
                 document.getElementById('total-price').textContent = `${totalPrice.toLocaleString('vi-VN')} VND`;
 
-                // Logic nhấn nút xác nhận
+               
                 document.getElementById('confirm-booking-btn').addEventListener('click', async () => {
                     if (!token) {
                         alert('Please log in to book a spot.');

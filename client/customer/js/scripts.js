@@ -1,9 +1,8 @@
-// File: client/customer/js/scripts.js
 
 /**
- * Chuyển đổi chuỗi ngày giờ từ định dạng "dd/mm/yyyy HH:ii" sang đối tượng Date.
- * @param {string} dateString - Chuỗi ngày giờ cần chuyển đổi.
- * @returns {Date|null} - Đối tượng Date hợp lệ hoặc null nếu thất bại.
+ * convert "dd/mm/yyyy HH:ii" to object Date.
+ * @param {string} dateString
+ * @returns {Date|null} 
  */
 function parseVietnameseDateString(dateString) {
     const parts = dateString.match(/(\d{2})\/(\d{2})\/(\d{4}) (\d{2}):(\d{2})/);
@@ -15,20 +14,20 @@ function parseVietnameseDateString(dateString) {
     const hours = parts[4];
     const minutes = parts[5];
 
-    // Tạo lại chuỗi theo định dạng chuẩn ISO (YYYY-MM-DDTHH:mm:ss)
+    // Recreate the string in ISO standard format (YYYY-MM-DDTHH:mm:ss)
     const isoString = `${year}-${month}-${day}T${hours}:${minutes}:00`;
     return new Date(isoString);
 }
 
 
 document.addEventListener('DOMContentLoaded', () => {
-    const API_URL = 'http://localhost:3001/api'; // Sử dụng port backend của bạn
+    const API_URL = 'http://localhost:3001/api'; 
     const searchForm = document.getElementById('searchForm');
     const locationInput = document.getElementById('location');
     const suggestionsBox = document.getElementById('suggestions-box');
     let debounceTimer;
 
-    // --- 1. LOGIC GỢI Ý (AUTOCOMPLETE) ---
+    // logic autocomplete
     if (locationInput && suggestionsBox) {
         locationInput.addEventListener('input', () => {
             clearTimeout(debounceTimer);
@@ -40,7 +39,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
-            // Kỹ thuật Debounce: Chờ 300ms sau khi người dùng ngừng gõ mới gửi request
+            // Wait 300ms after the user stops typing before sending the request
             debounceTimer = setTimeout(async () => {
                 try {
                     const response = await fetch(`${API_URL}/spots/autocomplete?q=${encodeURIComponent(query)}`);
@@ -52,7 +51,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }, 300);
         });
 
-        // Ẩn hộp gợi ý khi click ra ngoài
+        // Hide the suggestion box when clicking outside
         document.addEventListener('click', function(event) {
             if (!locationInput.contains(event.target)) {
                 suggestionsBox.style.display = 'none';
@@ -80,7 +79,7 @@ document.addEventListener('DOMContentLoaded', () => {
         suggestionsBox.style.display = 'block';
     }
 
-    // --- 2. LOGIC TÌM KIẾM KHI SUBMIT FORM ---
+    // SEARCH LOGIC WHEN SUBMIT FORM 
     if (searchForm) {
         searchForm.addEventListener('submit', function(event) {
             event.preventDefault();
@@ -107,8 +106,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 alert('End time must be after the start time.');
                 return;
             }
-
-            // Tạo query params chỉ với các thông tin cần thiết
             const queryParams = new URLSearchParams({
                 startTime: startDate.toISOString(),
                 endTime: endDate.toISOString(),
@@ -119,12 +116,12 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // --- 3. CẤU HÌNH LỊCH CHỌN NGÀY GIỜ (FLATPICKR) ---
+    // --- 3. CONFIGURATION OF DATE AND TIME SELECTION SCHEDULE (FLATPICKR) ---
     const datePickerOptions = {
         enableTime: true,
         dateFormat: "d/m/Y H:i",
         time_24hr: true,
-        minDate: "today" // Ngăn người dùng chọn ngày trong quá khứ
+        minDate: "today" 
     };
 
     flatpickr("#start-datetime", datePickerOptions);

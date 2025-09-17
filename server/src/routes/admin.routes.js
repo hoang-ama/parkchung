@@ -4,7 +4,6 @@ const { getDashboardStats, getAllUsers, getAllSpots, approveSpot, getAllBookings
 const { protect } = require('../middlewares/auth.middleware');
 const { isAdmin } = require('../middlewares/admin.middleware');
 
-// All admin routes are protected and require admin role
 router.use(protect, isAdmin);
 
 router.get('/stats', getDashboardStats);

@@ -1,4 +1,3 @@
-// Placeholder for email service (e.g., using Nodemailer with SendGrid/Mailgun)
 const sendBookingConfirmation = async (userEmail, bookingDetails) => {
     console.log(`Sending booking confirmation to ${userEmail}`);
     // TODO: Implement actual email sending logic here

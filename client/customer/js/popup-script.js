@@ -20,7 +20,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }, 60000);
   }
 
-  // ... Rest of the JavaScript logic for closing and submitting the popup ...
   
 });
 

@@ -16,7 +16,7 @@ exports.createBooking = async (req, res) => {
             return res.status(404).json({ message: 'Parking spot not found' });
         }
 
-        // Kiểm tra lại lần nữa xem chỗ có bị đặt trùng không
+        // Check again to see if there are any duplicates
         const existingBooking = await Booking.findOne({
             spot: spotId,
             status: 'confirmed',
@@ -27,10 +27,10 @@ exports.createBooking = async (req, res) => {
             return res.status(400).json({ message: 'Spot is not available for the selected time' });
         }
 
-       // logic tính tiền( trc 6 tiếng là đơn giá; sau 6h, mỗi giờ x2 tiền)
+       // billing logic
         const start = new Date(startTime);
         const end = new Date(endTime);
-        const totalHours = Math.ceil(Math.abs(end - start) / 36e5); // Tổng số giờ đỗ (làm tròn lên)
+        const totalHours = Math.ceil(Math.abs(end - start) / 36e5); // Before 6 hours is the unit price; after 6 hours, each hour is x2 price
         let totalPrice = 0;
 
         if (totalHours <= 6) {
@@ -38,7 +38,7 @@ exports.createBooking = async (req, res) => {
         } else {
             const priceForFirst6Hours = 6 * spot.hourlyRate;
             const remainingHours = totalHours - 6;
-            const priceForRemainingHours = remainingHours * (spot.hourlyRate * 2); // Đơn giá nhân đôi
+            const priceForRemainingHours = remainingHours * (spot.hourlyRate * 2); 
             totalPrice = priceForFirst6Hours + priceForRemainingHours;
         }
 
