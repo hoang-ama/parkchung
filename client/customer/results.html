@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search Results - ParkChung</title>
+    <link rel="icon" type="image/png" href="../assets/logo/favicon.png" />
+    <link rel="stylesheet" href="css/styles.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+</head>
+<body>
+    <header>
+        <div class="logo">
+             <a href="index.html" style="display: flex; align-items: center; text-decoration: none; color: inherit;">
+                <img src="../assets/logo/logo.svg" alt="Parkchung Logo" />
+                <div><h1>PARKCHUNG</h1></div>
+            </a>
+        </div>
+        <nav>
+            </nav>
+    </header>
+
+    <main class="results-page-main">
+        <div class="results-header">
+            <h2>Available Parking Spots</h2>
+            <p>Choose the best spot for you and book in seconds.</p>
+        </div>
+        <div id="results-grid" class="results-grid">
+            <p>Loading...</p>
+        </div>
+    </main>
+
+    <script type="module" src="js/app.js"></script>
+    <script type="module">
+        import { api } from './js/apiService.js';
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            const resultsGrid = document.getElementById('results-grid');
+            const params = new URLSearchParams(window.location.search);
+            
+            try {
+                const searchParams = Object.fromEntries(params.entries());
+                const spots = await api.searchSpots(searchParams);
+                
+                resultsGrid.innerHTML = ''; 
+
+                if (spots.length === 0) {
+                    resultsGrid.innerHTML = '<p class="no-results">Sorry, no available parking spots were found for your criteria.</p>';
+                    return;
+                }
+
+                spots.forEach((spot, index) => {
+                    const startTime = params.get('startTime');
+                    const endTime = params.get('endTime');
+
+                    const spotCard = document.createElement('a');
+                    spotCard.href = `booking.html?spotId=${spot._id}&startTime=${startTime}&endTime=${endTime}`;
+                    spotCard.className = 'spot-card';
+                    spotCard.style.animationDelay = `${index * 100}ms`; // Hiệu ứng xuất hiện nối tiếp
+
+                    const imageUrl = spot.images && spot.images.length > 0 
+                        ? spot.images[0] 
+                        : '../assets/image/parking-area.jpg'; // Ảnh mặc định
+
+                    spotCard.innerHTML = `
+                        <img src="${imageUrl}" alt="${spot.address}" class="spot-card__image">
+                        <div class="spot-card__content">
+                            <h3>${spot.address}</h3>
+                            <div class="spot-card__info">
+                                <span class="spot-card__info-price">${spot.hourlyRate.toLocaleString('vi-VN')} VND / hour</span>
+                                </div>
+                            <div class="spot-card__cta">Book Now</div>
+                        </div>
+                    `;
+                    
+                    resultsGrid.appendChild(spotCard);
+                });
+
+            } catch (error) {
+                resultsGrid.innerHTML = `<p class="no-results" style="color: red;">Error: ${error.message}</p>`;
+            }
+        });
+    </script>
+</body>
+</html>

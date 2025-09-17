@@ -2,7 +2,7 @@ const User = require('../models/user.model');
 const jwt = require('jsonwebtoken');
 const config = require('../config');
 
-// Hàm tạo JWT token
+// tạo JWT token
 const generateToken = (id, role) => {
     return jwt.sign({ id, role }, config.jwtSecret, { expiresIn: '30d' });
 };

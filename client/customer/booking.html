@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Confirm Your Booking - ParkChung</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="../assets/logo/favicon.png" />
+    <link rel="stylesheet" href="css/styles.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"/>
+</head>
+<body>
+    <header>
+        <div class="logo">
+             <a href="index.html" style="display: flex; align-items: center; text-decoration: none; color: inherit;">
+                <img src="../assets/logo/logo.svg" alt="Parkchung Logo" />
+                <div><h1>PARKCHUNG</h1></div>
+            </a>
+        </div>
+        <nav></nav>
+    </header>
+
+    <main class="booking-page-main">
+        <div id="booking-panel" class="booking-panel">
+            <!-- Phần ảnh sẽ được JS cập nhật -->
+            <div id="booking-panel-image" class="booking-panel__image"></div>
+            
+            <div class="booking-panel__details">
+                <h2>Confirm Your Booking</h2>
+                <p class="spot-address" id="spot-address">Loading...</p>
+
+                <div class="booking-summary-grid">
+                    <div class="summary-item">
+                        <div class="label">From</div>
+                        <div class="value" id="start-time"></div>
+                    </div>
+                    <div class="summary-item">
+                        <div class="label">Until</div>
+                        <div class="value" id="end-time"></div>
+                    </div>
+                </div>
+
+                <div class="total-price-section">
+                    <span class="label">Total Price:</span>
+                    <span class="value" id="total-price">Calculating...</span>
+                </div>
+                
+                <button id="confirm-booking-btn">Confirm & Book</button>
+                
+                <div class="navigation-buttons" style="margin-top: 20px; text-align: center;">
+                    <a href="javascript:history.back()" class="nav-button back-button">← Back to Search Results</a>
+                    <a href="index.html" class="nav-button home-button">Back to Home</a>
+                </div>
+                <p id="error-message" style="color: red; text-align: center; margin-top: 10px;"></p>
+            </div>
+        </div>
+    </main>
+
+    <script type="module" src="js/app.js"></script>
+    <script type="module">
+        import { api } from './js/apiService.js';
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            const params = new URLSearchParams(window.location.search);
+            const spotId = params.get('spotId');
+            const startTime = params.get('startTime');
+            const endTime = params.get('endTime');
+            const token = localStorage.getItem('userToken');
+
+            if (!spotId || !startTime || !endTime) {
+                document.getElementById('booking-panel').innerHTML = '<h2>Invalid booking link.</h2>';
+                return;
+            }
+
+            const options = { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' };
+            document.getElementById('start-time').textContent = new Date(startTime).toLocaleString('vi-VN', options);
+            document.getElementById('end-time').textContent = new Date(endTime).toLocaleString('vi-VN', options);
+
+            try {
+                const spot = await api.getSpotById(spotId);
+                
+                // Cập nhật thông tin và ảnh
+                document.getElementById('spot-address').textContent = spot.address;
+                const imageUrl = spot.images && spot.images.length > 0 ? spot.images[0] : '../assets/image/parking-area.jpg';
+                document.getElementById('booking-panel-image').style.backgroundImage = `url('${imageUrl}')`;
+
+                // Logic tính tiền
+                const start = new Date(startTime);
+                const end = new Date(endTime);
+                const totalHours = Math.ceil(Math.abs(end - start) / 36e5);
+                let totalPrice = 0;
+                if (totalHours <= 6) {
+                    totalPrice = totalHours * spot.hourlyRate;
+                } else {
+                    totalPrice = (6 * spot.hourlyRate) + ((totalHours - 6) * (spot.hourlyRate * 2));
+                }
+                document.getElementById('total-price').textContent = `${totalPrice.toLocaleString('vi-VN')} VND`;
+
+                // Logic nhấn nút xác nhận
+                document.getElementById('confirm-booking-btn').addEventListener('click', async () => {
+                    if (!token) {
+                        alert('Please log in to book a spot.');
+                        window.location.href = `login.html?redirect=${encodeURIComponent(window.location.href)}`;
+                        return;
+                    }
+                    try {
+                        await api.createBooking({ spotId, startTime, endTime });
+                        alert('Booking successful! Check "My Bookings" for details.');
+                        window.location.href = 'my-bookings.html'; 
+                    } catch (error) {
+                        document.getElementById('error-message').textContent = error.message;
+                    }
+                });
+
+            } catch (error) {
+                document.getElementById('booking-panel').innerHTML = `<h2>Error: ${error.message}</h2>`;
+            }
+        });
+    </script>
+</body>
+</html>

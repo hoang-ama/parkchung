@@ -73,3 +73,18 @@ exports.approveSpot = async (req, res) => {
         res.status(500).json({ message: 'Server error', error: error.message });
     }
 };
+/**
+ * @desc    Get all bookings
+ * @route   GET /api/admin/bookings
+ * @access  Private/Admin
+ */
+exports.getAllBookings = async (req, res) => {
+    try {
+        const bookings = await Booking.find({})
+            .populate('user', 'fullName email') 
+            .populate('spot', 'address');       
+        res.json(bookings);
+    } catch (error) {
+        res.status(500).json({ message: 'Server error', error: error.message });
+    }
+};

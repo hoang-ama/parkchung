@@ -1,93 +1,132 @@
-// File: scripts.js
-const googleSheetScriptURL = 'https://script.google.com/macros/s/AKfycbw3v7HA2uQ5anB9WByDtgZe2fa7cRm3WGG5ZFmblTwd8MyHg4nv5u7POLVZ4ZrdGcMLdg/exec'; 
+// File: client/customer/js/scripts.js
+
+/**
+ * Chuyển đổi chuỗi ngày giờ từ định dạng "dd/mm/yyyy HH:ii" sang đối tượng Date.
+ * @param {string} dateString - Chuỗi ngày giờ cần chuyển đổi.
+ * @returns {Date|null} - Đối tượng Date hợp lệ hoặc null nếu thất bại.
+ */
+function parseVietnameseDateString(dateString) {
+    const parts = dateString.match(/(\d{2})\/(\d{2})\/(\d{4}) (\d{2}):(\d{2})/);
+    if (!parts) return null;
+
+    const day = parts[1];
+    const month = parts[2];
+    const year = parts[3];
+    const hours = parts[4];
+    const minutes = parts[5];
+
+    // Tạo lại chuỗi theo định dạng chuẩn ISO (YYYY-MM-DDTHH:mm:ss)
+    const isoString = `${year}-${month}-${day}T${hours}:${minutes}:00`;
+    return new Date(isoString);
+}
+
 
 document.addEventListener('DOMContentLoaded', () => {
-    console.log("Parkchung Script Initializing... DOMContentLoaded.");
+    const API_URL = 'http://localhost:3001/api'; // Sử dụng port backend của bạn
+    const searchForm = document.getElementById('searchForm');
+    const locationInput = document.getElementById('location');
+    const suggestionsBox = document.getElementById('suggestions-box');
+    let debounceTimer;
 
+    // --- 1. LOGIC GỢI Ý (AUTOCOMPLETE) ---
+    if (locationInput && suggestionsBox) {
+        locationInput.addEventListener('input', () => {
+            clearTimeout(debounceTimer);
+            const query = locationInput.value;
 
-document.getElementById('searchForm').addEventListener('submit', function(event) {
-    event.preventDefault();
-    
-    const location = document.getElementById('location').value.trim();
-    const startDateTime = document.getElementById('start-datetime').value;
-    const endDateTime = document.getElementById('end-datetime').value;
-  
-    if (!location) {
-        alert('Please enter a location.');
-        return;
-    }
+            if (query.length < 2) {
+                suggestionsBox.innerHTML = '';
+                suggestionsBox.style.display = 'none';
+                return;
+            }
 
-    if (new Date(startDateTime) >= new Date(endDateTime)) {
-        alert('End time must be after start time.');
-        return;
-    }
+            // Kỹ thuật Debounce: Chờ 300ms sau khi người dùng ngừng gõ mới gửi request
+            debounceTimer = setTimeout(async () => {
+                try {
+                    const response = await fetch(`${API_URL}/spots/autocomplete?q=${encodeURIComponent(query)}`);
+                    const suggestions = await response.json();
+                    displaySuggestions(suggestions);
+                } catch (error) {
+                    console.error('Error fetching suggestions:', error);
+                }
+            }, 300);
+        });
 
-    alert(`Searching parking spots at "${location}" from ${startDateTime} to ${endDateTime}.`);
-    // TODO: Redirect or make API call with search parameters
-      // Thiết lập ngày mặc định start-datetime  end-datetime
-
-  if (startDateTime) {
-    startDateTime.value = getTomorrowDate();
-  }
-
-  function getTomorrowDate() {
-    const today = new Date();
-    const tomorrow = new Date(today);
-    tomorrow.setDate(today.getDate() + 1);
-    const year = tomorrow.getFullYear();
-    const month = String(tomorrow.getMonth() + 1).padStart(2, '0');
-    const day = String(tomorrow.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
-  }
-
-
-    // Nhập thông tin subscription và kiểm tra định dạnh email trong footer (email-subscription-form)
-
-     function validateEmail(email) {
-    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return re.test(email);
-  }
-     
-      const subscribeForm = document.forms['email-subscription-form'];
-    if (subscribeForm) {
-        subscribeForm.addEventListener('submit', e => { 
-            e.preventDefault();
-            const emailInput = subscribeForm.querySelector('#subscriber-email');
-            const submitButton = subscribeForm.querySelector('.subscribe-button');
-            if (emailInput) {
-                const email = emailInput.value.trim();
-                if (validateEmail(email)) { 
-                    if(submitButton) { submitButton.disabled = true; submitButton.textContent = "Subscribing..."; }
-                    sendSubscriptionEmailToGoogleSheet(email, subscribeForm, submitButton);
-                } else { alert('Please enter a valid email address (e.g., example@email.com).'); }
+        // Ẩn hộp gợi ý khi click ra ngoài
+        document.addEventListener('click', function(event) {
+            if (!locationInput.contains(event.target)) {
+                suggestionsBox.style.display = 'none';
             }
         });
     }
 
-    function sendSubscriptionEmailToGoogleSheet(email, form, button) { 
-        const data = new FormData(); 
-        data.append('timestamp', new Date().toISOString()); data.append('email', email); data.append('sheetName', 'Email'); 
-        fetch(googleSheetScriptURL, { method: 'POST', body: data }) 
-            .then(response => response.text()) 
-            .then(textResponse => {
-                console.log('Subscription API Response:', textResponse); alert('Thank you for subscribing!'); if(form) form.reset();
-            })
-            .catch(error => { console.error('Subscription Error!', error.message); alert('An error occurred. Please try again.'); })
-            .finally(() => { if(button) { button.disabled = false; button.textContent = "Sign-up"; }});
+    function displaySuggestions(suggestions) {
+        if (suggestions.length === 0) {
+            suggestionsBox.style.display = 'none';
+            return;
+        }
+        suggestionsBox.innerHTML = '';
+        suggestions.forEach(suggestion => {
+            const div = document.createElement('div');
+            div.textContent = suggestion;
+            div.className = 'suggestion-item';
+            div.addEventListener('click', () => {
+                locationInput.value = suggestion;
+                suggestionsBox.innerHTML = '';
+                suggestionsBox.style.display = 'none';
+            });
+            suggestionsBox.appendChild(div);
+        });
+        suggestionsBox.style.display = 'block';
     }
-    
 
-    // Testimonials slider
-  $(function () {
-    $('.testimonials-slider').slick({
-      slidesToShow: 1,
-      slidesToScroll: 1,
-      autoplay: true,
-      dots: true,
-      arrows: false
-    });
-  });
-    
-});
+    // --- 2. LOGIC TÌM KIẾM KHI SUBMIT FORM ---
+    if (searchForm) {
+        searchForm.addEventListener('submit', function(event) {
+            event.preventDefault();
+            
+            const locationText = locationInput.value.trim();
+            const startDateTimeValue = document.getElementById('start-datetime').value;
+            const endDateTimeValue = document.getElementById('end-datetime').value;
 
+            // Validation
+            if (!locationText || !startDateTimeValue || !endDateTimeValue) {
+                alert('Please fill in all search fields.');
+                return;
+            }
+
+            const startDate = parseVietnameseDateString(startDateTimeValue);
+            const endDate = parseVietnameseDateString(endDateTimeValue);
+
+            if (!startDate || !endDate) {
+                alert('The date and time format is invalid. Please use the date picker.');
+                return;
+            }
+
+            if (startDate >= endDate) {
+                alert('End time must be after the start time.');
+                return;
+            }
+
+            // Tạo query params chỉ với các thông tin cần thiết
+            const queryParams = new URLSearchParams({
+                startTime: startDate.toISOString(),
+                endTime: endDate.toISOString(),
+                q: locationText
+            });
+
+            window.location.href = `results.html?${queryParams.toString()}`;
+        });
+    }
+
+    // --- 3. CẤU HÌNH LỊCH CHỌN NGÀY GIỜ (FLATPICKR) ---
+    const datePickerOptions = {
+        enableTime: true,
+        dateFormat: "d/m/Y H:i",
+        time_24hr: true,
+        minDate: "today" // Ngăn người dùng chọn ngày trong quá khứ
+    };
+
+    flatpickr("#start-datetime", datePickerOptions);
+    flatpickr("#end-datetime", datePickerOptions);
 });

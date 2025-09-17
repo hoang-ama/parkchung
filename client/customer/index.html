@@ -9,6 +9,8 @@
     <link rel="stylesheet" href="css/styles.css" />
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet"/>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 </head>
 <body>
 
@@ -28,11 +30,10 @@
             <p class="tagline">Save time. Save money. Save Earth</p>
         </div>
     </div>
-    <nav>
-        <a href="#">Find Parking</a>
-        <a href="#">Become a Host</a>
-        <a href="#">Login</a>
-    </nav>
+   <nav>
+    <a href="register.html">Become a Host / Register</a>
+    <a href="login.html">Login</a>
+   </nav>
 </header>
 
 <!-- 2.Slider/ Search Section -->    
@@ -49,6 +50,7 @@
         <div class="search-input-wrapper">
           <input type="text" id="location" placeholder="Enter a place or postcode" required />
           <span class="search-icon"><i class="fa fa-search"></i></span>
+          <div class="autocomplete-suggestions" id="suggestions-box"></div>
         </div>
       </div>
       <div class="search-row date-row">
@@ -300,8 +302,8 @@
       </a>
     </div>
 
-<script src="../customer/js/scripts.js"></script>
-<script src="../customer/js/popup-script.js"></script>
-
+<script type="module" src="../customer/js/scripts.js"></script>
+<script type="module" src="../customer/js/popup-script.js"></script>
+<script type="module" src="js/app.js"></script>
 </body>
 </html>

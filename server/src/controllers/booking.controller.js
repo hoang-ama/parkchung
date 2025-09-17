@@ -27,19 +27,28 @@ exports.createBooking = async (req, res) => {
             return res.status(400).json({ message: 'Spot is not available for the selected time' });
         }
 
-        // Tính toán tổng giá
+       // logic tính tiền( trc 6 tiếng là đơn giá; sau 6h, mỗi giờ x2 tiền)
         const start = new Date(startTime);
         const end = new Date(endTime);
-        const hours = Math.ceil(Math.abs(end - start) / 36e5);
-        const totalPrice = hours * spot.hourlyRate;
+        const totalHours = Math.ceil(Math.abs(end - start) / 36e5); // Tổng số giờ đỗ (làm tròn lên)
+        let totalPrice = 0;
+
+        if (totalHours <= 6) {
+            totalPrice = totalHours * spot.hourlyRate;
+        } else {
+            const priceForFirst6Hours = 6 * spot.hourlyRate;
+            const remainingHours = totalHours - 6;
+            const priceForRemainingHours = remainingHours * (spot.hourlyRate * 2); // Đơn giá nhân đôi
+            totalPrice = priceForFirst6Hours + priceForRemainingHours;
+        }
 
         const booking = new Booking({
             user: userId,
             spot: spotId,
             startTime,
             endTime,
-            totalPrice,
-            status: 'confirmed' // Giả sử thanh toán thành công
+            totalPrice, 
+            status: 'confirmed'
         });
 
         const createdBooking = await booking.save();

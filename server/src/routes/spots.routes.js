@@ -1,12 +1,25 @@
+// File: server/src/routes/spots.routes.js
 const express = require('express');
 const router = express.Router();
-const { searchSpots, createSpot, getSpotById } = require('../controllers/spot.controller');
-const { protect } = require('../middlewares/auth.middleware');
+const spotController = require('../controllers/spot.controller');
+const authMiddleware = require('../middlewares/auth.middleware');
+const upload = require('../middlewares/upload.middleware');
 
-router.route('/')
-    .post(protect, createSpot); // User must be logged in to create a spot
+// Route để tạo một điểm đỗ xe mới (chỉ user đã đăng nhập)
+router.post(
+    '/', 
+    authMiddleware.protect, 
+    upload.single('spotImage'), 
+    spotController.createSpot
+);
 
-router.get('/search', searchSpots);
-router.get('/:id', getSpotById);
+// Route để lấy gợi ý địa chỉ (autocomplete)
+router.get('/autocomplete', spotController.getAutocompleteSuggestions);
+
+// Route để tìm kiếm các điểm đỗ xe
+router.get('/search', spotController.searchSpots);
+
+// Route để lấy thông tin chi tiết của một điểm đỗ xe cụ thể
+router.get('/:id', spotController.getSpotById);
 
 module.exports = router;

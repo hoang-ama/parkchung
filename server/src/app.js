@@ -1,5 +1,6 @@
 const express = require('express');
 const cors = require('cors');
+const path = require('path');
 const config = require('./config');
 const allRoutes = require('./routes');
 const { notFound, errorHandler } = require('./middlewares/error.middleware');
@@ -10,7 +11,7 @@ const app = express();
 app.use(cors({ origin: config.corsOrigin }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
+app.use(express.static(path.join(__dirname, '../public')));
 // API Routes
 app.get('/', (req, res) => {
     res.send('Welcome to ParkChung API!');

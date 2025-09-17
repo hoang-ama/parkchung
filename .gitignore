@@ -1,20 +1,19 @@
-# Ẩn các file chứa biến môi trường và thông tin nhạy cảm
+# Bypass file biến môi trường (chứa database, JWT certi,..)
 .env
 
-# Bỏ qua thư mục chứa các gói phụ thuộc của Node.js
-# Thư mục này sẽ được tạo lại khi chạy `npm install`
+# Bypass thư mục chứa các gói phụ thuộc của Node.js
 node_modules/
 
-# Bỏ qua các file log được tạo ra trong quá trình chạy hoặc gỡ lỗi
+# Bypass các file log được tạo ra trong quá trình chạy hoặc gỡ lỗi
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 *.log
 
-# Bỏ qua các file hệ thống của macOS và Windows
+# Bypass các file hệ thống của macOS và Windows
 .DS_Store
 Thumbs.db
 
-# Bỏ qua các thư mục cấu hình của các trình soạn thảo code (IDE)
+# Bypass các thư mục cấu hình của các trình soạn thảo code (IDE)
 .idea/
 .vscode/
