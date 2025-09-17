@@ -66,7 +66,7 @@ parkchung/
 └── README.md
 ```
 
-*(Để xem chi tiết, hãy tham khảo các file trong repo)*
+
 
 ## 🛠️ Hướng dẫn Cài đặt & Chạy Local
 
@@ -106,7 +106,7 @@ Server sẽ chạy tại `http://localhost:3001`.
 1.  Mở toàn bộ thư mục `parkchung/` bằng VS Code.
 2.  Đi đến tệp `client/customer/index.html`.
 3.  Nhấp chuột phải và chọn **"Open with Live Server"**.
-4.  Trang web sẽ được mở trong trình duyệt, thường ở địa chỉ `http://127.0.0.1:5500`.
+4.  Trang web sẽ được mở trong trình duyệt, thường ở địa chỉ `http://127.0.0.1:3000`.
 
 ## 🔮 Lộ trình Phát triển Tương lai
 
