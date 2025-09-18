@@ -1,9 +1,3 @@
-Chắc chắn rồi\! Dựa trên toàn bộ hành trình xây dựng dự án ParkChung của chúng ta, từ ý tưởng ban đầu đến một ứng dụng full-stack hoàn chỉnh, tôi đã tạo ra một tệp `README.md` chi tiết, chuyên nghiệp và đẹp mắt.
-
-Bạn có thể sao chép toàn bộ nội dung dưới đây và dán vào tệp `README.md` ở thư mục gốc của dự án.
-
------
-
 # 🅿️ ParkChung - Nền tảng Chia sẻ & Đặt chỗ Bãi đỗ xe
 
 **ParkChung** là một ứng dụng web full-stack được xây dựng để giải quyết vấn đề tìm kiếm và quản lý bãi đỗ xe tại các đô thị Việt Nam. Nền tảng cho phép các chủ xe (host) đăng ký và cho thuê các điểm đỗ xe chưa sử dụng, đồng thời giúp người lái xe (user) dễ dàng tìm kiếm, đặt chỗ và thanh toán một cách nhanh chóng.
@@ -72,7 +66,7 @@ parkchung/
 └── README.md
 ```
 
-*(Để xem chi tiết, hãy tham khảo các file trong repo)*
+
 
 ## 🛠️ Hướng dẫn Cài đặt & Chạy Local
 
@@ -112,7 +106,7 @@ Server sẽ chạy tại `http://localhost:3001`.
 1.  Mở toàn bộ thư mục `parkchung/` bằng VS Code.
 2.  Đi đến tệp `client/customer/index.html`.
 3.  Nhấp chuột phải và chọn **"Open with Live Server"**.
-4.  Trang web sẽ được mở trong trình duyệt, thường ở địa chỉ `http://127.0.0.1:5500`.
+4.  Trang web sẽ được mở trong trình duyệt, thường ở địa chỉ `http://127.0.0.1:3000`.
 
 ## 🔮 Lộ trình Phát triển Tương lai
 
