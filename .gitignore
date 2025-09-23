@@ -17,3 +17,5 @@ Thumbs.db
 # Bypass các thư mục cấu hình của các trình soạn thảo code (IDE)
 .idea/
 .vscode/
+#Bypass file parkchung_key.pem
+*.pem

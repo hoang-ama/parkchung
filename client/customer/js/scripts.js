@@ -1,4 +1,3 @@
-
 /**
  * convert "dd/mm/yyyy HH:ii" to object Date.
  * @param {string} dateString
@@ -53,7 +52,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Hide the suggestion box when clicking outside
         document.addEventListener('click', function(event) {
-            if (!locationInput.contains(event.target)) {
+            if (!locationInput.contains(event.target)) { 
                 suggestionsBox.style.display = 'none';
             }
         });

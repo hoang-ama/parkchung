@@ -1,4 +1,4 @@
-const API_URL = 'http://localhost:3001/api'; 
+ // const API_URL = 'http://localhost:3001/api'; comment tạm để test xem file config.js đã hoạt động chưa
 // Helper function to handle responses from API
 const handleResponse = async (response) => {
     const data = await response.json();

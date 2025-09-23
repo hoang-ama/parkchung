@@ -90,17 +90,16 @@ header nav a { color: var(--primary); margin-left: 25px; text-decoration: none; 
 
 /* Unified input styles */
 .search-input-wrapper input[type="text"],
-.date-group input[type="datetime-local"],
-.popup-right input,
-.popup-right textarea,
-.host-form input[type="text"]#address {
+.flatpickr-input { /* <-- Sửa lại selector ở đây */
   width: 100%;
   font-size: 1.1em;
-  padding: 10px 15px;
+  padding: 10px 15px; /* Giữ padding đồng bộ */
   border: 1.5px solid #ddd;
   border-radius: var(--radius);
   color: #222;
   background: var(--white);
+  font-family: 'Montserrat', sans-serif; /* Thêm font-family để đảm bảo nhất quán */
+  box-sizing: border-box; /* Thêm box-sizing để tính toán kích thước chính xác */
 }
 
 .search-icon { position: absolute; right: 16px; top: 50%; transform: translateY(-50%); color: var(--primary); font-size: 1.2em; opacity: 0.7; }
