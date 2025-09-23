@@ -20,7 +20,7 @@ function parseVietnameseDateString(dateString) {
 
 
 document.addEventListener('DOMContentLoaded', () => {
-    const API_URL = 'http://localhost:3001/api'; 
+   // const API_URL = 'http://localhost:3001/api'; 
     const searchForm = document.getElementById('searchForm');
     const locationInput = document.getElementById('location');
     const suggestionsBox = document.getElementById('suggestions-box');

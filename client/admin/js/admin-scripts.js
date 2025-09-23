@@ -8,7 +8,7 @@
  * @param {'approve' | 'reject' | 'delete'} action - Hành động cần thực hiện.
  */
 async function handleSpotAction(spotId, action) {
-    const API_URL = 'http://localhost:3001/api';
+   // const API_URL = 'http://localhost:3001/api';
     const token = localStorage.getItem('adminToken');
     let method = 'PUT';
     let endpoint = `/admin/spots/${spotId}/${action}`;
@@ -79,7 +79,7 @@ function toggleEditMode(spotId, isEditing) {
  */
 async function saveSpotChanges(spotId) {
     const row = document.getElementById(`spot-${spotId}`);
-    const API_URL = 'http://localhost:3001/api';
+   // const API_URL = 'http://localhost:3001/api';
     const token = localStorage.getItem('adminToken');
 
     const newAddress = row.querySelector('.editable-address input').value;
@@ -258,7 +258,7 @@ function handleDashboardPage(API_URL, token) {
 
 // --- LOGIC CHÍNH ĐỂ CHẠY TRANG KHI DOM ĐÃ TẢI XONG ---
 document.addEventListener('DOMContentLoaded', () => {
-    const API_URL = 'http://localhost:3001/api';
+   // const API_URL = 'http://localhost:3001/api';
     const token = localStorage.getItem('adminToken');
 
     if (document.getElementById('login-form')) {
