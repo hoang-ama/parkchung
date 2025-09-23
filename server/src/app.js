@@ -1,3 +1,4 @@
+// File: server/src/app.js
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
@@ -6,7 +7,6 @@ const allRoutes = require('./routes');
 const { notFound, errorHandler } = require('./middlewares/error.middleware');
 
 const app = express();
-
 
 // --- CẤU HÌNH CORS NÂNG CAO ---
 // Lấy danh sách các domain được phép từ file .env
@@ -30,11 +30,13 @@ const corsOptions = {
 app.use(cors(corsOptions));
 // --- KẾT THÚC CẤU HÌNH CORS ---
 
-// Middlewares
-app.use(cors({ origin: config.corsOrigin }));
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// Public thư mục 'public'
 app.use(express.static(path.join(__dirname, '../public')));
+
 // API Routes
 app.get('/', (req, res) => {
     res.send('Welcome to ParkChung API!');
