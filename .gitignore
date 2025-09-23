@@ -1,6 +1,5 @@
 # Bypass file biến môi trường (chứa database, JWT certi,..)
-# .env bỏ tạm
-
+# .env bỏ tạm để test
 # Bypass thư mục chứa các gói phụ thuộc của Node.js
 node_modules/
 
