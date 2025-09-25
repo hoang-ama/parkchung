@@ -79,7 +79,7 @@
                 const spot = await api.getSpotById(spotId);
                 
                 document.getElementById('spot-address').textContent = spot.address;
-                const imageUrl = spot.images && spot.images.length > 0 ? spot.images[0] : '../assets/image/parking-area.jpg';
+                const imageUrl = spot.images && spot.images.length > 0 ? spot.images[0] : '/assets/image/parking-area.jpg';
                 document.getElementById('booking-panel-image').style.backgroundImage = `url('${imageUrl}')`;
 
                 // Logic prepare the bill

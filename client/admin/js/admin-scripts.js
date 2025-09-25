@@ -107,7 +107,48 @@ async function saveSpotChanges(spotId) {
     }
 }
 
+/**
+ * HÀM MỚI: Kích hoạt cửa sổ chọn file cho một bãi đỗ cụ thể.
+ */
+function triggerImageUpload(spotId) {
+    const fileInput = document.getElementById(`image-upload-${spotId}`);
+    fileInput.click(); // Mô phỏng click vào input file ẩn
+}
+/**
+ * HÀM MỚI: Xử lý việc tải ảnh mới lên sau khi người dùng đã chọn file.
+ */
+async function handleImageUpdate(spotId) {
+    const token = localStorage.getItem('adminToken');
+    const fileInput = document.getElementById(`image-upload-${spotId}`);
+    const file = fileInput.files[0]; // Lấy file đã chọn
 
+    if (!file) {
+        alert('Please select an image file.');
+        return;
+    }
+
+    const formData = new FormData();
+    formData.append('spotImage', file); // Tên field phải khớp với `upload.single('spotImage')` ở backend
+
+    try {
+        const response = await fetch(`${API_URL}/admin/spots/${spotId}/image`, {
+            method: 'POST',
+            headers: { 'Authorization': `Bearer ${token}` },
+            body: formData // Gửi FormData, không cần 'Content-Type' header
+        });
+
+        if (!response.ok) {
+            const errData = await response.json();
+            throw new Error(errData.message || 'Failed to update image');
+        }
+
+        alert('Image updated successfully!');
+        // Sau khi cập nhật, tải lại trang spots để hiển thị ảnh mới
+        document.querySelector('.sidebar-nav .nav-item[data-section="spots"]').click(); 
+    } catch (error) {
+        alert(`Error: ${error.message}`);
+    }
+}
 // --- HÀM XỬ LÝ LOGIC TRANG ---
 
 function handleLoginPage(API_URL) {
@@ -188,20 +229,38 @@ function handleDashboardPage(API_URL, token) {
                 const rowsHtml = users.map(u => `<tr><td>${u._id}</td><td>${u.fullName}</td><td>${u.email}</td><td>${u.role}</td></tr>`).join('');
                 tableHtml = renderTable(headers, rowsHtml);
             } else if (sectionName === 'spots') {
-                const spots = await fetchAdminData('spots');
-                const headers = ['Address', 'Hourly Rate', 'Status', 'Actions'];
+                const spots = await fetchAdminData('spots'); // Không có phân trang theo yêu cầu
+                const headers = ['Image', 'Address', 'Hourly Rate', 'Status', 'Actions'];
                 const rowsHtml = spots.map(s => {
                     let actionsHtml = `<button class="action-btn btn-edit" onclick="toggleEditMode('${s._id}', true)">Edit</button>`;
+                    
+                    // Nút Approve/Reject chỉ khi trạng thái là 'pending'
                     if (s.status === 'pending') {
                         actionsHtml += `
                             <button class="action-btn btn-approve" onclick="handleSpotAction('${s._id}', 'approve')">Approve</button>
                             <button class="action-btn btn-reject" onclick="handleSpotAction('${s._id}', 'reject')">Reject</button>
                         `;
                     }
+                    
+                    // THÊM NÚT "Change Image" VÀ INPUT FILE ẨN
+                    actionsHtml += `
+                        <button class="action-btn btn-image" onclick="triggerImageUpload('${s._id}')">Change Image</button>
+                        <input 
+                            type="file" 
+                            id="image-upload-${s._id}" 
+                            style="display: none;" 
+                            accept="image/*"
+                            onchange="handleImageUpdate('${s._id}')"
+                        >
+                    `;
+                    
+                    // Nút Delete luôn có
                     actionsHtml += `<button class="action-btn btn-delete" onclick="handleSpotAction('${s._id}', 'delete')">Delete</button>`;
                     
+                    const imageUrl = s.images && s.images.length > 0 ? s.images[0] : '/assets/image/parking-area.jpg';
                     return `
                         <tr id="spot-${s._id}">
+                            <td class="spot-image-column"><img src="${imageUrl}" alt="Spot image" class="spot-thumbnail"></td>
                             <td class="editable-address">${s.address}</td>
                             <td class="editable-rate">${s.hourlyRate ? s.hourlyRate.toLocaleString('vi-VN') + ' VND' : 'N/A'}</td>
                             <td><span class="status-${s.status}">${s.status}</span></td>
@@ -210,6 +269,7 @@ function handleDashboardPage(API_URL, token) {
                     `;
                 }).join('');
                 tableHtml = renderTable(headers, rowsHtml);
+                // KHÔNG CÓ paginationHtml ở đây theo yêu cầu
             } else if (sectionName === 'bookings') {
                 const bookings = await fetchAdminData('bookings');
                 const headers = ['Spot Address', 'User', 'Start Time', 'End Time', 'Total Price', 'Status'];

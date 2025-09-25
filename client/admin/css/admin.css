@@ -267,3 +267,16 @@ tbody tr:nth-child(even) {
 .theme-switch label:hover {
   background-color: var(--hover);
 }
+/* === STYLING FOR SPOT IMAGE IN ADMIN TABLE === */
+
+.spot-image-column {
+    width: 120px; /* Đặt chiều rộng cố định cho cột ảnh */
+}
+
+.spot-thumbnail {
+    width: 100px;
+    height: 70px;
+    object-fit: cover; /* Đảm bảo ảnh vừa vặn, không bị méo */
+    border-radius: 6px; /* Bo góc nhẹ cho ảnh */
+    border: 1px solid var(--border);
+}
