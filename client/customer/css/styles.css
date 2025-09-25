@@ -47,7 +47,7 @@ header nav a { color: var(--primary); margin-left: 25px; text-decoration: none; 
 
 /* Hero Search Section */
 .search-section {
-  background: url('../../assets/image/Parking_slider.jpg') center/cover no-repeat;
+  background: url('/assets/image/Parking_slider.jpg') center/cover no-repeat;
   height: 700px; /* keep */
   display: block;
   padding: 20px;
@@ -169,8 +169,8 @@ header nav a { color: var(--primary); margin-left: 25px; text-decoration: none; 
   background-position: center right;
   background-repeat: no-repeat;
 }
-.rent-space-section { background-image: url('../../assets/image/4_charging_Electrify_America.jpeg'); }
-.car-park-section { background-image: url('../../assets/image/vw-skyscraper-tower.jpg'); }
+.rent-space-section { background-image: url('/assets/image/4_charging_Electrify_America.jpeg'); }
+.car-park-section { background-image: url('/assets/image/vw-skyscraper-tower.jpg'); }
 
 .rent-space-section h1, .car-park-section h1 { font-size: 2em; color: var(--primary); margin-bottom: 20px; }
 .rent-space-section p, .car-park-section p { font-size: 1.1em; color: var(--text); line-height: 1.6; margin-bottom: 30px; }
@@ -209,7 +209,7 @@ header nav a { color: var(--primary); margin-left: 25px; text-decoration: none; 
 #popup { display: flex; background-color: var(--white); width: 90%; max-width: 960px; border-radius: var(--radius); overflow: hidden; box-shadow: 0 5px 20px rgba(0,0,0,0.3); position: relative; }
 #close-popup { position: absolute; top: 12px; right: 16px; font-size: 24px; color: var(--black); cursor: pointer; }
 
-.popup-left { background: url('../../assets/image/popup_background.png') no-repeat bottom/cover; color: var(--white); width: 40%; padding: 30px; }
+.popup-left { background: url('assets/image/popup_background.png') no-repeat bottom/cover; color: var(--white); width: 40%; padding: 30px; }
 .popup-left h2 { margin-top: 0; color: var(--white); }
 .popup-left ul { padding: 0 0 20px 20px; }
 
@@ -309,7 +309,7 @@ header nav a { color: var(--primary); margin-left: 25px; text-decoration: none; 
 /* Become a Host */
 .host-page-container { display: flex; justify-content: center; align-items: center; padding: 50px 20px; background-color: var(--bg); }
 .host-panel { display: flex; max-width: 1100px; width: 100%; background-color: var(--white); border-radius: 15px; box-shadow: var(--shadow-3); overflow: hidden; animation: fadeInUp 0.8s ease-out; }
-.host-panel__info { flex-basis: 45%; background-image: linear-gradient(rgba(19,180,126,0.85), rgba(19,180,126,0.85)), url('../assets/image/home_parking.jpg'); background-size: cover; background-position: center; color: var(--white); padding: 50px 40px; display: flex; flex-direction: column; justify-content: center; }
+.host-panel__info { flex-basis: 45%; background-image: linear-gradient(rgba(19,180,126,0.85), rgba(19,180,126,0.85)), url('assets/image/home_parking.jpg'); background-size: cover; background-position: center; color: var(--white); padding: 50px 40px; display: flex; flex-direction: column; justify-content: center; }
 .host-panel__info h2 { color: var(--white); text-align: left; font-size: 2.5em; font-weight: 700; margin: 0 0 20px; padding: 0; }
 .host-panel__info p { font-size: 1.1em; line-height: 1.6; opacity: 0.9; }
 .host-panel__info ul { list-style: none; padding: 0; margin-top: 20px; }
