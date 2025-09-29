@@ -7,6 +7,10 @@ const parkingSpotSchema = new mongoose.Schema({
         type: { type: String, enum: ['Point'], required: true },
         coordinates: { type: [Number], required: true } // [longitude, latitude]
     },
+    images: [{
+        type: String,
+        required: false, // Ảnh có thể không bắt buộc lúc tạo, nhưng sẽ được thêm sau
+    }],
     hourlyRate: { type: Number, required: true },
     monthlyRate: { type: Number },
     status: { type: String, enum: ['pending', 'approved', 'rejected'], default: 'pending' },

@@ -71,7 +71,7 @@ exports.createSpot = async (req, res) => {
         return res.status(400).json({ message: 'An image for the spot is required.' });
     }
     
-    const imageUrl = `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}`;
+    const imageUrl = req.file.path;
 
     try {
         const newSpot = new ParkingSpot({

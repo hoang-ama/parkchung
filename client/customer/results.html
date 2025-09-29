@@ -28,9 +28,10 @@
         <div id="results-grid" class="results-grid">
             <p>Loading...</p>
         </div>
+        <div id="spots-container"></div>
     </main>
-    <script src="js/config.js"></script> 
-    <script type="module" src="js/app.js"></script>
+    <script src="/customer/js/config.js"></script> 
+    <script type="module" src="/customer/js/app.js"></script>
     <script type="module">
         import { api } from './js/apiService.js';
 
@@ -54,7 +55,7 @@
                     const endTime = params.get('endTime');
 
                     const spotCard = document.createElement('a');
-                    spotCard.href = `booking.html?spotId=${spot._id}&startTime=${startTime}&endTime=${endTime}`;
+                    spotCard.href = `spot-details.html?id=${spot._id}&arrival=${encodeURIComponent(startTime)}&leaving=${encodeURIComponent(endTime)}`;
                     spotCard.className = 'spot-card';
                     spotCard.style.animationDelay = `${index * 100}ms`; 
 

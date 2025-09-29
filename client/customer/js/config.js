@@ -10,6 +10,3 @@ if (window.location.hostname === 'localhost' || window.location.hostname === '12
     // Hãy thay thế bằng địa chỉ API thật của bạn
     API_URL = 'https://parkchung.com/api'; 
 }
-
-// In ra để kiểm tra
-console.log(`Current API URL: ${API_URL}`);

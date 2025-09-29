@@ -1,185 +1,20 @@
-/**
- * Chuyển đổi chuỗi ngày giờ từ định dạng "dd/mm/yyyy HH:ii" sang đối tượng Date.
- * @param {string} dateString - Chuỗi ngày giờ cần chuyển đổi.
- * @returns {Date|null} - Đối tượng Date hợp lệ hoặc null nếu thất bại.
- */
-function parseVietnameseDateString(dateString) {
-    if (!dateString) return null;
-    const parts = dateString.match(/(\d{2})\/(\d{2})\/(\d{4}) (\d{2}):(\d{2})/);
-    if (!parts) return null;
+// File: client/customer/js/spot-details.js
 
-    const day = parts[1];
-    const month = parts[2];
-    const year = parts[3];
-    const hours = parts[4];
-    const minutes = parts[5];
-
-    // Tạo lại chuỗi theo định dạng chuẩn ISO (YYYY-MM-DDTHH:mm:ss)
-    const isoString = `${year}-${month}-${day}T${hours}:${minutes}:00`;
-    return new Date(isoString);
-}
-
-// --- LOGIC CHÍNH KHI DOM ĐÃ TẢI ---
 document.addEventListener('DOMContentLoaded', () => {
-    // --- Logic cho Trang chủ (index.html) ---
-    const searchForm = document.getElementById('searchForm');
-    if (searchForm) {
-        const locationInput = document.getElementById('location');
-        const suggestionsBox = document.getElementById('suggestions-box');
-        let debounceTimer;
+    // Chỉ chạy nếu đang ở trang spot-details.html
+    if (!document.querySelector('.booking-grid')) return;
 
-        // Logic Autocomplete
-        locationInput.addEventListener('input', () => {
-            clearTimeout(debounceTimer);
-            const query = locationInput.value;
-            if (query.length < 2) {
-                suggestionsBox.style.display = 'none';
-                return;
-            }
-            debounceTimer = setTimeout(async () => {
-                try {
-                    const response = await fetch(`${API_URL}/spots/autocomplete?q=${encodeURIComponent(query)}`);
-                    const suggestions = await response.json();
-                    displaySuggestions(suggestions, suggestionsBox, locationInput);
-                } catch (error) {
-                    console.error('Error fetching suggestions:', error);
-                }
-            }, 300);
-        });
+    const urlParams = new URLSearchParams(window.location.search);
+    const spotId = urlParams.get('id');
 
-        document.addEventListener('click', (event) => {
-            if (!locationInput.contains(event.target)) {
-                suggestionsBox.style.display = 'none';
-            }
-        });
-
-        // Logic Submit Form
-        searchForm.addEventListener('submit', (event) => {
-            event.preventDefault();
-            const locationText = locationInput.value.trim();
-            const startDateTimeValue = document.getElementById('start-datetime').value;
-            const endDateTimeValue = document.getElementById('end-datetime').value;
-
-            if (!locationText || !startDateTimeValue || !endDateTimeValue) {
-                return alert('Please fill in all search fields.');
-            }
-
-            const startDate = parseVietnameseDateString(startDateTimeValue);
-            const endDate = parseVietnameseDateString(endDateTimeValue);
-
-            if (!startDate || !endDate) {
-                return alert('The date and time format is invalid. Please use the date picker.');
-            }
-            if (startDate >= endDate) {
-                return alert('End time must be after the start time.');
-            }
-
-            const queryParams = new URLSearchParams({
-                startTime: startDate.toISOString(),
-                endTime: endDate.toISOString(),
-                q: locationText
-            });
-            window.location.href = `results.html?${queryParams.toString()}`;
-        });
-
-        // Cấu hình Flatpickr
-        flatpickr("#start-datetime", { enableTime: true, dateFormat: "d/m/Y H:i", time_24hr: true, minDate: "today" });
-        flatpickr("#end-datetime", { enableTime: true, dateFormat: "d/m/Y H:i", time_24hr: true, minDate: "today" });
-    }
-
-    function displaySuggestions(suggestions, box, input) {
-        if (suggestions.length === 0) {
-            box.style.display = 'none';
-            return;
-        }
-        box.innerHTML = '';
-        suggestions.forEach(suggestion => {
-            const div = document.createElement('div');
-            div.textContent = suggestion;
-            div.className = 'suggestion-item';
-            div.onclick = () => {
-                input.value = suggestion;
-                box.style.display = 'none';
-            };
-            box.appendChild(div);
-        });
-        box.style.display = 'block';
-    }
-    
-    // --- Logic cho Trang kết quả (results.html) ---
-    if (window.location.pathname.endsWith('results.html')) {
-        const resultsGrid = document.getElementById('results-grid');
-        const params = new URLSearchParams(window.location.search);
-        const criteria = {
-            q: params.get('q'),
-            startTime: params.get('startTime'),
-            endTime: params.get('endTime')
-        };
-        loadAndDisplaySpots(criteria, resultsGrid);
-    }
-
-    // --- Logic cho Trang chi tiết bãi đỗ (spot-details.html) ---
-    if (window.location.pathname.endsWith('spot-details.html')) {
-        const urlParams = new URLSearchParams(window.location.search);
-        const spotId = urlParams.get('id');
-        if (!spotId) {
-            alert('Spot ID not found. Redirecting...');
-            window.location.href = 'results.html';
-        } else {
-            initializeSpotBookingPage(spotId);
-        }
+    if (!spotId) {
+        alert('Spot ID not found. Redirecting...');
+        window.location.href = 'results.html';
+    } else {
+        initializeSpotBookingPage(spotId);
     }
 });
 
-/**
- * Tải và hiển thị danh sách các bãi đỗ xe
- * @param {object} criteria - Các tiêu chí tìm kiếm {q, startTime, endTime}
- * @param {HTMLElement} container - Element để hiển thị kết quả
- */
-async function loadAndDisplaySpots(criteria, container) {
-    if (!container) return;
-    container.innerHTML = '<p>Loading...</p>';
-    try {
-        const query = new URLSearchParams(criteria).toString();
-        const response = await fetch(`${API_URL}/spots/search?${query}`);
-        if (!response.ok) throw new Error(await response.text());
-        const spots = await response.json();
-
-        container.innerHTML = '';
-        if (spots.length === 0) {
-            container.innerHTML = '<p class="no-results">Sorry, no available parking spots were found for your criteria.</p>';
-            return;
-        }
-
-        spots.forEach((spot, index) => {
-            const spotCard = document.createElement('a');
-            // Đảm bảo truyền đúng tham số
-            spotCard.href = `spot-details.html?id=${spot._id}&arrival=${encodeURIComponent(criteria.startTime)}&leaving=${encodeURIComponent(criteria.endTime)}`;
-            spotCard.className = 'spot-card';
-            spotCard.style.animationDelay = `${index * 100}ms`;
-            const imageUrl = spot.images && spot.images.length > 0 ? spot.images[0] : '../assets/image/parking-area.jpg';
-            spotCard.innerHTML = `
-                <img src="${imageUrl}" alt="${spot.address}" class="spot-card__image">
-                <div class="spot-card__content">
-                    <h3>${spot.address}</h3>
-                    <div class="spot-card__info">
-                        <span class="spot-card__info-price">${spot.hourlyRate.toLocaleString('vi-VN')} VND / hour</span>
-                    </div>
-                    <div class="spot-card__cta">Book Now</div>
-                </div>
-            `;
-            container.appendChild(spotCard);
-        });
-    } catch (error) {
-        container.innerHTML = `<p class="no-results" style="color: red;">Error: ${error.message}</p>`;
-        console.error('Error loading spots:', error);
-    }
-}
-
-/**
- * Khởi tạo và xử lý logic cho trang chi tiết bãi đỗ
- * @param {string} spotId - ID của bãi đỗ xe
- */
 async function initializeSpotBookingPage(spotId) {
     let currentSpotData = null; // Để lưu dữ liệu spot hiện tại
     let arrivalFlatpickr, leavingFlatpickr; // Biến cho Flatpickr instances

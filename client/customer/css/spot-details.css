@@ -1,0 +1,260 @@
+/* ============================================= */
+/* === STYLING FOR SPOT DETAILS & BOOKING PAGE === */
+/* ============================================= */
+
+
+/* ================= HEADER / NAVIGATION BAR ================= */
+.main-header {
+  background-color: #43957f;   /* màu nền header */
+  padding: 15px 30px;
+  position: sticky;            /* header luôn dính trên cùng */
+  top: 0;
+  z-index: 1000;
+}
+
+.header-container {
+  display: flex;               /* chia logo & nav ra 2 bên */
+  justify-content: space-between;
+  align-items: center;
+  max-width: 1200px;
+  margin: auto;
+}
+
+.logo a {
+  font-size: 1.5em;            /* chữ logo to hơn */
+  font-weight: 700;
+  color: #fff;                 /* màu trắng */
+  text-decoration: none;       /* bỏ gạch chân */
+}
+
+.main-nav .nav-list {
+  list-style: none;            /* bỏ dấu chấm */
+  display: flex;               /* menu ngang */
+  gap: 25px;
+  margin: 0;
+  padding: 0;
+}
+
+.main-nav .nav-item a {
+  color: #fff;                 /* chữ trắng */
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.3s ease; /* hiệu ứng hover mượt */
+}
+
+.main-nav .nav-item a:hover {
+  color: #222;                 /* hover chuyển đen */
+}
+
+/* ----- Responsive cho mobile ----- */
+@media (max-width: 768px) {
+  .main-nav .nav-list {
+    flex-direction: column;    /* menu dọc */
+    background: #13b47e;
+    position: absolute;
+    top: 60px;
+    right: 0;
+    padding: 20px;
+    display: none;             /* mặc định ẩn, sau này JS sẽ bật */
+  }
+}
+
+
+/* ================= BOOKING PAGE LAYOUT ================= */
+.booking-page-main {
+    padding: 40px 20px;         /* khoảng cách xung quanh trang */
+    background-color: var(--bg);
+}
+
+.page-title {
+    font-size: 2.2em;           /* tiêu đề trang */
+    color: var(--text);
+    margin: 0 0 30px 0;
+    text-align: left;
+    padding: 0;
+}
+
+.booking-grid {
+    display: grid;              /* chia layout 2 cột */
+    grid-template-columns: 2fr 1fr; /* trái 2 phần, phải 1 phần */
+    gap: 30px;
+    align-items: flex-start;
+    max-width: 1200px;
+    margin: auto;
+}
+
+.booking-details-column,
+.booking-summary-column {
+    display: flex;              /* xếp các card theo cột */
+    flex-direction: column;
+    gap: 25px;
+}
+
+.info-card {
+    background: var(--white);
+    border-radius: var(--radius-lg);
+    padding: 25px;
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--border, #e1e7ec);
+}
+
+
+/* ================= LEFT COLUMN: DETAILS ================= */
+.spot-image-map {
+  position: relative;
+  padding: 0;
+  overflow: hidden;
+}
+
+.spot-image-large {
+    width: 100%;
+    height: 400px;
+    object-fit: cover;          /* ảnh fill toàn bộ */
+    display: block;
+    background-color: #eee;     /* fallback màu xám */
+}
+
+.spot-image-nav {
+    /* Định vị ở giữa theo chiều dọc */
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+
+    /* Trải dài ra toàn bộ chiều rộng của ảnh */
+    left: 0;
+    right: 0;
+
+    /* Sắp xếp các nút và bộ đếm */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 15px; /* Khoảng cách từ hai bên mép ảnh */
+    pointer-events: none; /* Cho phép click xuyên qua lớp này */
+}
+.spot-image-nav-btn { 
+    background-color: rgba(0, 0, 0, 0.4);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    font-size: 1.2em;
+    cursor: pointer;
+    transition: background-color 0.2s, transform 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: all; /* Cho phép click vào nút */ 
+}
+.spot-image-nav-btn:hover {
+    background-color: rgba(0, 0, 0, 0.6);
+    transform: scale(1.1);
+}
+.spot-image-nav-btn:disabled {
+    opacity: 0.3;
+    cursor: not-allowed; 
+}
+#spot-image-counter {
+    background-color: rgba(0, 0, 0, 0.6);
+    color: white;
+    padding: 5px 15px;
+    border-radius: 20px;
+    font-size: 0.9em;
+    font-weight: 600;
+    pointer-events: all; /* Cho phép tương tác nếu cần */
+}
+
+.booking-info-card h2,
+.user-contact-card h2,
+.vehicle-info-card h2 {
+    font-size: 1.5em;            /* heading card bên trái */
+    color: var(--text);
+    margin: 0 0 20px 0;
+    padding-bottom: 15px;
+    border-bottom: 1px solid var(--border, #e0e0e0);
+}
+.booking-info-item {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap; /* Cho phép các phần tử xuống dòng khi cần */
+    margin-bottom: 15px;
+    font-size: 1em;
+}
+
+.booking-info-item .label {
+    flex-basis: 100%; /* Đảm bảo label chiếm trọn một hàng */
+    margin-bottom: 8px; /* Thêm khoảng cách với input bên dưới */
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--text-light);
+}
+
+.booking-info-item .flatpickr-input {
+    width: 100%; /* Đảm bảo input chiếm trọn chiều rộng */
+}
+.booking-info-item .label { display: flex; align-items: center; gap: 10px; color: var(--muted); }
+.booking-info-item .icon { font-size: 1em; color: var(--primary); width: 30px; text-align: center; }
+.booking-info-item .highlight-text,
+.booking-info-item .flatpickr-input { font-weight: 600; color: var(--primary-dark); text-align: right; border: none; background: transparent; font-size: 1em; padding: 0; cursor: pointer; font-family: 'Montserrat', sans-serif; }
+.booking-info-item .flatpickr-input:focus { outline: none; }
+.booking-info-item .value-wrapper {
+    margin-left: auto; /* Đẩy khối này sang phải */
+    text-align: right;  /* Căn phải nội dung bên trong */
+    flex-grow: 1;       /* Cho phép nó chiếm không gian còn lại */
+}
+.user-contact-card p,
+.vehicle-info-card p { margin: 0 0 10px 0; color: var(--muted); }
+.user-contact-card .help-text { font-size: 0.9em; font-style: italic; }
+
+
+/* ================= RIGHT COLUMN: SUMMARY & PAYMENT ================= */
+.booking-summary-card {
+    position: sticky;            /* sticky bên phải */
+    top: 100px;
+}
+
+.booking-summary-card h3 { font-size: 1.4em; color: var(--text); margin: 0 0 10px 0; }
+
+.price-breakdown { border-top: 1px solid var(--border, #e0e0e0); padding-top: 20px; margin: 20px 0; }
+.price-item { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; font-size: 1em; }
+.price-item .info-icon { font-size: 0.8em; color: var(--muted); cursor: help; }
+.price-value { font-weight: 600; }
+.total-price { font-size: 1.3em !important; font-weight: 700; color: var(--primary); margin-top: 15px; padding-top: 15px; border-top: 1px solid var(--border, #e0e0e0); }
+.rechecked-info { font-size: 0.85em; color: var(--muted); text-align: right; }
+
+.countdown-timer { background-color: var(--primary-light, #f5faf6); border-radius: var(--radius); padding: 15px; text-align: center; margin: 20px 0; }
+.countdown-timer p { margin: 0 0 8px 0; font-size: 0.9em; font-weight: 500; }
+.countdown-timer .timer-value { font-size: 2.2em; font-weight: 700; color: var(--primary-dark); }
+
+#pay-and-reserve-btn {
+    width: 100%;
+    padding: 15px;
+    font-size: 1.2em;
+    font-weight: 700;
+    background: linear-gradient(45deg, var(--primary), #27ae60);
+    color: var(--white);
+    border: none;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 10px rgba(19, 180, 126, 0.3);
+}
+#pay-and-reserve-btn:hover { transform: translateY(-3px); box-shadow: 0 6px 15px rgba(19, 180, 126, 0.4); }
+#pay-and-reserve-btn:disabled { background: #bdc3c7; cursor: not-allowed; box-shadow: none; transform: none; }
+
+.terms-text { font-size: 0.8em; color: var(--muted); text-align: center; margin-top: 15px; }
+.terms-text a { color: var(--primary); text-decoration: underline; }
+
+.trust-info-card { background: transparent; box-shadow: none; border: none; padding: 0; }
+.trust-item { display: flex; align-items: center; margin-bottom: 12px; color: var(--text-light); font-size: 0.9em; }
+.trust-item .icon { font-size: 1.2em; margin-right: 10px; color: var(--primary); }
+.trust-item.trustpilot { font-weight: bold; }
+.trust-item.trustpilot .stars { margin-left: 5px; color: #f39c12; }
+
+
+/* ================= RESPONSIVE (TABLET / MOBILE) ================= */
+@media (max-width: 992px) {
+    .booking-grid { grid-template-columns: 1fr; }   /* từ 2 cột → 1 cột */
+    .booking-summary-card { position: static; margin-top: 30px; } /* bỏ sticky trên mobile */
+}
