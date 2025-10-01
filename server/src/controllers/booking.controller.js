@@ -1,5 +1,6 @@
 const Booking = require('../models/booking.model');
 const ParkingSpot = require('../models/parkingSpot.model');
+const Lead = require('../models/lead.model');
 /**
  * Hàm trợ giúp để tính toán giá dựa trên thời gian và giá giờ của spot
  * @param {Date} startTime
@@ -20,6 +21,73 @@ const calculatePrice = (startTime, endTime, hourlyRate) => {
 
     // Ví dụ: Làm tròn lên 2 chữ số thập phân
     return parseFloat(totalPrice.toFixed(2));
+};
+
+/**
+ * @desc    Create booking as guest (no login required)
+ * @route   POST /api/bookings/guest
+ * @access  Public
+ */
+exports.createGuestBooking = async (req, res) => {
+    const { spot, startTime, endTime, fullName, email, phoneNumber } = req.body;
+
+    if (!fullName || !email || !phoneNumber) {
+        return res.status(400).json({ message: 'Full name, email and phone number are required.' });
+    }
+
+    const parkingSpot = await ParkingSpot.findById(spot);
+    if (!parkingSpot) {
+        return res.status(404).json({ message: 'Parking spot not found.' });
+    }
+
+    const parsedStartTime = new Date(startTime);
+    const parsedEndTime = new Date(endTime);
+
+    if (isNaN(parsedStartTime) || isNaN(parsedEndTime)) {
+        return res.status(400).json({ message: 'Invalid start or end time.' });
+    }
+    if (parsedStartTime >= parsedEndTime) {
+        return res.status(400).json({ message: 'End time must be after start time.' });
+    }
+    if (parsedStartTime < new Date()) {
+        return res.status(400).json({ message: 'Start time cannot be in the past.' });
+    }
+
+    // Check overlap with active bookings
+    const conflictingBookings = await Booking.find({
+        spot: spot,
+        status: { $in: ['pending', 'confirmed'] },
+        $or: [
+            {
+                startTime: { $lt: parsedEndTime },
+                endTime: { $gt: parsedStartTime }
+            }
+        ]
+    });
+    if (conflictingBookings.length > 0) {
+        return res.status(409).json({ message: 'This parking spot is already booked for the selected time slot.' });
+    }
+
+    const totalPrice = calculatePrice(parsedStartTime, parsedEndTime, parkingSpot.hourlyRate);
+
+    try {
+        const lead = new Lead({
+            spot,
+            startTime: parsedStartTime,
+            endTime: parsedEndTime,
+            totalPrice,
+            status: 'pending',
+            fullName,
+            email,
+            phoneNumber,
+            source: 'guest'
+        });
+
+        const createdLead = await lead.save();
+        res.status(201).json(createdLead);
+    } catch (error) {
+        res.status(400).json({ message: error.message });
+    }
 };
 
 /**

@@ -1,5 +1,7 @@
 // File: client/customer/js/spot-details.js
 
+
+
 document.addEventListener('DOMContentLoaded', () => {
     // Chỉ chạy nếu đang ở trang spot-details.html
     if (!document.querySelector('.booking-grid')) return;
@@ -160,6 +162,7 @@ async function initializeSpotBookingPage(spotId) {
         altInput: true,
         altFormat: "F j, Y h:i K", // VD: September 10, 2024 03:30 PM
         time_24hr: false,
+        onChange: updatePriceSummary,
         onClose: function(selectedDates, dateStr, instance) {
             if (instance === arrivalFlatpickr && selectedDates.length > 0) {
                 leavingFlatpickr.set('minDate', selectedDates[0]);
@@ -252,21 +255,88 @@ async function initializeSpotBookingPage(spotId) {
 
     payAndReserveBtn.addEventListener('click', async () => {
         const token = localStorage.getItem('userToken');
-        if (!token) {
-            alert('You need to be logged in to make a booking.');
-            window.location.href = 'login.html';
-            return;
-        }
-
         const startTime = arrivalFlatpickr.selectedDates[0];
         const endTime = leavingFlatpickr.selectedDates[0];
-        const phoneNumber = phoneNumberInput.value.trim();
-        const vehicleReg = vehicleRegInput.value.trim();
-
         if (!startTime || !endTime || startTime >= endTime) {
             alert('Please select valid arrival and leaving times.');
             return;
         }
+
+        // If not logged in, open guest modal and handle guest booking flow
+        if (!token) {
+            const modal = document.getElementById('leadModal');
+            const fullNameEl = document.getElementById('guest-fullname');
+            const emailEl = document.getElementById('guest-email');
+            const phoneEl = document.getElementById('guest-phone');
+            const cancelBtn = document.getElementById('guest-cancel');
+            const cancelBtnSecondary = document.getElementById('guest-cancel-secondary');
+            const submitBtn = document.getElementById('guest-submit');
+
+            // Set selected times preview
+            const options = { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' };
+            const fromEl = document.getElementById('pc-time-from');
+            const toEl = document.getElementById('pc-time-to');
+            if (fromEl) fromEl.textContent = new Date(startTime).toLocaleString('vi-VN', options);
+            if (toEl) toEl.textContent = new Date(endTime).toLocaleString('vi-VN', options);
+
+            // Open modal via class for CSS animations
+            modal.classList.add('is-open');
+            // Autofocus first field for convenience
+            if (fullNameEl) { try { fullNameEl.focus(); } catch(e) {} }
+
+            const closeModal = () => { modal.classList.remove('is-open'); };
+            cancelBtn.onclick = closeModal;
+            if (cancelBtnSecondary) cancelBtnSecondary.onclick = closeModal;
+            modal.onclick = (e) => { if (e.target === modal) closeModal(); };
+            // Allow closing with Escape
+            const escHandler = (e) => { if (e.key === 'Escape') { closeModal(); window.removeEventListener('keydown', escHandler); } };
+            window.addEventListener('keydown', escHandler);
+
+            submitBtn.onclick = async () => {
+                const fullName = (fullNameEl.value || '').trim();
+                const email = (emailEl.value || '').trim();
+                const phoneNumber = (phoneEl.value || '').trim();
+                if (!fullName || !email || !phoneNumber) {
+                    alert('Please fill in full name, email and phone number.');
+                    return;
+                }
+                try {
+                    submitBtn.disabled = true;
+                    submitBtn.textContent = 'Submitting...';
+                    const response = await fetch(`${API_URL}/bookings/guest`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            spot: spotId,
+                            startTime: startTime.toISOString(),
+                            endTime: endTime.toISOString(),
+                            fullName,
+                            email,
+                            phoneNumber
+                        })
+                    });
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        throw new Error(errorData.message || 'Guest booking failed.');
+                    }
+                    const bookingConfirmation = await response.json();
+                    closeModal();
+                    alert('Booking successful!');
+                    // Guest does not have My Bookings, redirect to home or results
+                    window.location.href = 'index.html';
+                } catch (error) {
+                    alert(error.message);
+                } finally {
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Send & Reserve';
+                }
+            };
+            return; // Stop further processing
+        }
+
+        const phoneNumber = phoneNumberInput.value.trim();
+        const vehicleReg = vehicleRegInput.value.trim();
+
         if (!phoneNumber) {
             alert('Please enter your phone number.');
             return;

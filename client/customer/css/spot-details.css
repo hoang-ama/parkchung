@@ -5,7 +5,7 @@
 
 /* ================= HEADER / NAVIGATION BAR ================= */
 .main-header {
-  background-color: #43957f;   /* màu nền header */
+  background-color: #0d4234;   /* màu nền header */
   padding: 15px 30px;
   position: sticky;            /* header luôn dính trên cùng */
   top: 0;
@@ -23,7 +23,7 @@
 .logo a {
   font-size: 1.5em;            /* chữ logo to hơn */
   font-weight: 700;
-  color: #fff;                 /* màu trắng */
+  color: #878484;                 /* màu trắng */
   text-decoration: none;       /* bỏ gạch chân */
 }
 
@@ -36,7 +36,7 @@
 }
 
 .main-nav .nav-item a {
-  color: #fff;                 /* chữ trắng */
+  color: #ffffff;                 /* chữ trắng */
   text-decoration: none;
   font-weight: 500;
   transition: color 0.3s ease; /* hiệu ứng hover mượt */

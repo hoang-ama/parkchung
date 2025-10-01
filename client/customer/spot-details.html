@@ -6,6 +6,8 @@
     <title>Booking - details </title>
     <link rel="stylesheet" href="/customer/css/spot-details.css">
     <link rel="stylesheet" href="/customer/css/styles.css">
+    <link rel="stylesheet" href="/customer/css/popup.css">
+    <link rel="icon" type="image/png" href="/assets/logo/favicon.png" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/material_blue.css">
 </head>
@@ -17,19 +19,19 @@
             </div>
             <nav class="main-nav">
                 <ul class="nav-list">
-                    <li class="nav-item"><a href="index.html">Home</a></li>
-                    <li class="nav-item"><a href="results.html">Available Spots</a></li>
-                    <li class="nav-item"><a href="#" id="logout-link">Logout</a></li>
-                    <li class="nav-item"><a href="login.html" id="login-link">Login</a></li>
-                    <li class="nav-item"><a href="register.html" id="register-link">Register</a></li>
+                    <li class="nav-item"><a href="index.html" data-i18n="nav_home">Home</a></li>
+                    <li class="nav-item"><a href="results.html" data-i18n="nav_available">Available Spots</a></li>
+                    <li class="nav-item"><a href="#" id="logout-link" data-i18n="logout">Logout</a></li>
+                    <li class="nav-item"><a href="login.html" id="login-link" data-i18n="login">Login</a></li>
+                    <li class="nav-item"><a href="register.html" id="register-link" data-i18n="becomeHostRegister">Become a Host / Register</a></li>
                 </ul>
             </nav>
         </div>
     </header>
     <div class="page-banner">
         <div class="container banner-container">
-            <h1 class="banner-title">Parkchung Booking Details</h1>
-            <p class="banner-subtitle">You're almost done! Just a few more details to confirm your booking.</p>
+            <h1 class="banner-title" data-i18n="details_title">Parkchung Booking Details</h1>
+            <p class="banner-subtitle" data-i18n="details_subtitle">You're almost done! Just a few more details to confirm your booking.</p>
         </div>  
     <main class="booking-page-main container">
         <div class="booking-grid">
@@ -48,20 +50,20 @@
                     </div>
                 </div>
                 <div class="info-card booking-info-card">
-                    <h2>Booking details</h2>
+                    <h2 data-i18n="details_section_title">Booking details</h2>
                     <div class="booking-info-item">
                         <span class="icon">📅</span>
-                        <span>Arriving on</span>
-                        <input type="text" id="booking-arrival-date-input" class="text-input flatpickr-input" placeholder="Select Date/Time">
+                        <span data-i18n="arriving_on">Arriving on</span>
+                        <input type="text" id="booking-arrival-date-input" class="text-input flatpickr-input" placeholder="Select Date/Time" data-i18n-placeholder="ph_select_datetime">
                     </div>
                     <div class="booking-info-item">
                         <span class="icon">📅</span>
-                        <span>Leaving on</span>
-                        <input type="text" id="booking-leaving-date-input" class="text-input flatpickr-input" placeholder="Select Date/Time">
+                        <span data-i18n="leaving_on">Leaving on</span>
+                        <input type="text" id="booking-leaving-date-input" class="text-input flatpickr-input" placeholder="Select Date/Time" data-i18n-placeholder="ph_select_datetime">
                     </div>
                     <div class="booking-info-item">
                         <span class="icon">⏱️</span>
-                        <span>Duration</span>
+                        <span data-i18n="duration">Duration</span>
                         <div class="value-wrapper">
                             <span id="booking-duration" class="highlight-text">--</span>
                         </div>
@@ -69,26 +71,26 @@
                     </div>
 
                 <div class="info-card user-contact-card">
-                    <h2>Let's get started</h2>
-                    <p>Phone number <span class="help-text">In case you need to be contacted.</span></p>
-                    <input type="text" id="phone-number-input" placeholder="+44" class="text-input">
+                    <h2 data-i18n="contact_title">Let's get started</h2>
+                    <p><span data-i18n="contact_phone_label">Phone number</span> <span class="help-text" data-i18n="contact_hint">In case you need to be contacted.</span></p>
+                    <input type="text" id="phone-number-input" placeholder="+84" class="text-input">
                     </div>
 
                 <div class="info-card vehicle-info-card">
-                    <h2>Vehicle information</h2>
-                    <p>Your vehicle registration number will be shared with the parking space owner/operator.</p>
-                    <input type="text" id="vehicle-reg-input" placeholder="Enter registration" class="text-input">
+                    <h2 data-i18n="vehicle_title">Vehicle information</h2>
+                    <p data-i18n="vehicle_desc">Your vehicle registration number will be shared with the parking space owner/operator.</p>
+                    <input type="text" id="vehicle-reg-input" placeholder="Enter registration" data-i18n-placeholder="ph_vehicle_reg" class="text-input">
                 </div>
 
                 <div class="info-card payment-method-card">
-                    <h2>Payment information</h2>
-                    <p>All payments are secure and encrypted</p>
+                    <h2 data-i18n="payment_title">Payment information</h2>
+                    <p data-i18n="payment_desc">All payments are secure and encrypted</p>
                     </div>
             </div>
 
             <div class="booking-summary-column">
                 <div class="booking-summary-card">
-                    <h3 id="spot-address">Loading Address...</h3>
+                    <h3 id="spot-address" data-i18n="spot_loading">Loading Address...</h3>
                     <div class="rating">
                         <span class="stars">★★★★★</span>
                         <span class="rating-value">4.9</span>
@@ -96,57 +98,92 @@
 
                     <div class="price-breakdown">
                     <div class="price-item">
-                        <span>Unit Price</span>
+                        <span data-i18n="unit_price">Unit Price</span>
                         <span id="summary-unit-price" class="price-value">-- VND / hour</span>
                     </div>
                     <div class="price-item">
-                        <span>Parking Duration</span>
+                        <span data-i18n="parking_duration">Parking Duration</span>
                         <span id="summary-duration" class="price-value">-- hours</span>
                     </div>
                     <div class="price-item total-price">
-                        <span>Total Price</span>
+                        <span data-i18n="total_price">Total Price</span>
                         <span id="summary-final-price" class="price-value">0 VND</span>
                     </div>
                 </div>
 
-                    <p class="rechecked-info">Availability rechecked in <span id="rechecked-time">--:--</span></p>
+                    <p class="rechecked-info" data-i18n="rechecked">Availability rechecked in <span id="rechecked-time">--:--</span></p>
 
                     <div class="countdown-timer">
-                        <p>Time to complete booking:</p>
+                        <p data-i18n="time_to_complete">Time to complete booking:</p>
                         <span id="timer-display" class="timer-value">15:00</span>
                     </div>
 
-                    <button id="pay-and-reserve-btn" class="btn btn-action" disabled>£0.00 - Pay now and reserve</button>
-                    <p class="terms-text">Clicking below indicates that you have read and accept the <a href="#">Terms & Conditions</a></p>
+                    <button id="pay-and-reserve-btn" class="btn btn-action" disabled data-i18n="btn_pay_reserve">£0.00 - Pay now and reserve</button>
+                    <p class="terms-text" data-i18n="terms">Clicking below indicates that you have read and accept the <a href="#">Terms & Conditions</a></p>
                     <div class="trust-item">
-                        <span class="icon">✅</span> Best Price Guaranteed
+                        <span class="icon">✅</span> <span data-i18n="trust_best_price">Best Price Guaranteed</span>
                     </div>
                     <div class="trust-item">
-                        <span class="icon">⭐</span> 163,000+ reviews
+                        <span class="icon">⭐</span> <span data-i18n="trust_reviews">163,000+ reviews</span>
                     </div>
                     <div class="trust-item">
-                        <span class="icon">🔒</span> Trusted by 10m drivers
+                        <span class="icon">🔒</span> <span data-i18n="trust_trusted">Trusted by 10m drivers</span>
                     </div>
                     <div class="trust-item">
-                        <span class="icon">⏰</span> Free cancellation up to 24 hours before arrival
+                        <span class="icon">⏰</span> <span data-i18n="trust_free_cancel">Free cancellation up to 24 hours before arrival</span>
                     </div>
                     <div class="trust-item">
-                        <span class="icon">🏆</span> Award-winning customer service
+                        <span class="icon">🏆</span> <span data-i18n="trust_award">Award-winning customer service</span>
                     </div>
                     <div class="trust-item trustpilot">
-                        Excellent <span class="stars">★★★★★</span> Trustpilot
+                        <span data-i18n="trust_excellent">Excellent</span> <span class="stars">★★★★★</span> 
                     </div>
                 </div>
             </div>
         </div>
     </main>
-
-
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script src="/customer/js/config.js"></script> 
     <script src="/customer/js/utils.js"></script>
     <script type="module" src="/customer/js/app.js"></script>
     <script src="/customer/js/spot-details.js"></script> 
+
+    <!-- Guest Booking Modal styled by popup.css -->
+    <div id="leadModal">
+        <div class="pc-modal" role="dialog" aria-modal="true" aria-labelledby="guest-modal-title">
+            <button id="guest-cancel" class="pc-modal__close" aria-label="Close">×</button>
+            <div class="pc-modal__title" id="guest-modal-title" data-i18n="popup_title">Complete your booking</div>
+            <div class="pc-times">
+                <div class="pc-time">
+                    <div class="pc-time__label" data-i18n="popup_from">From</div>
+                    <div id="pc-time-from">--</div>
+                </div>
+                <div class="pc-time pc-time--arrow">→</div>
+                <div class="pc-time">
+                    <div class="pc-time__label" data-i18n="popup_to">To</div>
+                    <div id="pc-time-to">--</div>
+                </div>
+            </div>
+            <div class="pc-form">
+                <div>
+                    <div class="pc-label" data-i18n="popup_fullname">Full name</div>
+                    <input id="guest-fullname" class="pc-input" type="text" placeholder="e.g. Alex Nguyen">
+                </div>
+                <div>
+                    <div class="pc-label" data-i18n="popup_email">Email</div>
+                    <input id="guest-email" class="pc-input" type="email" placeholder="e.g. alex@example.com">
+                </div>
+                <div>
+                    <div class="pc-label" data-i18n="popup_phone">Phone number</div>
+                    <input id="guest-phone" class="pc-input" type="tel" placeholder="e.g. +84 912 345 678">
+                </div>
+            </div>
+            <div class="pc-actions">
+                <button id="guest-cancel-secondary" class="pc-btn pc-btn--secondary" data-i18n="popup_cancel">Cancel</button>
+                <button id="guest-submit" class="pc-btn pc-btn--primary" data-i18n="popup_send">Send & Reserve</button>
+            </div>
+        </div>
+    </div>
 
 </body>
 </html>

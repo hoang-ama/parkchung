@@ -8,10 +8,11 @@ document.addEventListener('DOMContentLoaded', () => {
             e.preventDefault();
             const fullName = e.target.fullName.value;
             const email = e.target.email.value;
+            const phone = e.target.phone ? e.target.phone.value : undefined;
             const password = e.target.password.value;
 
             try {
-                await api.register(fullName, email, password);
+                await api.register(fullName, email, password, phone);
                 alert('Registration successful! Please log in.');
                 window.location.href = 'login.html';
             } catch (error) {

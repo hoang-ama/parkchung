@@ -46,5 +46,4 @@ app.use('/api', allRoutes);
 // Error Handling Middlewares
 app.use(notFound);
 app.use(errorHandler);
-
 module.exports = app;

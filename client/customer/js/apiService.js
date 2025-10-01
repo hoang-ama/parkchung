@@ -40,10 +40,10 @@ export const api = {
             body: JSON.stringify({ email, password }),
         });
     },
-    register: (fullName, email, password) => {
+    register: (fullName, email, password, phone) => {
         return request('/auth/register', {
             method: 'POST',
-            body: JSON.stringify({ fullName, email, password }),
+            body: JSON.stringify({ fullName, email, password, phone }),
         });
     },
     searchSpots: (params) => {

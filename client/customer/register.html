@@ -27,7 +27,7 @@
                 <img src="../assets/logo/logo.svg" alt="Parkchung Logo" />
                 <div>
                     <h1>PARKCHUNG</h1>
-                    <p class="tagline">Save time. Save money. Save Earth</p>
+                    <p class="tagline" data-i18n="tagline">Save time. Save money. Save Earth</p>
                 </div>
             </a>
         </div>
@@ -37,21 +37,25 @@
 
     <main class="auth-container">
         <form id="register-form" class="auth-form">
-            <h2>Create Your Account</h2>
+            <h2 data-i18n="register_title">Create Your Account</h2>
             <div class="form-group">
-                <label for="fullName">Full Name</label>
+                <label for="fullName" data-i18n="full_name">Full Name</label>
                 <input type="text" id="fullName" name="fullName" required>
             </div>
             <div class="form-group">
-                <label for="email">Email</label>
+                <label for="email" data-i18n="email">Email</label>
                 <input type="email" id="email" name="email" required>
             </div>
             <div class="form-group">
-                <label for="password">Password</label>
+                <label for="phone" data-i18n="phone">Phone</label>
+                <input type="tel" id="phone" name="phone">
+            </div>
+            <div class="form-group">
+                <label for="password" data-i18n="password">Password</label>
                 <input type="password" id="password" name="password" required>
             </div>
-            <button type="submit">Register</button>
-            <p class="form-link">Already have an account? <a href="login.html">Login here</a></p>
+            <button type="submit" data-i18n="register">Register</button>
+            <p class="form-link"><span data-i18n="have_account">Already have an account?</span> <a href="login.html" data-i18n="login_here">Login here</a></p>
         </form>
     </main>
     <script src="/customer/js/config.js"></script>

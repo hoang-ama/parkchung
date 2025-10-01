@@ -15,7 +15,7 @@
                 <img src="/assets/logo/logo.svg" alt="Parkchung Logo" />
                 <div>
                     <h1>PARKCHUNG</h1>
-                    <p class="tagline">Save time. Save money. Save Earth</p>
+                    <p class="tagline" data-i18n="tagline">Save time. Save money. Save Earth</p>
                 </div>
             </a>
         </div>
@@ -25,12 +25,12 @@
 
     <main class="bookings-main">
         <div class="bookings-header">
-            <h2>My Bookings</h2>
-            <a href="index.html" class="nav-button home-button">← Back to Home</a>
+            <h2 data-i18n="my_bookings">My Bookings</h2>
+            <a href="index.html" class="nav-button home-button" data-i18n="back_home">← Back to Home</a>
         </div>
         
         <div id="bookings-container">
-            <p>Loading your bookings...</p>
+            <p data-i18n="loading">Loading your bookings...</p>
         </div>
     </main>
     <script src="js/config.js"></script> 
@@ -40,6 +40,7 @@
 
         document.addEventListener('DOMContentLoaded', async () => {
             const container = document.getElementById('bookings-container');
+            const userData = JSON.parse(localStorage.getItem('userData') || '{}');
             if (!localStorage.getItem('userToken')) {
                 container.innerHTML = '<p class="no-bookings-message">Please <a href="login.html">log in</a> to see your bookings.</p>';
                 return;
@@ -63,8 +64,12 @@
                         </div>
                         <div class="booking-card__details">
                             <h3>${b.spot ? b.spot.address : 'Spot Not Found'}</h3>
+                            <p><strong>Customer:</strong> ${userData.fullName || 'N/A'}</p>
+                            <p><strong>Email:</strong> ${userData.email || 'N/A'}</p>
+                            <p><strong>Phone:</strong> ${b.phoneNumber || userData.phone || 'N/A'}</p>
                             <p><strong>From:</strong> ${new Date(b.startTime).toLocaleString('vi-VN', options)}</p>
                             <p><strong>To:</strong> ${new Date(b.endTime).toLocaleString('vi-VN', options)}</p>
+                            <p><strong>Order Time:</strong> ${b.createdAt ? new Date(b.createdAt).toLocaleString('vi-VN', options) : 'N/A'}</p>
                             <p><strong>Status:</strong> <span class="booking-status status-${b.status}">${b.status}</span></p>
                         </div>
                     </div>
