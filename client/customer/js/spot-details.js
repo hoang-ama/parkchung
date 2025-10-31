@@ -251,6 +251,17 @@ async function initializeSpotBookingPage(spotId) {
         }
     }
 
+    // --- HELPER FUNCTIONS ---
+    function updateButtonText(button, text) {
+        if (!button) return;
+        const btnText = button.querySelector('.btn-text');
+        if (btnText) {
+            btnText.textContent = text;
+        } else {
+            button.textContent = text;
+        }
+    }
+
     // --- XỬ LÝ ĐẶT CHỖ ---
 
     payAndReserveBtn.addEventListener('click', async () => {
@@ -300,9 +311,17 @@ async function initializeSpotBookingPage(spotId) {
                     alert('Please fill in full name, email and phone number.');
                     return;
                 }
+                
+                // Validate email format
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailRegex.test(email)) {
+                    alert('Please enter a valid email address.');
+                    return;
+                }
                 try {
                     submitBtn.disabled = true;
-                    submitBtn.textContent = 'Submitting...';
+                    submitBtn.classList.add('loading');
+                    updateButtonText(submitBtn, 'Processing...');
                     const response = await fetch(`${API_URL}/bookings/guest`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
@@ -328,7 +347,8 @@ async function initializeSpotBookingPage(spotId) {
                     alert(error.message);
                 } finally {
                     submitBtn.disabled = false;
-                    submitBtn.textContent = 'Send & Reserve';
+                    submitBtn.classList.remove('loading');
+                    updateButtonText(submitBtn, 'Complete Booking');
                 }
             };
             return; // Stop further processing

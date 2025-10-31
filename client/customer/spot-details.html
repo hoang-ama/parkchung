@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Booking - details </title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/customer/css/spot-details.css">
     <link rel="stylesheet" href="/customer/css/styles.css">
     <link rel="stylesheet" href="/customer/css/popup.css">
@@ -50,42 +53,58 @@
                     </div>
                 </div>
                 <div class="info-card booking-info-card">
-                    <h2 data-i18n="details_section_title">Booking details</h2>
+                    <h2 data-i18n="details_section_title">Booking Details</h2>
                     <div class="booking-info-item">
                         <span class="icon">📅</span>
-                        <span data-i18n="arriving_on">Arriving on</span>
-                        <input type="text" id="booking-arrival-date-input" class="text-input flatpickr-input" placeholder="Select Date/Time" data-i18n-placeholder="ph_select_datetime">
+                        <span class="label" data-i18n="arriving_on">Arriving on</span>
+                        <input type="text" id="booking-arrival-date-input" class="flatpickr-input" placeholder="Select Date/Time" data-i18n-placeholder="ph_select_datetime">
                     </div>
                     <div class="booking-info-item">
                         <span class="icon">📅</span>
-                        <span data-i18n="leaving_on">Leaving on</span>
-                        <input type="text" id="booking-leaving-date-input" class="text-input flatpickr-input" placeholder="Select Date/Time" data-i18n-placeholder="ph_select_datetime">
+                        <span class="label" data-i18n="leaving_on">Leaving on</span>
+                        <input type="text" id="booking-leaving-date-input" class="flatpickr-input" placeholder="Select Date/Time" data-i18n-placeholder="ph_select_datetime">
                     </div>
                     <div class="booking-info-item">
                         <span class="icon">⏱️</span>
-                        <span data-i18n="duration">Duration</span>
+                        <span class="label" data-i18n="duration">Duration</span>
                         <div class="value-wrapper">
                             <span id="booking-duration" class="highlight-text">--</span>
                         </div>
                     </div>
-                    </div>
+                </div>
 
                 <div class="info-card user-contact-card">
-                    <h2 data-i18n="contact_title">Let's get started</h2>
-                    <p><span data-i18n="contact_phone_label">Phone number</span> <span class="help-text" data-i18n="contact_hint">In case you need to be contacted.</span></p>
-                    <input type="text" id="phone-number-input" placeholder="+84" class="text-input">
+                    <h2 data-i18n="contact_title">Contact Information</h2>
+                    <p class="help-text" data-i18n="contact_hint">We'll use this to contact you about your booking</p>
+                    <div class="form-group">
+                        <label for="phone-number-input" class="form-label" data-i18n="contact_phone_label">Phone Number</label>
+                        <input type="tel" id="phone-number-input" placeholder="Enter your phone number" class="text-input" required>
                     </div>
+                </div>
 
                 <div class="info-card vehicle-info-card">
-                    <h2 data-i18n="vehicle_title">Vehicle information</h2>
-                    <p data-i18n="vehicle_desc">Your vehicle registration number will be shared with the parking space owner/operator.</p>
-                    <input type="text" id="vehicle-reg-input" placeholder="Enter registration" data-i18n-placeholder="ph_vehicle_reg" class="text-input">
+                    <h2 data-i18n="vehicle_title">Vehicle Information</h2>
+                    <p class="help-text" data-i18n="vehicle_desc">Your vehicle registration will be shared with the parking operator</p>
+                    <div class="form-group">
+                        <label for="vehicle-reg-input" class="form-label" data-i18n="vehicle_reg_label">Vehicle Registration</label>
+                        <input type="text" id="vehicle-reg-input" placeholder="Enter your vehicle registration" data-i18n-placeholder="ph_vehicle_reg" class="text-input" required>
+                    </div>
                 </div>
 
                 <div class="info-card payment-method-card">
-                    <h2 data-i18n="payment_title">Payment information</h2>
-                    <p data-i18n="payment_desc">All payments are secure and encrypted</p>
+                    <h2 data-i18n="payment_title">Payment Information</h2>
+                    <p class="help-text" data-i18n="payment_desc">All payments are secure and encrypted with bank-level security</p>
+                    <div class="payment-security">
+                        <div class="security-item">
+                            <span class="security-icon">🔒</span>
+                            <span data-i18n="payment_secure">256-bit SSL encryption</span>
+                        </div>
+                        <div class="security-item">
+                            <span class="security-icon">💳</span>
+                            <span data-i18n="payment_methods">All major cards accepted</span>
+                        </div>
                     </div>
+                </div>
             </div>
 
             <div class="booking-summary-column">
@@ -114,8 +133,14 @@
                     <p class="rechecked-info" data-i18n="rechecked">Availability rechecked in <span id="rechecked-time">--:--</span></p>
 
                     <div class="countdown-timer">
-                        <p data-i18n="time_to_complete">Time to complete booking:</p>
+                        <div class="countdown-header">
+                            <span class="countdown-icon">⏰</span>
+                            <p data-i18n="time_to_complete">Time to complete booking:</p>
+                        </div>
                         <span id="timer-display" class="timer-value">15:00</span>
+                        <div class="countdown-progress">
+                            <div class="progress-bar"></div>
+                        </div>
                     </div>
 
                     <button id="pay-and-reserve-btn" class="btn btn-action" disabled data-i18n="btn_pay_reserve">£0.00 - Pay now and reserve</button>
@@ -148,39 +173,67 @@
     <script type="module" src="/customer/js/app.js"></script>
     <script src="/customer/js/spot-details.js"></script> 
 
-    <!-- Guest Booking Modal styled by popup.css -->
-    <div id="leadModal">
-        <div class="pc-modal" role="dialog" aria-modal="true" aria-labelledby="guest-modal-title">
-            <button id="guest-cancel" class="pc-modal__close" aria-label="Close">×</button>
-            <div class="pc-modal__title" id="guest-modal-title" data-i18n="popup_title">Complete your booking</div>
-            <div class="pc-times">
-                <div class="pc-time">
-                    <div class="pc-time__label" data-i18n="popup_from">From</div>
-                    <div id="pc-time-from">--</div>
+    <!-- Guest Booking Modal -->
+    <div id="leadModal" class="guest-modal">
+        <div class="guest-modal__overlay"></div>
+        <div class="guest-modal__container">
+            <div class="guest-modal__header">
+                <h2 class="guest-modal__title" data-i18n="popup_title">Complete Your Booking</h2>
+                <button id="guest-cancel" class="guest-modal__close" aria-label="Close">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+            
+            <div class="guest-modal__content">
+                <div class="booking-summary">
+                    <div class="booking-summary__title" data-i18n="popup_booking_summary">Booking Summary</div>
+                    <div class="booking-summary__times">
+                        <div class="time-item">
+                            <div class="time-label" data-i18n="popup_from">From</div>
+                            <div class="time-value" id="pc-time-from">--</div>
+                        </div>
+                        <div class="time-separator">→</div>
+                        <div class="time-item">
+                            <div class="time-label" data-i18n="popup_to">To</div>
+                            <div class="time-value" id="pc-time-to">--</div>
+                        </div>
+                    </div>
                 </div>
-                <div class="pc-time pc-time--arrow">→</div>
-                <div class="pc-time">
-                    <div class="pc-time__label" data-i18n="popup_to">To</div>
-                    <div id="pc-time-to">--</div>
+
+                <div class="guest-form">
+                    <div class="form-section">
+                        <h3 class="form-section__title" data-i18n="popup_contact_info">Contact Information</h3>
+                        <p class="form-section__description" data-i18n="popup_contact_desc">We'll use this information to confirm your booking</p>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="guest-fullname" class="form-label" data-i18n="popup_fullname">Full Name</label>
+                        <input id="guest-fullname" class="form-input" type="text" placeholder="Enter your full name" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="guest-email" class="form-label" data-i18n="popup_email">Email Address</label>
+                        <input id="guest-email" class="form-input" type="email" placeholder="Enter your email address" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="guest-phone" class="form-label" data-i18n="popup_phone">Phone Number</label>
+                        <input id="guest-phone" class="form-input" type="tel" placeholder="Enter your phone number" required>
+                    </div>
                 </div>
             </div>
-            <div class="pc-form">
-                <div>
-                    <div class="pc-label" data-i18n="popup_fullname">Full name</div>
-                    <input id="guest-fullname" class="pc-input" type="text" placeholder="e.g. Alex Nguyen">
-                </div>
-                <div>
-                    <div class="pc-label" data-i18n="popup_email">Email</div>
-                    <input id="guest-email" class="pc-input" type="email" placeholder="e.g. alex@example.com">
-                </div>
-                <div>
-                    <div class="pc-label" data-i18n="popup_phone">Phone number</div>
-                    <input id="guest-phone" class="pc-input" type="tel" placeholder="e.g. +84 912 345 678">
-                </div>
-            </div>
-            <div class="pc-actions">
-                <button id="guest-cancel-secondary" class="pc-btn pc-btn--secondary" data-i18n="popup_cancel">Cancel</button>
-                <button id="guest-submit" class="pc-btn pc-btn--primary" data-i18n="popup_send">Send & Reserve</button>
+
+            <div class="guest-modal__footer">
+                <button id="guest-cancel-secondary" class="btn btn-secondary" data-i18n="popup_cancel">Cancel</button>
+                <button id="guest-submit" class="btn btn-primary" data-i18n="popup_send">
+                    <span class="btn-text">Complete Booking</span>
+                    <svg class="btn-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M5 12h14M12 5l7 7-7 7"/>
+                    </svg>
+                </button>
             </div>
         </div>
     </div>
