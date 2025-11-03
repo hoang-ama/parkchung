@@ -18,3 +18,6 @@ Thumbs.db
 .vscode/
 #Bypass file parkchung_key.pem
 *.pem
+
+# Bypass file thông tin kết nối đến google api
+credentials.json
