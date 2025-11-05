@@ -1,5 +1,5 @@
 const express = require('express');
-const ggSheetController = require('../controllers/googleSheet.controller');
+const ggSheetController = require('../../controllers/google/googleSheet.controller');
 
 const router = express.Router();
 

@@ -1,4 +1,4 @@
-import * as ggSheetService from "../services/google/googleSheet.service.js";
+import * as ggSheetService from "../../services/google/googleSheet.service.js";
 
 export const readSheetData = async(req, res) => {
     try {
