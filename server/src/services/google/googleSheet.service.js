@@ -1,9 +1,9 @@
-import { google } from 'googleapis';
-import { promises as fs } from "fs"
-import { config } from '../../config/constant.js';
+const { google } = require('googleapis');
+const { promises } =require("fs");
+const { config } = require('../../config/constant.js');
 
 const getSheetData = async (sheetId, sheetTitle) => {
-    const credentials = JSON.parse(await fs.readFile('credentials.json', 'utf-8'));
+    const credentials = JSON.parse(await promises.readFile('credentials.json', 'utf-8'));
     const auth = new google.auth.GoogleAuth({
         credentials,
         scopes: ["https://www.googleapis.com/auth/spreadsheets.readonly"],
@@ -51,4 +51,4 @@ const readGGSheetData = async() => {
     return results;
 }
 
-export { readGGSheetData, getSheetData };
+module.exports = { readGGSheetData, getSheetData };
