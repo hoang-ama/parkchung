@@ -1,9 +1,10 @@
-import { google } from 'googleapis';
-import { promises as fs } from "fs"
-import { config } from '../../config/constant.js';
+const {google} = require('googleapis');
+const { promises } = require("fs");
+const { config } = require('../../config/constant.js');
 
 const getSheetData = async (sheetId, sheetTitle) => {
-    const credentials = JSON.parse(await fs.readFile('credentials.json', 'utf-8'));
+    const credentials = JSON.parse(await promises.readFile('credentials.json', 'utf-8'));
+    
     const auth = new google.auth.GoogleAuth({
         credentials,
         scopes: ["https://www.googleapis.com/auth/spreadsheets.readonly"],
@@ -15,12 +16,16 @@ const getSheetData = async (sheetId, sheetTitle) => {
 
     sheetId = sheetId ? sheetId : config.GGSHEET.sheetId;
     sheetTitle = sheetTitle ? sheetTitle : config.GGSHEET.sheetTitle;
-
-    const response = await sheets.spreadsheets.values.get({
-        spreadsheetId: sheetId,
-        range: sheetTitle
-    })
-
+    let response;
+    try {
+        response = await sheets.spreadsheets.values.get({
+            spreadsheetId: sheetId,
+            range: sheetTitle
+        })
+    } catch (error) {
+        console.log("Message error: ", error)
+        response = [[]]
+    }
     return response.data.values;
 }
 
@@ -51,4 +56,4 @@ const readGGSheetData = async() => {
     return results;
 }
 
-export { readGGSheetData, getSheetData };
+module.exports =  { readGGSheetData, getSheetData };

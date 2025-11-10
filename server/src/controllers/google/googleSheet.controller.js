@@ -1,6 +1,6 @@
-import * as ggSheetService from "../../services/google/googleSheet.service.js";
+const ggSheetService = require("../../services/google/googleSheet.service.js")
 
-export const readSheetData = async(req, res) => {
+const readSheetData = async(req, res) => {
     try {
         const result = await ggSheetService.readGGSheetData();
         res.status(200).json(result);
@@ -8,3 +8,5 @@ export const readSheetData = async(req, res) => {
         res.status(400).json({message: `Cannot get read google sheet data: ${error.message}`});
     }
 }
+
+module.exports = { readSheetData };
