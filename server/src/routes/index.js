@@ -7,6 +7,7 @@ const bookingRoutes = require('./bookings.routes');
 const adminRoutes = require('./admin.routes');
 const googleRoutes = require('./google/google.routes');
 const paymentRouter = require('./payment');
+const bookingEmailRouter = require('./mail/bookingEmail.routes');
 
 router.use('/auth', authRoutes);
 router.use('/spots', spotRoutes);
@@ -14,5 +15,6 @@ router.use('/bookings', bookingRoutes);
 router.use('/admin', adminRoutes);
 router.use('/google', googleRoutes);
 router.use('/payments', paymentRouter);
+router.use('/mail', bookingEmailRouter);
 
 module.exports = router;
