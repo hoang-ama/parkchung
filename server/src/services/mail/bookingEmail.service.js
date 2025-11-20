@@ -1,13 +1,20 @@
 const { getTemplateId, sendMail } = require('./brevo.service.js');
 const { getAddressFromCoordinates } = require('../google/googleMaps.service.js');
+const ParkingSpot = require('../../models/parkingSpot.model.js');
+const User = require('../../models/user.model.js');
 
 const LIST = {
     DEFAULT : 2,
 }
 
-async function sendBookingConfirmEmail(booking) {
-    const templateId = getTemplateId('bookingConfirm');
-    const params = await getParamsSendEmail(booking);
+const RECEIVER_TYPE = {
+    CUSTOMER: 'CUSTOMER',
+    PARTNER: 'PARTNER',
+}
+
+async function sendBookingEmail(booking, templateName) {
+    const templateId = getTemplateId(templateName);
+    const params = await getParamsSendEmail(booking, RECEIVER_TYPE.CUSTOMER);
 
     const bookingEmailBody = {
         to: [
@@ -28,9 +35,9 @@ async function sendBookingConfirmEmail(booking) {
     })
 }
 
-async function sendBookingCancelEmail(booking) {
-    const templateId = getTemplateId('bookingCancel');
-    const params = await getParamsSendEmail(booking);
+async function sendEmailPartner(booking, templateName) {
+    const templateId = getTemplateId(templateName);
+    const params = await getParamsSendEmail(booking, RECEIVER_TYPE.PARTNER);
 
     const bookingEmailBody = {
         to: [
@@ -51,18 +58,20 @@ async function sendBookingCancelEmail(booking) {
     })
 }
 
-async function getParamsSendEmail(booking) {
+async function getParamsSendEmail(booking, receiverType) {
     
     const startTimeObj = parseDateTime(booking.startTime);
     const endTimeObj = parseDateTime(booking.endTime);
 
-    const spot = booking.spot;
+    const spotId = booking.spot;
+
+    const spot = await ParkingSpot.findById(spotId);
     const spotAddress = await getAddressFromCoordinates(spot.location.coordinates[1], spot.location.coordinates[0]);
 
     let params = {
-        guestName: booking.guestFullName,
-        guestMail: booking.guestEmail,
-        guestPhone: booking.guestPhoneNumber,
+        receiverName: booking.guestFullName,
+        receiverMail: booking.guestEmail,
+        receiverPhone: booking.guestPhoneNumber,
         senderMail: 'contact@parkchung.com',
         startDay: startTimeObj.day,
         startMonth: startTimeObj.month,
@@ -78,6 +87,12 @@ async function getParamsSendEmail(booking) {
         spotAddress: spotAddress,
         bookingId: String(booking._id),
         bookingTotal: String(formatCurrency(booking.totalPrice)),
+    }
+
+    if (receiverType === RECEIVER_TYPE.PARTNER) {
+        const partner = await User.findById(spot.owner);
+        params['partnerName'] = partner.fullName;
+        params['partnerMail'] = partner.email;
     }
 
     return params;
@@ -99,4 +114,4 @@ function formatCurrency(number) {
     return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(number);
 }
 
-module.exports = { sendBookingConfirmEmail, sendBookingCancelEmail };
+module.exports = { sendBookingEmail, sendEmailPartner };

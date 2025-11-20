@@ -1,6 +1,8 @@
 const Booking = require('../models/booking.model');
 const ParkingSpot = require('../models/parkingSpot.model');
 const Lead = require('../models/lead.model');
+const { sendBookingEmail, sendEmailPartner } = require('../services/mail/bookingEmail.service.js');
+const { MAIL_TEMPLATE_NAMES } = require('../services/mail/brevo.service.js');
 /**
  * Hàm trợ giúp để tính toán giá dựa trên thời gian và giá giờ của spot
  * @param {Date} startTime
@@ -146,6 +148,13 @@ exports.createBooking = async (req, res) => {
         });
 
         const createdBooking = await booking.save();
+
+        // Gửi email xác nhận đặt chỗ
+        if (createdBooking) {
+            sendBookingEmail(createdBooking, MAIL_TEMPLATE_NAMES.BOOKING_CONFIRM);
+            sendEmailPartner(createdBooking, MAIL_TEMPLATE_NAMES.PARTNER_CONFIRM);
+        }
+
         res.status(201).json(createdBooking);
     } catch (error) {
         res.status(400).json({ message: error.message });

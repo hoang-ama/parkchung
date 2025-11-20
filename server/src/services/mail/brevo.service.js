@@ -10,6 +10,14 @@ const SENDINBLUE_ERRORS = {
     document_not_found: 'document_not_found',
 }
 
+const MAIL_TEMPLATE_NAMES = {
+    BOOKING_CONFIRM: 'bookingConfirm',
+    BOOKING_CANCEL: 'bookingCancel',
+    PARTNER_CANCEL: 'partnerCancel',
+    PARTNER_CONFIRM: 'partnerConfirm',
+    REVIEW: 'review',
+}
+
 async function CreateContact(contactData) {
     const apiInstanceContact = new SibApiV3Sdk.ContactsApi();
     
@@ -68,4 +76,4 @@ function getTemplateId(key) {
     return configTemplateEmail[key];
 }
 
-module.exports = { sendMail, getTemplateId };
+module.exports = { sendMail, getTemplateId, MAIL_TEMPLATE_NAMES };
