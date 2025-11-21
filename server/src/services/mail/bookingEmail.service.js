@@ -42,8 +42,8 @@ async function sendEmailPartner(booking, templateName) {
     const bookingEmailBody = {
         to: [
             {
-                email: booking.guestEmail,
-                name: booking.guestFullName,
+                email: params?.partnerMail,
+                name: params?.partnerName,
             }
         ],
         templateId: templateId,
@@ -51,9 +51,9 @@ async function sendEmailPartner(booking, templateName) {
     };
 
     await sendMail(bookingEmailBody, {
-        name: booking.guestFullName,
-        email: booking.guestEmail,
-        phone: booking.guestPhoneNumber,
+        name: params?.partnerName,
+        email: params?.partnerMail,
+        phone: params?.partnerPhone,
         ids: [LIST.DEFAULT],
     })
 }
@@ -93,6 +93,7 @@ async function getParamsSendEmail(booking, receiverType) {
         const partner = await User.findById(spot.owner);
         params['partnerName'] = partner.fullName;
         params['partnerMail'] = partner.email;
+        params['partnerPhone'] = partner.phone;
     }
 
     return params;
