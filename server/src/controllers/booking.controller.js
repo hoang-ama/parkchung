@@ -282,6 +282,9 @@ exports.cancelBooking = async (req, res) => {
             if (partnerEmail) {
                 await brevoService.sendEmailPartner(bookingData, 'partnerCancel');
             }
+
+            // Also send review request email when customer cancels
+            await brevoService.sendReviewEmail(bookingData);
         } catch (emailError) {
             console.error('Failed to send cancellation emails:', emailError);
             // Don't fail the cancellation if email fails

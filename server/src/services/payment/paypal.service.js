@@ -210,15 +210,32 @@ const markPaymentAndBooking = async ({ payment, booking, paymentStatus, bookingS
                 console.warn(`Skipping partner email for booking ${booking._id}: Partner email not found.`);
             }
 
-            // Schedule review email to be sent 2 hours after successful booking
-            setTimeout(async () => {
+            // Schedule review email to be sent AFTER the parking duration ends (after endTime)
+            const endTime = new Date(booking.endTime);
+            const now = new Date();
+            const delayMs = endTime.getTime() - now.getTime();
+
+            // Only schedule if endTime is in the future
+            if (delayMs > 0) {
+                setTimeout(async () => {
+                    try {
+                        console.log(`Sending scheduled review email for booking ${booking._id} after parking duration ended...`);
+                        await brevoService.sendReviewEmail(bookingData);
+                    } catch (reviewError) {
+                        console.error(`Failed to send scheduled review email for booking ${booking._id}:`, reviewError);
+                    }
+                }, delayMs);
+
+                console.log(`Review email scheduled for booking ${booking._id} at ${endTime.toISOString()} (in ${Math.round(delayMs / 1000 / 60)} minutes)`);
+            } else {
+                console.log(`Booking ${booking._id} has already ended. Sending review email immediately.`);
+                // If the booking has already ended, send review email immediately
                 try {
-                    console.log(`Sending scheduled review email for booking ${booking._id}...`);
                     await brevoService.sendReviewEmail(bookingData);
                 } catch (reviewError) {
-                    console.error(`Failed to send scheduled review email for booking ${booking._id}:`, reviewError);
+                    console.error(`Failed to send immediate review email for booking ${booking._id}:`, reviewError);
                 }
-            }, 2 * 60 * 60 * 1000); // 2 hours in milliseconds
+            }
 
         } else if (bookingStatus === 'cancelled') {
             await brevoService.sendBookingEmail(bookingData, 'bookingCancel');
