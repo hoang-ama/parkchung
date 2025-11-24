@@ -1,0 +1,30 @@
+const PAYMENT_METHODS = Object.freeze({
+    PAYPAL: 'PAYPAL',
+    OFFLINE: 'OFFLINE',
+});
+
+const PAYMENT_STATUSES = Object.freeze({
+    INITIATED: 'INITIATED',
+    PENDING: 'PENDING',
+    COMPLETED: 'COMPLETED',
+    FAILED: 'FAILED',
+    CANCELLED: 'CANCELLED',
+    VOIDED: 'VOIDED',
+    REFUNDED: 'REFUNDED',
+});
+
+const BOOKING_PAYMENT_STATUS = Object.freeze({
+    UNPAID: 'UNPAID',
+    PENDING: 'PENDING',
+    PAID: 'PAID',
+    FAILED: 'FAILED',
+    REFUNDED: 'REFUNDED',
+    CANCELLED: 'CANCELLED',
+});
+
+module.exports = {
+    PAYMENT_METHODS,
+    PAYMENT_STATUSES,
+    BOOKING_PAYMENT_STATUS,
+};
+
