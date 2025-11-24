@@ -1386,10 +1386,10 @@ header nav a {
 .flatpickr-button-container {
   display: flex;
   gap: 10px;
-  padding: 12px;
+  padding: 12px 5px;
   border-top: 1px solid #e6e6e6;
   background-color: #f9f9f9;
-  justify-content: flex-end;
+  justify-content: space-between;
 }
 
 .flatpickr-confirm-btn,

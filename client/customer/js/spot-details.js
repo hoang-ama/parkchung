@@ -42,7 +42,7 @@ async function initializeSpotBookingPage(spotId) {
 
     // --- CÁC HÀM TIỆN ÍCH ---
 
-     function formatCurrency(amount) {
+    function formatCurrency(amount) {
         return `${parseInt(amount).toLocaleString('vi-VN')} VND`;
     }
 
@@ -56,11 +56,11 @@ async function initializeSpotBookingPage(spotId) {
         const minutes = diffMinutes % 60;
 
         if (hours === 0 && minutes === 0) return '--';
-        
+
         let durationText = '';
         if (hours > 0) durationText += `${hours} hour${hours > 1 ? 's' : ''}`;
         if (minutes > 0) durationText += ` ${minutes} minute${minutes > 1 ? 's' : ''}`;
-        
+
         return durationText.trim();
     }
 
@@ -83,7 +83,7 @@ async function initializeSpotBookingPage(spotId) {
             bookingDuration.textContent = '--';
             return;
         }
-        
+
         const totalHours = Math.ceil(Math.abs(endTime - startTime) / 36e5);
 
         // Cập nhật giao diện với thông tin mới
@@ -152,6 +152,59 @@ async function initializeSpotBookingPage(spotId) {
         }
     });
 
+    // --- HELPER FUNCTION FOR FLATPICKR BUTTONS ---
+
+    /**
+     * Adds Confirm and Cancel buttons to a Flatpickr instance
+     * @param {Object} fp - The Flatpickr instance
+     */
+    function addConfirmCancelButtons(fp) {
+        let previousValue = fp.input.value;
+
+        // Create button container
+        const buttonContainer = document.createElement('div');
+        buttonContainer.className = 'flatpickr-button-container';
+
+        // Create Confirm button
+        const confirmBtn = document.createElement('button');
+        confirmBtn.type = 'button';
+        confirmBtn.className = 'flatpickr-confirm-btn';
+        confirmBtn.textContent = 'Confirm';
+        confirmBtn.addEventListener('click', () => {
+            previousValue = fp.input.value;
+            fp.close();
+        });
+
+        // Create Cancel button
+        const cancelBtn = document.createElement('button');
+        cancelBtn.type = 'button';
+        cancelBtn.className = 'flatpickr-cancel-btn';
+        cancelBtn.textContent = 'Cancel';
+        cancelBtn.addEventListener('click', () => {
+            if (previousValue) {
+                fp.input.value = previousValue;
+                // Parse the altFormat to restore the date
+                const parsedDate = fp.parseDate(previousValue, fp.config.altFormat);
+                if (parsedDate) {
+                    fp.setDate(parsedDate, false);
+                }
+            }
+            fp.close();
+        });
+
+        // Append buttons to container
+        buttonContainer.appendChild(confirmBtn);
+        buttonContainer.appendChild(cancelBtn);
+
+        // Append container to calendar
+        fp.calendarContainer.appendChild(buttonContainer);
+
+        // Store previous value when picker opens
+        fp.config.onOpen.push(() => {
+            previousValue = fp.input.value;
+        });
+    }
+
     // --- KHỞI TẠO FLATPCKR VÀ XỬ LÝ SỰ KIỆN ---
 
     const commonFlatpickrOptions = {
@@ -162,7 +215,11 @@ async function initializeSpotBookingPage(spotId) {
         altFormat: "F j, Y h:i K", // VD: September 10, 2024 03:30 PM
         time_24hr: false,
         onChange: updatePriceSummary,
-        onClose: function(selectedDates, dateStr, instance) {
+        onReady: function (selectedDates, dateStr, instance) {
+            addConfirmCancelButtons(instance);
+        },
+        onOpen: [],
+        onClose: function (selectedDates, dateStr, instance) {
             if (instance === arrivalFlatpickr && selectedDates.length > 0) {
                 leavingFlatpickr.set('minDate', selectedDates[0]);
                 if (leavingFlatpickr.selectedDates[0] && leavingFlatpickr.selectedDates[0] <= selectedDates[0]) {
@@ -194,12 +251,12 @@ async function initializeSpotBookingPage(spotId) {
     function startCountdown() {
         clearInterval(countdownInterval);
         timeRemaining = 15 * 60;
-        
+
         countdownInterval = setInterval(() => {
             const minutes = Math.floor(timeRemaining / 60);
             const seconds = timeRemaining % 60;
             timerDisplay.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-            
+
             recheckedTimeDisplay.textContent = new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
 
             if (timeRemaining <= 0) {
@@ -224,7 +281,7 @@ async function initializeSpotBookingPage(spotId) {
             currentSpotData = await response.json();
 
             spotAddressDisplay.textContent = currentSpotData.address;
-            
+
             updateSpotImageDisplay();
 
             const queryParams = new URLSearchParams(window.location.search);
@@ -243,7 +300,7 @@ async function initializeSpotBookingPage(spotId) {
             }
 
             startCountdown();
-            
+
         } catch (error) {
             console.error('Error loading spot details:', error);
             alert(`Error loading spot details: ${error.message}`);
