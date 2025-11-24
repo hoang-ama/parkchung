@@ -1,0 +1,330 @@
+/* ===================
+   PARKCHUNG THEME CSS
+   ===================
+   Includes:
+   - Login Page Styles
+   - Admin Dashboard Styles
+   - Light / Dark Mode Toggle
+*/
+
+:root {
+  /* Light Theme */
+  --primary: #13b47e;
+  --primary-dark: #0d9a6b;
+  --bg: #f4f7fa;
+  --text: #2c3e50;
+  --card-bg: #ffffff;
+  --muted: #7f8c8d;
+  --hover: #e6f5ef;
+  --border: #e1e7ec;
+  --shadow: rgba(0, 0, 0, 0.06);
+}
+
+[data-theme="dark"] {
+  --bg: #1e1e1e;
+  --card-bg: #2c2c2c;
+  --text: #ecf0f1;
+  --muted: #bdc3c7;
+  --border: #444;
+  --shadow: rgba(255, 255, 255, 0.05);
+}
+
+body {
+  margin: 0;
+  font-family: 'Montserrat', sans-serif;
+  background-color: var(--bg);
+  color: var(--text);
+  transition: background 0.3s, color 0.3s;
+}
+
+/* ========== LOGIN ========== */
+.login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: var(--bg);
+  padding: 20px;
+}
+
+.login-form {
+  background: var(--card-bg);
+  padding: 40px;
+  border-radius: 16px;
+  box-shadow: 0 8px 32px var(--shadow);
+  width: 100%;
+  max-width: 400px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.login-form h2 {
+  text-align: center;
+  color: var(--primary);
+  font-size: 2rem;
+  margin-bottom: 10px;
+}
+
+.form-group label {
+  font-weight: 600;
+  margin-bottom: 5px;
+  display: block;
+  color: var(--text);
+}
+
+.form-group input {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: #fff;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.form-group input:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px rgba(19, 180, 126, 0.2);
+  outline: none;
+}
+
+button {
+  padding: 12px;
+  width: 100%;
+  background: var(--primary);
+  color: #fff;
+  font-weight: 700;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+button:hover {
+  background-color: var(--primary-dark);
+}
+
+.error-message {
+  color: #e74c3c;
+  text-align: center;
+  font-weight: 500;
+}
+
+/* ========== ADMIN DASHBOARD ========== */
+.admin-panel {
+  display: flex;
+  min-height: 100vh;
+}
+
+.sidebar {
+  width: 250px;
+  background: var(--primary);
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.sidebar-header {
+  padding: 24px;
+  font-size: 1.4rem;
+  font-weight: bold;
+  text-align: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.sidebar-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.sidebar-nav a {
+  color: #fff;
+  padding: 14px 24px;
+  text-decoration: none;
+  transition: background 0.2s;
+  display: flex;
+  align-items: center;
+}
+
+.sidebar-nav a:hover,
+.sidebar-nav a.active {
+  background-color: var(--primary-dark);
+}
+
+.main-content {
+  flex-grow: 1;
+  background: var(--bg);
+  padding: 32px;
+}
+
+.main-header {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 24px;
+  border-bottom: 2px solid var(--border);
+  padding-bottom: 12px;
+}
+
+/* TABLE */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--card-bg);
+  box-shadow: 0 2px 6px var(--shadow);
+  border-radius: 8px;
+  overflow: hidden;
+  margin-top: 20px;
+}
+
+th,
+td {
+  padding: 14px 18px;
+  text-align: left;
+  border: 1px solid var(--border);
+}
+
+th {
+  background-color: var(--hover);
+  color: var(--primary);
+  font-weight: bold;
+}
+
+tbody tr:nth-child(even) {
+  background-color: #f8fafa;
+}
+
+/* STATUS COLORS */
+.status-pending {
+  color: #f39c12;
+  font-weight: bold;
+}
+
+.status-approved {
+  color: #2ecc71;
+  font-weight: bold;
+}
+
+.status-confirmed {
+  color: #2ecc71;
+  font-weight: bold;
+}
+
+color: #fff;
+padding: 6px 14px;
+border: none;
+border-radius: 6px;
+cursor: pointer;
+}
+
+.btn-edit:hover {
+  background-color: var(--primary-dark);
+}
+
+.action-btn {
+  padding: 6px 14px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  color: #fff;
+  font-size: 0.85rem;
+}
+
+.btn-approve {
+  background-color: #2ecc71;
+}
+
+.btn-approve:hover {
+  background-color: #27ae60;
+}
+
+.btn-reject {
+  background-color: #e74c3c;
+}
+
+.btn-reject:hover {
+  background-color: #c0392b;
+}
+
+.btn-delete {
+  background-color: #e74c3c;
+}
+
+.btn-delete:hover {
+  background-color: #c0392b;
+}
+
+.btn-image {
+  background-color: #3498db;
+}
+
+.btn-image:hover {
+  background-color: #2980b9;
+}
+
+/* EDITABLE INPUT */
+.editable-input {
+  width: 90%;
+  padding: 6px;
+  border: 1px solid var(--primary);
+  border-radius: 4px;
+  font-size: 0.9rem;
+}
+
+select.editable-input {
+  width: 95%;
+}
+
+.action-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: flex-start;
+  margin-top: 6px;
+}
+
+/* ========== THEME SWITCH ========== */
+.theme-switch {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 1000;
+}
+
+.theme-switch input[type="checkbox"] {
+  display: none;
+}
+
+.theme-switch label {
+  display: flex;
+  align-items: center;
+  background-color: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 6px 12px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--text);
+  gap: 6px;
+  box-shadow: 0 2px 4px var(--shadow);
+  transition: background 0.2s;
+}
+
+.theme-switch label:hover {
+  background-color: var(--hover);
+}
+
+/* === STYLING FOR SPOT IMAGE IN ADMIN TABLE === */
+.spot-image-column {
+  width: 120px;
+}
+
+.spot-thumbnail {
+  width: 100px;
+  height: 70px;
+  object-fit: cover;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+}

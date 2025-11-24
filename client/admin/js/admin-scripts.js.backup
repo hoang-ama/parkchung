@@ -1,0 +1,434 @@
+// File: client/admin/js/admin-scripts.js
+
+// --- HÀM XỬ LÝ HÀNH ĐỘNG (ĐẶT Ở GLOBAL SCOPE) ---
+
+/**
+ * Xử lý các hành động Approve, Reject, Delete cho một điểm đỗ xe.
+ * @param {string} spotId - ID của điểm đỗ xe.
+ * @param {'approve' | 'reject' | 'delete'} action - Hành động cần thực hiện.
+ */
+async function handleSpotAction(spotId, action) {
+    const token = localStorage.getItem('adminToken');
+    let method = 'PUT';
+    let endpoint = `/admin/spots/${spotId}/${action}`;
+    let confirmationMessage = `Are you sure you want to ${action} this spot?`;
+
+    if (action === 'delete') {
+        method = 'DELETE';
+        endpoint = `/admin/spots/${spotId}`;
+        confirmationMessage = 'WARNING: This will PERMANENTLY delete the spot. Are you sure?';
+    }
+
+    if (confirm(confirmationMessage)) {
+        try {
+            const response = await fetch(API_URL + endpoint, {
+                method: method,
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+
+            if (!response.ok) {
+                const errData = await response.json();
+                throw new Error(errData.message || `Failed to ${action} spot`);
+            }
+
+            alert(`Spot ${action}d successfully!`);
+            document.querySelector('.sidebar-nav .nav-item[data-section="spots"]').click();
+        } catch (error) {
+            alert(`Error: ${error.message}`);
+        }
+    }
+}
+
+/**
+ * Xử lý các hành động Delete cho booking.
+ * @param {string} bookingId - ID của booking.
+ * @param {'delete'} action - Hành động cần thực hiện.
+ */
+async function handleBookingAction(bookingId, action) {
+    const token = localStorage.getItem('adminToken');
+
+    if (action === 'delete') {
+        if (confirm('Are you sure you want to delete this booking?')) {
+            try {
+                const response = await fetch(`${API_URL}/admin/bookings/${bookingId}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (!response.ok) {
+                    const errData = await response.json();
+                    throw new Error(errData.message || 'Failed to delete booking');
+                }
+
+                alert('Booking deleted successfully!');
+                document.querySelector('.sidebar-nav .nav-item[data-section="bookings"]').click();
+            } catch (error) {
+                alert(`Error: ${error.message}`);
+            }
+        }
+    }
+}
+
+/**
+ * Bật/tắt chế độ chỉnh sửa cho một hàng trong bảng spots.
+ * @param {string} spotId - ID của điểm đỗ xe.
+ * @param {boolean} isEditing - True để bật chế độ chỉnh sửa, false để tắt.
+ */
+function toggleEditMode(spotId, isEditing) {
+    const row = document.getElementById(`spot-${spotId}`);
+    if (!row) return;
+
+    const addressCell = row.querySelector('.editable-address');
+    const rateCell = row.querySelector('.editable-rate');
+    const actionsCell = row.querySelector('.action-buttons');
+
+    if (isEditing) {
+        const currentAddress = addressCell.textContent;
+        const currentRate = parseFloat(rateCell.textContent.replace(/[^0-9.-]+/g, ""));
+
+        addressCell.innerHTML = `<input type="text" class="editable-input" value="${currentAddress}">`;
+        rateCell.innerHTML = `<input type="number" class="editable-input" value="${currentRate}">`;
+
+        actionsCell.setAttribute('data-original-actions', actionsCell.innerHTML);
+        actionsCell.innerHTML = `
+            <button class="action-btn btn-approve" onclick="saveSpotChanges('${spotId}')">Save</button>
+            <button class="action-btn btn-reject" onclick="toggleEditMode('${spotId}', false)">Cancel</button>
+        `;
+    } else {
+        document.querySelector('.sidebar-nav .nav-item[data-section="spots"]').click();
+    }
+}
+
+/**
+ * Bật/tắt chế độ chỉnh sửa cho booking.
+ * @param {string} bookingId - ID của booking.
+ * @param {boolean} isEditing - True để bật chế độ chỉnh sửa, false để tắt.
+ */
+function toggleBookingEditMode(bookingId, isEditing) {
+    const row = document.getElementById(`booking-${bookingId}`);
+    if (!row) return;
+
+    const startCell = row.querySelector('.editable-start');
+    const endCell = row.querySelector('.editable-end');
+    const statusCell = row.querySelector('.editable-status');
+    const actionsCell = row.querySelector('.action-buttons');
+
+    if (isEditing) {
+        // Get current values
+        const startText = startCell.textContent.trim();
+        const endText = endCell.textContent.trim();
+        const statusText = statusCell.querySelector('span').textContent.trim();
+
+        // Convert Vietnamese format to datetime-local format
+        const startDate = parseDateFromVietnamese(startText);
+        const endDate = parseDateFromVietnamese(endText);
+
+        startCell.innerHTML = `<input type="datetime-local" class="editable-input" value="${startDate}">`;
+        endCell.innerHTML = `<input type="datetime-local" class="editable-input" value="${endDate}">`;
+        statusCell.innerHTML = `
+            <select class="editable-input">
+                <option value="pending" ${statusText === 'pending' ? 'selected' : ''}>pending</option>
+                <option value="confirmed" ${statusText === 'confirmed' ? 'selected' : ''}>confirmed</option>
+                <option value="cancelled" ${statusText === 'cancelled' ? 'selected' : ''}>cancelled</option>
+                <option value="completed" ${statusText === 'completed' ? 'selected' : ''}>completed</option>
+            </select>
+        `;
+
+        actionsCell.setAttribute('data-original-actions', actionsCell.innerHTML);
+        actionsCell.innerHTML = `
+            <button class="action-btn btn-approve" onclick="saveBookingChanges('${bookingId}')">Save</button>
+            <button class="action-btn btn-reject" onclick="toggleBookingEditMode('${bookingId}', false)">Cancel</button>
+ */
+async function saveSpotChanges(spotId) {
+    const row = document.getElementById(`spot - ${ spotId } `);
+    const token = localStorage.getItem('adminToken');
+
+    const newAddress = row.querySelector('.editable-address input').value;
+    const newRate = row.querySelector('.editable-rate input').value;
+
+    try {
+        const response = await fetch(`${ API_URL } /admin/spots / ${ spotId } `, {
+            method: 'PUT',
+            headers: {
+                'Authorization': `Bearer ${ token } `,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ address: newAddress, hourlyRate: newRate })
+        });
+
+        if (!response.ok) {
+            const errData = await response.json();
+            throw new Error(errData.message || 'Failed to save changes');
+        }
+        alert('Spot updated successfully!');
+        toggleEditMode(spotId, false);
+
+    } catch (error) {
+        alert(`Error: ${ error.message } `);
+    }
+}
+
+/**
+ * Lưu các thay đổi sau khi chỉnh sửa booking.
+ * @param {string} bookingId - ID của booking.
+ */
+async function saveBookingChanges(bookingId) {
+    const row = document.getElementById(`booking - ${ bookingId } `);
+    const token = localStorage.getItem('adminToken');
+
+    const newStartTime = row.querySelector('.editable-start input').value;
+    const newEndTime = row.querySelector('.editable-end input').value;
+    const newStatus = row.querySelector('.editable-status select').value;
+
+    try {
+        const response = await fetch(`${ API_URL } /admin/bookings / ${ bookingId } `, {
+            method: 'PUT',
+            headers: {
+                'Authorization': `Bearer ${ token } `,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                startTime: newStartTime,
+                endTime: newEndTime,
+                status: newStatus
+            })
+        });
+
+        if (!response.ok) {
+            const errData = await response.json();
+            throw new Error(errData.message || 'Failed to save changes');
+        }
+        alert('Booking updated successfully!');
+        toggleBookingEditMode(bookingId, false);
+
+    } catch (error) {
+        alert(`Error: ${ error.message } `);
+    }
+}
+
+/**
+ * HÀM MỚI: Kích hoạt cửa sổ chọn file cho một bãi đỗ cụ thể.
+ */
+function triggerImageUpload(spotId) {
+    const fileInput = document.getElementById(`image - upload - ${ spotId } `);
+    fileInput.click();
+}
+
+/**
+ * HÀM MỚI: Xử lý việc tải ảnh mới lên sau khi người dùng đã chọn file.
+ */
+async function handleImageUpdate(spotId) {
+    const token = localStorage.getItem('adminToken');
+    const fileInput = document.getElementById(`image - upload - ${ spotId } `);
+    const file = fileInput.files[0];
+
+    if (!file) {
+        alert('Please select an image file.');
+        return;
+    }
+
+    const formData = new FormData();
+    formData.append('spotImage', file);
+
+    try {
+        const response = await fetch(`${ API_URL } /admin/spots / ${ spotId }/image`, {
+        method: 'POST',
+            headers: { 'Authorization': `Bearer ${token}` },
+        body: formData
+    });
+
+    if (!response.ok) {
+        const errData = await response.json();
+        throw new Error(errData.message || 'Failed to update image');
+    }
+
+    alert('Image updated successfully!');
+    document.querySelector('.sidebar-nav .nav-item[data-section="spots"]').click();
+} catch (error) {
+    alert(`Error: ${error.message}`);
+}
+}
+
+// --- HÀM XỬ LÝ LOGIC TRANG ---
+
+function handleLoginPage(API_URL) {
+    const loginForm = document.getElementById('login-form');
+    if (!loginForm) return;
+
+    const errorMessage = document.getElementById('error-message');
+    loginForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        try {
+            const response = await fetch(`${API_URL}/auth/login`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email: e.target.email.value, password: e.target.password.value })
+            });
+            const data = await response.json();
+            if (!response.ok || data.role !== 'admin') throw new Error('Not an admin or invalid credentials.');
+            localStorage.setItem('adminToken', data.token);
+            window.location.href = 'dashboard.html';
+        } catch (error) {
+            errorMessage.textContent = error.message;
+        }
+    });
+}
+
+function handleDashboardPage(API_URL, token) {
+    const navItems = document.querySelectorAll('.sidebar-nav .nav-item');
+    const contentArea = document.getElementById('content-area');
+    const logoutBtn = document.getElementById('logout-btn');
+
+    async function fetchAdminData(endpoint) {
+        const response = await fetch(`${API_URL}/admin/${endpoint}`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (!response.ok) {
+            if (response.status === 401 || response.status === 403) logoutBtn.click();
+            const errData = await response.json();
+            throw new Error(errData.message);
+        }
+        return response.json();
+    }
+
+    /**
+     * Hàm renderTable được tối ưu để nhận trực tiếp chuỗi HTML cho các hàng.
+     * @param {Array<string>} headers - Mảng chứa các tiêu đề cột.
+     * @param {string} rowsHtml - Chuỗi HTML của các hàng (đã được định dạng sẵn).
+     */
+    function renderTable(headers, rowsHtml) {
+        return `
+            <table>
+                <thead><tr>${headers.map(h => `<th>${h}</th>`).join('')}</tr></thead>
+                <tbody>${rowsHtml}</tbody>
+            </table>
+        `;
+    }
+
+    async function loadSection(sectionName) {
+        contentArea.innerHTML = '<h2>Loading...</h2>';
+        try {
+            let title = `<h2>${sectionName.charAt(0).toUpperCase() + sectionName.slice(1)} Management</h2>`;
+            let tableHtml = '';
+
+            if (sectionName === 'dashboard') {
+                const stats = await fetchAdminData('stats');
+                contentArea.innerHTML = `
+                    <h2>Dashboard</h2>
+                    <div style="display: flex; flex-wrap: wrap; gap: 20px;">
+                        <div style="border: 1px solid #ccc; padding: 20px; border-radius: 8px;"><h3>Total Users: ${stats.users}</h3></div>
+                        <div style="border: 1px solid #ccc; padding: 20px; border-radius: 8px;"><h3>Total Spots: ${stats.spots}</h3></div>
+                        <div style="border: 1px solid #ccc; padding: 20px; border-radius: 8px;"><h3>Pending Spots: ${stats.pendingSpots}</h3></div>
+                        <div style="border: 1px solid #ccc; padding: 20px; border-radius: 8px;"><h3>Total Bookings: ${stats.bookings}</h3></div>
+                    </div>
+                `;
+                return;
+            } else if (sectionName === 'users') {
+                const users = await fetchAdminData('users');
+                const headers = ['ID', 'Full Name', 'Email', 'Role'];
+                const rowsHtml = users.map(u => `<tr><td>${u._id}</td><td>${u.fullName}</td><td>${u.email}</td><td>${u.role}</td></tr>`).join('');
+                tableHtml = renderTable(headers, rowsHtml);
+            } else if (sectionName === 'spots') {
+                const spots = await fetchAdminData('spots');
+                const headers = ['Image', 'Address', 'Hourly Rate', 'Status', 'Actions'];
+                const rowsHtml = spots.map(s => {
+                    let actionsHtml = `<button class="action-btn btn-edit" onclick="toggleEditMode('${s._id}', true)">Edit</button>`;
+
+                    if (s.status === 'pending') {
+                        actionsHtml += `
+                            <button class="action-btn btn-approve" onclick="handleSpotAction('${s._id}', 'approve')">Approve</button>
+                            <button class="action-btn btn-reject" onclick="handleSpotAction('${s._id}', 'reject')">Reject</button>
+                        `;
+                    }
+
+                    actionsHtml += `
+                        <button class="action-btn btn-image" onclick="triggerImageUpload('${s._id}')">Change Image</button>
+                        <input 
+                            type="file" 
+                            id="image-upload-${s._id}" 
+                            style="display: none;" 
+                            accept="image/*"
+                            onchange="handleImageUpdate('${s._id}')"
+                        >
+                    `;
+
+                    actionsHtml += `<button class="action-btn btn-delete" onclick="handleSpotAction('${s._id}', 'delete')">Delete</button>`;
+
+                    const imageUrl = s.images && s.images.length > 0 ? s.images[0] : '/assets/image/parking-area.jpg';
+                    return `
+                        <tr id="spot-${s._id}">
+                            <td class="spot-image-column"><img src="${imageUrl}" alt="Spot image" class="spot-thumbnail"></td>
+                            <td class="editable-address">${s.address}</td>
+                            <td class="editable-rate">${s.hourlyRate ? s.hourlyRate.toLocaleString('vi-VN') + ' VND' : 'N/A'}</td>
+                            <td><span class="status-${s.status}">${s.status}</span></td>
+                            <td><div class="action-buttons">${actionsHtml}</div></td>
+                        </tr>
+                    `;
+                }).join('');
+                tableHtml = renderTable(headers, rowsHtml);
+            } else if (sectionName === 'bookings') {
+                const bookings = await fetchAdminData('bookings');
+                const headers = ['Spot Address', 'User', 'Start Time', 'End Time', 'Total Price', 'Status', 'Actions'];
+                const rowsHtml = bookings.map(b => {
+                    const options = { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' };
+                    const userDisplay = b.user ? b.user.email : (b.guestEmail || 'N/A');
+
+                    let actionsHtml = `
+                        <button class="action-btn btn-edit" onclick="toggleBookingEditMode('${b._id}', true)">Edit</button>
+                        <button class="action-btn btn-delete" onclick="handleBookingAction('${b._id}', 'delete')">Delete</button>
+                    `;
+
+                    return `
+                        <tr id="booking-${b._id}">
+                            <td class="editable-spot">${b.spot ? b.spot.address : 'N/A'}</td>
+                            <td>${userDisplay}</td>
+                            <td class="editable-start">${new Date(b.startTime).toLocaleString('vi-VN', options)}</td>
+                            <td class="editable-end">${new Date(b.endTime).toLocaleString('vi-VN', options)}</td>
+                            <td class="editable-price">${b.totalPrice.toLocaleString('vi-VN')} VND</td>
+                            <td class="editable-status"><span class="status-${b.status}">${b.status}</span></td>
+                            <td><div class="action-buttons">${actionsHtml}</div></td>
+                        </tr>
+                    `;
+                }).join('');
+                tableHtml = renderTable(headers, rowsHtml);
+            }
+
+            contentArea.innerHTML = title + tableHtml;
+        } catch (error) {
+            contentArea.innerHTML = `<p style="color: red;">${error.message}</p>`;
+        }
+    }
+
+    navItems.forEach(item => {
+        item.addEventListener('click', (e) => {
+            e.preventDefault();
+            if (item.id === 'logout-btn') return;
+            const currentActive = document.querySelector('.sidebar-nav .nav-item.active');
+            if (currentActive) currentActive.classList.remove('active');
+            item.classList.add('active');
+            loadSection(item.getAttribute('data-section'));
+        });
+    });
+
+    logoutBtn.addEventListener('click', () => {
+        localStorage.removeItem('adminToken');
+        window.location.href = 'login.html';
+    });
+
+    loadSection('dashboard');
+}
+
+// --- LOGIC CHÍNH ĐỂ CHẠY TRANG KHI DOM ĐÃ TẢI XONG ---
+document.addEventListener('DOMContentLoaded', () => {
+    const token = localStorage.getItem('adminToken');
+
+    if (document.getElementById('login-form')) {
+        handleLoginPage(API_URL);
+    } else if (document.querySelector('.admin-panel')) {
+        if (!token) {
+            window.location.href = 'login.html';
+            return;
+        }
+        handleDashboardPage(API_URL, token);
+    }
+});

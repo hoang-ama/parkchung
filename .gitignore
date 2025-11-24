@@ -1,0 +1,23 @@
+# Bypass file biến môi trường (chứa database, JWT certi,..)
+server/.env 
+server/.env.example
+# Bypass thư mục chứa các gói phụ thuộc của Node.js
+node_modules/
+
+# Bypass các file log được tạo ra trong quá trình chạy hoặc gỡ lỗi
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+*.log
+
+# Bypass các file hệ thống của macOS và Windows
+.DS_Store
+Thumbs.db
+
+# Bypass các thư mục cấu hình của các trình soạn thảo code (IDE)
+.idea/
+.vscode/
+#Bypass file parkchung_key.pem
+*.pem
+#Bypass thư mục Parkchung_Resource chứa các tài nguyên của Parkchung
+Parkchung_Resource/
