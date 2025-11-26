@@ -3,6 +3,13 @@ const mongoose = require('mongoose');
 const parkingSpotSchema = new mongoose.Schema({
     owner: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
     address: { type: String, required: true, trim: true },
+    nameAddress: { type: String, required: true, trim: true },
+    spotQuery: { type: String, required: false, trim: true },
+    spotCategory: { type: String, required: false, trim: true },
+    spotType: { type: String, required: false, trim: true },
+    spotPhone: { type: String, required: false, trim: true },
+    workingHours: { type: String, required: false, trim: true },
+    otherHours: { type: String, required: false, trim: true },
     location: {
         type: { type: String, enum: ['Point'], required: true },
         coordinates: { type: [Number], required: true } // [longitude, latitude]
