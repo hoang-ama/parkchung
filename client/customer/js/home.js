@@ -69,7 +69,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 const div = document.createElement('div');
                 div.textContent = item.address;
                 div.className = 'suggestion-item';
-                div.onclick = () => {
+                // Use onmousedown instead of onclick to prevent race condition with blur event
+                // mousedown fires BEFORE blur, ensuring navigation happens before suggestions are hidden
+                div.onmousedown = (e) => {
+                    e.preventDefault(); // Prevent blur from interfering
                     // Redirect directly to spot details page with the spot ID
                     // This allows users to select arrival/departure times on the details page
                     // Note: spot-details.js expects the parameter to be named 'id'

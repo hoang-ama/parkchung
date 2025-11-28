@@ -1,5 +1,10 @@
 // File: client/customer/js/my-bookings.js
 
+// Pagination state
+let allBookings = [];
+let currentPage = 1;
+const bookingsPerPage = 3;
+
 document.addEventListener('DOMContentLoaded', async () => {
     const bookingListContainer = document.querySelector('.booking-list');
     const token = localStorage.getItem('userToken');
@@ -38,12 +43,11 @@ document.addEventListener('DOMContentLoaded', async () => {
             return;
         }
 
-        // Display bookings
-        bookingListContainer.innerHTML = '';
-        bookings.forEach(booking => {
-            const bookingCard = createBookingCard(booking);
-            bookingListContainer.appendChild(bookingCard);
-        });
+        // Sort bookings by createdAt date (newest first)
+        allBookings = bookings.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+        // Display first page
+        displayBookings();
 
     } catch (error) {
         console.error('Error loading bookings:', error);
@@ -56,6 +60,159 @@ document.addEventListener('DOMContentLoaded', async () => {
         `;
     }
 });
+
+function displayBookings() {
+    const bookingListContainer = document.querySelector('.booking-list');
+    bookingListContainer.innerHTML = '';
+
+    // Calculate pagination
+    const totalPages = Math.ceil(allBookings.length / bookingsPerPage);
+    const startIndex = (currentPage - 1) * bookingsPerPage;
+    const endIndex = startIndex + bookingsPerPage;
+    const bookingsToDisplay = allBookings.slice(startIndex, endIndex);
+
+    // Display bookings for current page
+    bookingsToDisplay.forEach(booking => {
+        const bookingCard = createBookingCard(booking);
+        bookingListContainer.appendChild(bookingCard);
+    });
+
+    // Add pagination controls
+    if (totalPages > 1) {
+        const paginationContainer = createPaginationControls(totalPages);
+        bookingListContainer.appendChild(paginationContainer);
+    }
+}
+
+function createPaginationControls(totalPages) {
+    const paginationDiv = document.createElement('div');
+    paginationDiv.className = 'pagination-controls';
+    paginationDiv.style.cssText = `
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 10px;
+        margin-top: 40px;
+        padding: 20px;
+    `;
+
+    // Previous button
+    const prevButton = document.createElement('button');
+    prevButton.textContent = '← Previous';
+    prevButton.disabled = currentPage === 1;
+    prevButton.style.cssText = `
+        padding: 12px 24px;
+        background: ${currentPage === 1 ? 'rgba(255, 255, 255, 0.1)' : 'rgba(255, 255, 255, 0.2)'};
+        color: white;
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        border-radius: 50px;
+        font-weight: 600;
+        font-size: 14px;
+        cursor: ${currentPage === 1 ? 'not-allowed' : 'pointer'};
+        transition: all 0.3s ease;
+        opacity: ${currentPage === 1 ? '0.5' : '1'};
+    `;
+    prevButton.addEventListener('click', () => {
+        if (currentPage > 1) {
+            currentPage--;
+            displayBookings();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    });
+    if (currentPage > 1) {
+        prevButton.addEventListener('mouseenter', (e) => {
+            e.target.style.background = 'rgba(255, 255, 255, 0.3)';
+            e.target.style.transform = 'translateY(-2px)';
+        });
+        prevButton.addEventListener('mouseleave', (e) => {
+            e.target.style.background = 'rgba(255, 255, 255, 0.2)';
+            e.target.style.transform = 'translateY(0)';
+        });
+    }
+
+    // Page numbers
+    const pageNumbersDiv = document.createElement('div');
+    pageNumbersDiv.style.cssText = `
+        display: flex;
+        gap: 8px;
+        align-items: center;
+    `;
+
+    for (let i = 1; i <= totalPages; i++) {
+        const pageButton = document.createElement('button');
+        pageButton.textContent = i;
+        pageButton.style.cssText = `
+            width: 40px;
+            height: 40px;
+            padding: 8px;
+            background: ${i === currentPage ? 'linear-gradient(135deg, #13b47e 0%, #1f6f35 100%)' : 'rgba(255, 255, 255, 0.2)'};
+            color: white;
+            border: 2px solid ${i === currentPage ? '#13b47e' : 'rgba(255, 255, 255, 0.3)'};
+            border-radius: 50%;
+            font-weight: ${i === currentPage ? '700' : '600'};
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: ${i === currentPage ? '0 4px 15px rgba(19, 180, 126, 0.3)' : 'none'};
+        `;
+        pageButton.addEventListener('click', () => {
+            currentPage = i;
+            displayBookings();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+        if (i !== currentPage) {
+            pageButton.addEventListener('mouseenter', (e) => {
+                e.target.style.background = 'rgba(255, 255, 255, 0.3)';
+                e.target.style.transform = 'scale(1.1)';
+            });
+            pageButton.addEventListener('mouseleave', (e) => {
+                e.target.style.background = 'rgba(255, 255, 255, 0.2)';
+                e.target.style.transform = 'scale(1)';
+            });
+        }
+        pageNumbersDiv.appendChild(pageButton);
+    }
+
+    // Next button
+    const nextButton = document.createElement('button');
+    nextButton.textContent = 'Next →';
+    nextButton.disabled = currentPage === totalPages;
+    nextButton.style.cssText = `
+        padding: 12px 24px;
+        background: ${currentPage === totalPages ? 'rgba(255, 255, 255, 0.1)' : 'rgba(255, 255, 255, 0.2)'};
+        color: white;
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        border-radius: 50px;
+        font-weight: 600;
+        font-size: 14px;
+        cursor: ${currentPage === totalPages ? 'not-allowed' : 'pointer'};
+        transition: all 0.3s ease;
+        opacity: ${currentPage === totalPages ? '0.5' : '1'};
+    `;
+    nextButton.addEventListener('click', () => {
+        if (currentPage < totalPages) {
+            currentPage++;
+            displayBookings();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    });
+    if (currentPage < totalPages) {
+        nextButton.addEventListener('mouseenter', (e) => {
+            e.target.style.background = 'rgba(255, 255, 255, 0.3)';
+            e.target.style.transform = 'translateY(-2px)';
+        });
+        nextButton.addEventListener('mouseleave', (e) => {
+            e.target.style.background = 'rgba(255, 255, 255, 0.2)';
+            e.target.style.transform = 'translateY(0)';
+        });
+    }
+
+    paginationDiv.appendChild(prevButton);
+    paginationDiv.appendChild(pageNumbersDiv);
+    paginationDiv.appendChild(nextButton);
+
+    return paginationDiv;
+}
 
 function createBookingCard(booking) {
     const card = document.createElement('div');
@@ -235,8 +392,28 @@ async function handleCancelBooking(bookingId) {
         }
 
         alert('Booking cancelled successfully!');
-        // Reload the page to show updated bookings
-        location.reload();
+
+        // Reload bookings data and refresh the current page
+        const bookingsResponse = await fetch(`${API_URL}/bookings/mybookings`, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+
+        if (bookingsResponse.ok) {
+            const bookings = await bookingsResponse.json();
+            allBookings = bookings.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+            // Adjust current page if needed (in case we deleted the last item on a page)
+            const totalPages = Math.ceil(allBookings.length / bookingsPerPage);
+            if (currentPage > totalPages && totalPages > 0) {
+                currentPage = totalPages;
+            }
+
+            displayBookings();
+        } else {
+            location.reload();
+        }
 
     } catch (error) {
         console.error('Error cancelling booking:', error);
