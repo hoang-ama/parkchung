@@ -494,7 +494,7 @@ async function handlePayNow(bookingId) {
 
         // Redirect to PayPal checkout
         if (data.redirectUrl) {
-            window.location.href = data.redirectUrl;
+            window.open(data.redirectUrl, '_blank');
         } else {
             throw new Error('No payment URL received');
         }

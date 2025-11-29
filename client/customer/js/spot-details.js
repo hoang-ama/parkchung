@@ -348,7 +348,7 @@ async function initializeSpotBookingPage(spotId) {
                 throw new Error('Missing PayPal approval link.');
             }
 
-            window.location.href = data.redirectUrl;
+            window.open(data.redirectUrl, '_blank');
             success = true;
             return true;
         } catch (error) {
