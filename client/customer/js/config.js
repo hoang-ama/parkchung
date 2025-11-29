@@ -8,5 +8,5 @@ if (window.location.hostname === 'localhost' || window.location.hostname === '12
 } else {
     // Môi trường Production (Khi đã deploy lên EC2)
     // Hãy thay thế bằng địa chỉ API thật của bạn
-    API_URL = 'https://parkchung.com/api'; 
+    API_URL = 'https://parkchung.com/api';
 }

@@ -343,6 +343,25 @@ function createBookingCard(booking) {
                     </button>
                 </div>
                 ` : ''}
+                ${booking.paymentStatus.toLowerCase() === 'pending' ? `
+                <div class="detail-row" style="margin-top: 15px; border-top: 2px solid rgba(0,0,0,0.1); padding-top: 15px;">
+                    <button class="pay-now-btn" data-booking-id="${booking._id}" style="
+                        width: 100%;
+                        padding: 12px 24px;
+                        background: linear-gradient(135deg, #13b47e 0%, #1f6f35 100%);
+                        color: white;
+                        border: none;
+                        border-radius: 50px;
+                        font-weight: 600;
+                        font-size: 14px;
+                        cursor: pointer;
+                        transition: all 0.3s ease;
+                        box-shadow: 0 4px 15px rgba(19, 180, 126, 0.3);
+                    ">
+                        Pay Now
+                    </button>
+                </div>
+                ` : ''}
             </div>
         </div>
     `;
@@ -358,6 +377,20 @@ function createBookingCard(booking) {
         cancelBtn.addEventListener('mouseleave', (e) => {
             e.target.style.transform = 'translateY(0)';
             e.target.style.boxShadow = '0 4px 15px rgba(231, 76, 60, 0.3)';
+        });
+    }
+
+    // Add pay now button event listener
+    const payNowBtn = card.querySelector('.pay-now-btn');
+    if (payNowBtn) {
+        payNowBtn.addEventListener('click', () => handlePayNow(booking._id));
+        payNowBtn.addEventListener('mouseenter', (e) => {
+            e.target.style.transform = 'translateY(-2px)';
+            e.target.style.boxShadow = '0 8px 25px rgba(19, 180, 126, 0.4)';
+        });
+        payNowBtn.addEventListener('mouseleave', (e) => {
+            e.target.style.transform = 'translateY(0)';
+            e.target.style.boxShadow = '0 4px 15px rgba(19, 180, 126, 0.3)';
         });
     }
 
@@ -422,6 +455,57 @@ async function handleCancelBooking(bookingId) {
         if (cancelBtn) {
             cancelBtn.disabled = false;
             cancelBtn.textContent = 'Cancel Booking';
+        }
+    }
+}
+
+async function handlePayNow(bookingId) {
+    const token = localStorage.getItem('userToken');
+
+    if (!token) {
+        alert('Please login to complete payment');
+        window.location.href = 'login.html';
+        return;
+    }
+
+    const payNowBtn = document.querySelector(`[data-booking-id="${bookingId}"].pay-now-btn`);
+
+    if (payNowBtn) {
+        payNowBtn.disabled = true;
+        payNowBtn.textContent = 'Processing...';
+    }
+
+    try {
+        const response = await fetch(`${API_URL}/payments/paypal/retry`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ bookingId })
+        });
+
+        if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.message || 'Failed to initiate payment');
+        }
+
+        const data = await response.json();
+
+        // Redirect to PayPal checkout
+        if (data.redirectUrl) {
+            window.location.href = data.redirectUrl;
+        } else {
+            throw new Error('No payment URL received');
+        }
+
+    } catch (error) {
+        console.error('Error initiating payment:', error);
+        alert(`Failed to initiate payment: ${error.message}`);
+
+        if (payNowBtn) {
+            payNowBtn.disabled = false;
+            payNowBtn.textContent = 'Pay Now';
         }
     }
 }

@@ -38,10 +38,10 @@ exports.createGuestBooking = async (req, res) => {
         return res.status(400).json({ message: 'Start time cannot be in the past.' });
     }
 
-    // Check overlap with active bookings
+    // Check overlap with confirmed bookings only (pending bookings don't reserve the spot)
     const conflictingBookings = await Booking.find({
         spot: spot,
-        status: { $in: ['pending', 'confirmed'] },
+        status: 'confirmed',
         $or: [
             {
                 startTime: { $lt: parsedEndTime },
@@ -100,12 +100,12 @@ exports.createBooking = async (req, res) => {
         return res.status(400).json({ message: 'Start time cannot be in the past.' });
     }
 
-    // 2. TÍCH HỢP LOGIC KIỂM TRA TRÙNG LẶP THỜI GIAN
+    // 2. Check for overlapping confirmed bookings only (pending bookings don't reserve the spot)
     const conflictingBookings = await Booking.find({
-        spot: spot, // Chỉ kiểm tra trên bãi đỗ cụ thể này
-        status: { $in: ['pending', 'confirmed'] }, // Chỉ quan tâm đến các booking đang chờ hoặc đã xác nhận
+        spot: spot,
+        status: 'confirmed', // Only check confirmed bookings
         $or: [
-            { // Trường hợp 1: Booking mới bắt đầu trong khoảng thời gian của booking hiện có
+            {
                 startTime: { $lt: parsedEndTime },
                 endTime: { $gt: parsedStartTime }
             }
@@ -115,7 +115,6 @@ exports.createBooking = async (req, res) => {
     if (conflictingBookings.length > 0) {
         return res.status(409).json({ message: 'This parking spot is already booked for the selected time slot.' });
     }
-    // KẾT THÚC LOGIC KIỂM TRA TRÙNG LẶP THỜI GIAN
 
     const totalPrice = calculatePrice(parsedStartTime, parsedEndTime, parkingSpot.hourlyRate);
 
@@ -172,6 +171,27 @@ exports.getMyBookings = async (req, res) => {
             .populate('spot', 'address')
             .populate('user', 'fullName email')
             .populate('payment');
+
+        // Auto-cancel pending bookings with past start times
+        const now = new Date();
+        const updatePromises = [];
+
+        for (const booking of bookings) {
+            if (booking.status === 'pending' &&
+                booking.paymentStatus === BOOKING_PAYMENT_STATUS.PENDING &&
+                new Date(booking.startTime) < now) {
+
+                booking.status = 'cancelled';
+                booking.paymentStatus = BOOKING_PAYMENT_STATUS.FAILED;
+                updatePromises.push(booking.save());
+            }
+        }
+
+        // Wait for all updates to complete
+        if (updatePromises.length > 0) {
+            await Promise.all(updatePromises);
+        }
+
         res.json(bookings);
     } catch (error) {
         res.status(500).json({ message: 'Server error fetching bookings', error: error.message });
