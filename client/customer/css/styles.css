@@ -500,7 +500,7 @@ header nav a {
   height: 100%;
   text-align: center;
   /* margin-bottom: 30px; */
-  background-image: url("/parkchung/client/assets/image/cx_about.jpg");
+  background-image: url("../../assets/image/cx_about.jpg");
   background-size: cover;
   padding: 15px;
 }
@@ -574,7 +574,7 @@ header nav a {
   width: 100%;
   height: 100%;
   margin: 0 auto;
-  background-image: url("/parkchung/client/assets/image/cx_about.jpg");
+  background-image: url("../../assets/image/cx_about.jpg");
   color: var(--white);
   padding: 15px;
   text-align: center;
