@@ -1,6 +1,6 @@
 const PAYMENT_METHODS = Object.freeze({
     PAYPAL: 'PAYPAL',
-    OFFLINE: 'OFFLINE',
+    CASH: 'CASH',
 });
 
 const PAYMENT_STATUSES = Object.freeze({

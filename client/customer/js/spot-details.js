@@ -152,6 +152,50 @@ async function initializeSpotBookingPage(spotId) {
         }
     });
 
+    // --- PAYMENT METHOD SELECTION ---
+    const paymentMethodRadios = document.querySelectorAll('input[name="paymentMethod"]');
+    const paymentSecurityBadges = document.getElementById('payment-security-badges');
+
+    // Handle payment method change
+    paymentMethodRadios.forEach(radio => {
+        radio.addEventListener('change', handlePaymentMethodChange);
+    });
+
+    function handlePaymentMethodChange(e) {
+        const selectedMethod = e.target.value;
+
+        // Toggle security badges visibility
+        if (selectedMethod === 'paypal') {
+            paymentSecurityBadges?.classList.remove('hidden');
+        } else if (selectedMethod === 'cash') {
+            paymentSecurityBadges?.classList.add('hidden');
+        }
+
+        // Update button text
+        updatePayButtonText();
+    }
+
+    function updatePayButtonText() {
+        const selectedMethod = document.querySelector('input[name="paymentMethod"]:checked')?.value;
+        const startTime = arrivalFlatpickr?.selectedDates[0];
+        const endTime = leavingFlatpickr?.selectedDates[0];
+
+        if (!startTime || !endTime || startTime >= endTime || !currentSpotData) {
+            payAndReserveBtn.textContent = selectedMethod === 'cash' ? 'Reserve now, pay later' : 'Pay now and reserve';
+            return;
+        }
+
+        // Get the current price from the summary
+        const priceText = summaryFinalPrice.textContent;
+
+        if (selectedMethod === 'paypal') {
+            payAndReserveBtn.textContent = `${priceText} - Pay now and reserve`;
+        } else if (selectedMethod === 'cash') {
+            payAndReserveBtn.textContent = `${priceText} - Reserve now, pay later`;
+        }
+    }
+
+
     // --- HELPER FUNCTION FOR FLATPICKR BUTTONS ---
 
     /**
@@ -376,6 +420,13 @@ async function initializeSpotBookingPage(spotId) {
             return;
         }
 
+        // Get the selected payment method
+        const selectedPaymentMethod = document.querySelector('input[name="paymentMethod"]:checked')?.value;
+        if (!selectedPaymentMethod) {
+            alert('Please select a payment method.');
+            return;
+        }
+
         const basePayload = {
             spot: spotId,
             startTime: startTime.toISOString(),
@@ -425,38 +476,114 @@ async function initializeSpotBookingPage(spotId) {
                     return;
                 }
 
-                const success = await initiatePaypalCheckout({
-                    payload: {
-                        ...basePayload,
-                        fullName,
-                        email,
-                        phoneNumber,
-                        guestPhoneNumber: phoneNumber,
-                    },
-                    triggerButton: submitBtn,
-                    defaultButtonText: 'Complete Booking',
-                });
-                if (success) {
-                    closeModal();
+                // Check payment method for guest users too
+                if (selectedPaymentMethod === 'paypal') {
+                    const success = await initiatePaypalCheckout({
+                        payload: {
+                            ...basePayload,
+                            fullName,
+                            email,
+                            phoneNumber,
+                            guestPhoneNumber: phoneNumber,
+                        },
+                        triggerButton: submitBtn,
+                        defaultButtonText: 'Complete Booking',
+                    });
+                    if (success) {
+                        closeModal();
+                    }
+                } else if (selectedPaymentMethod === 'cash') {
+                    // Create booking directly for cash payment (guest)
+                    try {
+                        submitBtn.disabled = true;
+                        updateButtonText(submitBtn, 'Creating booking...');
+
+                        const response = await fetch(`${API_URL}/bookings/guest`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                ...basePayload,
+                                fullName,
+                                email,
+                                phoneNumber,
+                            }),
+                        });
+
+                        if (!response.ok) {
+                            const errorData = await response.json().catch(() => ({}));
+                            throw new Error(errorData.message || 'Failed to create booking.');
+                        }
+
+                        const booking = await response.json();
+                        alert('Booking created successfully! You can pay at the parking spot.');
+                        closeModal();
+                        // Optionally redirect to a confirmation page
+                        window.location.href = '/customer/index.html';
+                    } catch (error) {
+                        console.error('Cash booking error:', error);
+                        alert(error.message || 'Failed to create booking. Please try again.');
+                    } finally {
+                        submitBtn.disabled = false;
+                        updateButtonText(submitBtn, 'Complete Booking');
+                    }
                 }
             };
             return; // Stop further processing
         }
 
+        // For logged-in users
         const phoneNumber = phoneNumberInput.value.trim();
         if (!phoneNumber) {
             alert('Please enter your phone number.');
             return;
         }
 
-        await initiatePaypalCheckout({
-            payload: {
-                ...basePayload,
-                phoneNumber,
-            },
-            token,
-            triggerButton: payAndReserveBtn,
-        });
+        // Handle payment based on selected method
+        if (selectedPaymentMethod === 'paypal') {
+            await initiatePaypalCheckout({
+                payload: {
+                    ...basePayload,
+                    phoneNumber,
+                },
+                token,
+                triggerButton: payAndReserveBtn,
+            });
+        } else if (selectedPaymentMethod === 'cash') {
+            // Create booking directly for cash payment (logged-in user)
+            try {
+                payAndReserveBtn.disabled = true;
+                payAndReserveBtn.classList.add('loading');
+                updateButtonText(payAndReserveBtn, 'Creating booking...');
+
+                const response = await fetch(`${API_URL}/bookings`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`,
+                    },
+                    body: JSON.stringify({
+                        ...basePayload,
+                        phoneNumber,
+                    }),
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json().catch(() => ({}));
+                    throw new Error(errorData.message || 'Failed to create booking.');
+                }
+
+                const booking = await response.json();
+                alert('Booking created successfully! You can pay at the parking spot.');
+                // Optionally redirect to a confirmation page or my bookings
+                window.location.href = '/customer/my-bookings.html';
+            } catch (error) {
+                console.error('Cash booking error:', error);
+                alert(error.message || 'Failed to create booking. Please try again.');
+                payAndReserveBtn.disabled = false;
+                payAndReserveBtn.classList.remove('loading');
+                updatePayButtonText();
+            }
+        }
     });
 
     loadSpotDetails(); // Gọi khi initializeSpotBookingPage được gọi

@@ -7,6 +7,41 @@ const {
     BOOKING_PAYMENT_STATUS,
 } = require('../constants/payment');
 const { calculatePrice } = require('../utils/pricing');
+const brevoService = require('../services/brevo.service');
+
+// Helper functions for email sending
+const ensureBookingPopulated = async (booking) => {
+    if (!booking.spot || !booking.spot.owner || (!booking.user && !booking.guestEmail)) {
+        await booking.populate([
+            { path: 'spot', populate: { path: 'owner' } },
+            { path: 'user' }
+        ]);
+    }
+    return booking;
+};
+
+const prepareBookingData = (booking) => {
+    const customerName = booking.user ? booking.user.fullName : booking.guestFullName;
+    const customerEmail = booking.user ? booking.user.email : booking.guestEmail;
+
+    // Safely access partner info
+    const partner = booking.spot && booking.spot.owner;
+    const partnerName = partner ? partner.fullName : 'Partner';
+    const partnerEmail = partner ? partner.email : null;
+
+    return {
+        customerName,
+        customerEmail,
+        partnerName,
+        partnerEmail,
+        bookingId: booking._id,
+        spotAddress: booking.spot ? booking.spot.address : 'Unknown Address',
+        startTime: booking.startTime,
+        endTime: booking.endTime,
+        totalPrice: booking.totalPrice,
+        ...booking.toObject()
+    };
+};
 
 /**
  * @desc    Create booking as guest (no login required)
@@ -14,7 +49,7 @@ const { calculatePrice } = require('../utils/pricing');
  * @access  Public
  */
 exports.createGuestBooking = async (req, res) => {
-    const { spot, startTime, endTime, fullName, email, phoneNumber } = req.body;
+    const { spot, startTime, endTime, fullName, email, phoneNumber, paymentMethod } = req.body;
 
     if (!fullName || !email || !phoneNumber) {
         return res.status(400).json({ message: 'Full name, email and phone number are required.' });
@@ -56,7 +91,7 @@ exports.createGuestBooking = async (req, res) => {
     const totalPrice = calculatePrice(parsedStartTime, parsedEndTime, parkingSpot.hourlyRate);
 
     try {
-        const lead = new Lead({
+        const leadData = {
             spot,
             startTime: parsedStartTime,
             endTime: parsedEndTime,
@@ -65,10 +100,73 @@ exports.createGuestBooking = async (req, res) => {
             fullName,
             email,
             phoneNumber,
-            source: 'guest'
-        });
+            source: 'guest',
+            paymentMethod: paymentMethod || 'OFFLINE'
+        };
 
+        // Handle Cash Payment for Guest
+        if (paymentMethod === PAYMENT_METHODS.CASH) {
+            leadData.status = 'confirmed';
+        }
+
+        const lead = new Lead(leadData);
         const createdLead = await lead.save();
+
+        // Send Emails if Confirmed (Cash)
+        if (createdLead.status === 'confirmed') {
+            try {
+                // Populate spot for email data
+                await createdLead.populate({ path: 'spot', populate: { path: 'owner' } });
+
+                // Prepare data (Lead has guestFullName etc. mapped to fullName in model, but prepareBookingData expects guestFullName)
+                // Actually prepareBookingData expects: booking.guestFullName.
+                // Lead model has: fullName.
+                // So we need to adapt the object passed to prepareBookingData or modify prepareBookingData.
+                // Let's manually construct bookingData for Lead to be safe.
+
+                const partner = createdLead.spot && createdLead.spot.owner;
+                const bookingData = {
+                    customerName: createdLead.fullName,
+                    customerEmail: createdLead.email,
+                    partnerName: partner ? partner.fullName : 'Partner',
+                    partnerEmail: partner ? partner.email : null,
+                    bookingId: createdLead._id,
+                    spotAddress: createdLead.spot ? createdLead.spot.address : 'Unknown Address',
+                    startTime: createdLead.startTime,
+                    endTime: createdLead.endTime,
+                    totalPrice: createdLead.totalPrice,
+                    phoneNumber: createdLead.phoneNumber,
+                    guestPhoneNumber: createdLead.phoneNumber
+                };
+
+                // Send Customer Confirmation
+                await brevoService.sendBookingEmail(bookingData, 'bookingConfirm');
+
+                // Send Partner Confirmation
+                if (bookingData.partnerEmail) {
+                    await brevoService.sendEmailPartner(bookingData, 'partnerConfirm');
+                }
+
+                // Schedule Review Email (same logic)
+                const endTime = new Date(createdLead.endTime);
+                const now = new Date();
+                const delayMs = endTime.getTime() - now.getTime();
+
+                if (delayMs > 0) {
+                    setTimeout(async () => {
+                        try {
+                            await brevoService.sendReviewEmail(bookingData);
+                        } catch (e) { console.error(e); }
+                    }, delayMs);
+                } else {
+                    try { await brevoService.sendReviewEmail(bookingData); } catch (e) { console.error(e); }
+                }
+
+            } catch (emailError) {
+                console.error('Failed to send confirmation emails for guest cash booking:', emailError);
+            }
+        }
+
         res.status(201).json(createdLead);
     } catch (error) {
         res.status(400).json({ message: error.message });
@@ -126,12 +224,59 @@ exports.createBooking = async (req, res) => {
             endTime: parsedEndTime,
             totalPrice,
             phoneNumber,
-            status: 'pending',
+            status: 'confirmed', // Cash bookings are confirmed immediately
             paymentStatus: BOOKING_PAYMENT_STATUS.UNPAID,
-            paymentMethod: PAYMENT_METHODS.OFFLINE,
+            paymentMethod: PAYMENT_METHODS.CASH,
         });
 
         const createdBooking = await booking.save();
+
+        // Send Emails for Cash Payment (Confirmed status)
+        if (booking.status === 'confirmed' && booking.paymentMethod === PAYMENT_METHODS.CASH) {
+            try {
+                await ensureBookingPopulated(createdBooking);
+                const bookingData = prepareBookingData(createdBooking);
+
+                // Send Customer Confirmation
+                await brevoService.sendBookingEmail(bookingData, 'bookingConfirm');
+
+                // Send Partner Confirmation
+                if (bookingData.partnerEmail) {
+                    await brevoService.sendEmailPartner(bookingData, 'partnerConfirm');
+                } else {
+                    console.warn(`Skipping partner email for booking ${createdBooking._id}: Partner email not found.`);
+                }
+
+                // Schedule Review Email
+                const endTime = new Date(booking.endTime);
+                const now = new Date();
+                const delayMs = endTime.getTime() - now.getTime();
+
+                if (delayMs > 0) {
+                    setTimeout(async () => {
+                        try {
+                            console.log(`Sending scheduled review email for booking ${createdBooking._id} after parking duration ended...`);
+                            await brevoService.sendReviewEmail(bookingData);
+                        } catch (reviewError) {
+                            console.error(`Failed to send scheduled review email for booking ${createdBooking._id}:`, reviewError);
+                        }
+                    }, delayMs);
+                    console.log(`Review email scheduled for booking ${createdBooking._id} at ${endTime.toISOString()}`);
+                } else {
+                    // If booking ended (e.g. testing with past time or very short duration), send immediately
+                    try {
+                        await brevoService.sendReviewEmail(bookingData);
+                    } catch (reviewError) {
+                        console.error(`Failed to send immediate review email for booking ${createdBooking._id}:`, reviewError);
+                    }
+                }
+
+            } catch (emailError) {
+                console.error('Failed to send confirmation emails for cash booking:', emailError);
+                // Don't fail the request if email fails, just log it
+            }
+        }
+
         res.status(201).json(createdBooking);
     } catch (error) {
         res.status(400).json({ message: error.message });

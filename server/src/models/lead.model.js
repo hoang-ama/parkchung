@@ -8,8 +8,9 @@ const leadSchema = new mongoose.Schema({
     startTime: { type: Date, required: true },
     endTime: { type: Date, required: true },
     totalPrice: { type: Number, required: true },
-    status: { type: String, enum: ['pending', 'confirmed', 'cancelled','completed'], default: 'pending' },
-    source: { type: String, default: 'guest' }
+    status: { type: String, enum: ['pending', 'confirmed', 'cancelled', 'completed'], default: 'pending' },
+    source: { type: String, default: 'guest' },
+    paymentMethod: { type: String, default: 'OFFLINE' }
 }, { timestamps: true });
 
 const Lead = mongoose.model('Lead', leadSchema);
