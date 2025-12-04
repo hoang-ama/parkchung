@@ -1,0 +1,15 @@
+{
+    "name": "parkchung",
+    "version": "1.0.0",
+    "description": "ParkChung - Parking Spot Booking Platform",
+    "private": true,
+    "scripts": {
+        "dev": "concurrently -n server,host -c blue,green \"npm run dev:server\" \"npm run dev:host\"",
+        "dev:server": "cd server && npm run dev",
+        "dev:host": "cd client/host && npm run dev",
+        "install:all": "npm install && cd server && npm install && cd ../client/host && npm install"
+    },
+    "devDependencies": {
+        "concurrently": "^9.1.0"
+    }
+}

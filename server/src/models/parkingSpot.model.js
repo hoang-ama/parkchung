@@ -1,23 +1,75 @@
+// File: server/src/models/parkingSpot.model.js
 const mongoose = require('mongoose');
 
 const parkingSpotSchema = new mongoose.Schema({
-    owner: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
-    address: { type: String, required: true, trim: true },
-    location: {
-        type: { type: String, enum: ['Point'], required: true },
-        coordinates: { type: [Number], required: true } // [longitude, latitude]
+    owner: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        required: true
     },
-    images: [{
+    name: {
         type: String,
-        required: false, // Ảnh có thể không bắt buộc lúc tạo, nhưng sẽ được thêm sau
+        required: true,
+        trim: true
+    },
+    address: {
+        type: String,
+        required: true,
+        trim: true
+    },
+    location: {
+        type: {
+            type: String,
+            enum: ['Point'],
+            default: 'Point'
+        },
+        coordinates: {
+            type: [Number], // [longitude, latitude]
+            required: true
+        }
+    },
+    hourlyRate: {
+        type: Number,
+        required: true
+    },
+    monthlyRate: {
+        type: Number
+    },
+    description: {
+        type: String,
+        trim: true
+    },
+    hasRoof: {
+        type: Boolean,
+        default: false
+    },
+    vehicleTypes: [{
+        type: String,
+        enum: ['car', 'motorbike', 'truck', 'bicycle']
     }],
-    hourlyRate: { type: Number, required: true },
-    monthlyRate: { type: Number },
-    status: { type: String, enum: ['pending', 'approved', 'rejected'], default: 'pending' },
-    images: [{ type: String }],
+    numberOfSlots: {
+        type: Number,
+        default: 1
+    },
+    paymentMethods: [{
+        type: String,
+        enum: ['cash', 'paypal']
+    }],
+    images: [{
+        type: String // URLs of spot images
+    }],
+    status: {
+        type: String,
+        enum: ['pending', 'approved', 'rejected', 'archived'],
+        default: 'pending'
+    }
 }, { timestamps: true });
 
+// Create 2dsphere index for geo-queries
 parkingSpotSchema.index({ location: '2dsphere' });
+
+// Index for faster owner queries
+parkingSpotSchema.index({ owner: 1, status: 1 });
 
 const ParkingSpot = mongoose.model('ParkingSpot', parkingSpotSchema);
 module.exports = ParkingSpot;

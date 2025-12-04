@@ -5,8 +5,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const t = {
         en: {
-            becomeHost: 'Become a Host',
-            becomeHostRegister: 'Become a Host / Register',
+            becomeHost: 'Host',
+            registerText: 'Register',
             myBookings: 'My Bookings',
             welcome: 'Welcome',
             logout: 'Logout',
@@ -136,8 +136,8 @@ document.addEventListener('DOMContentLoaded', () => {
             popup_send: 'Complete Booking'
         },
         vi: {
-            becomeHost: 'Trở thành Chủ bãi',
-            becomeHostRegister: 'Trở thành Chủ bãi / Đăng ký',
+            becomeHost: 'Đăng bãi',
+            registerText: 'Đăng ký',
             myBookings: 'Đặt chỗ của tôi',
             welcome: 'Xin chào',
             logout: 'Đăng xuất',
@@ -272,14 +272,14 @@ document.addEventListener('DOMContentLoaded', () => {
         const dict = t[currentLang] || t.en;
         const langSwitcher = `
             <span style="margin: 0 10px;">|</span>
-            <button id="lang-en" style="background:none;border:none;color:${currentLang==='en' ? '#13b47e' : '#555'};font-weight:${currentLang==='en' ? '700' : '500'};cursor:pointer;">EN</button>
+            <button id="lang-en" style="background:none;border:none;color:${currentLang === 'en' ? '#13b47e' : '#555'};font-weight:${currentLang === 'en' ? '700' : '500'};cursor:pointer;">EN</button>
             <span style="color:#aaa;">/</span>
-            <button id="lang-vi" style="background:none;border:none;color:${currentLang==='vi' ? '#13b47e' : '#555'};font-weight:${currentLang==='vi' ? '700' : '500'};cursor:pointer;">VI</button>
+            <button id="lang-vi" style="background:none;border:none;color:${currentLang === 'vi' ? '#13b47e' : '#555'};font-weight:${currentLang === 'vi' ? '700' : '500'};cursor:pointer;">VI</button>
         `;
 
         if (userData) {
             nav.innerHTML = `
-            <a href="create-spot.html" style="text-decoration: none; color: #13b47e; font-weight: 500;">${dict.becomeHost}</a>
+            <a href="http://localhost:5173/host/login" style="text-decoration: none; color: #13b47e; font-weight: 500;">${dict.becomeHost}</a>
             <a href="my-bookings.html" style="text-decoration: none; color: #13b47e; font-weight: 500; margin-left: 15px;">${dict.myBookings}</a>
             <span style="margin: 0 15px;">|</span>
             <span>${dict.welcome}, ${userData.fullName}!</span>
@@ -288,7 +288,8 @@ document.addEventListener('DOMContentLoaded', () => {
             `;
         } else {
             nav.innerHTML = `
-            <a href="register.html">${dict.becomeHostRegister}</a>
+            <a href="http://localhost:5173/host/login">${dict.becomeHost}</a>
+            <a href="register.html">${dict.registerText}</a>
             <a href="login.html">${dict.login}</a>
             ${langSwitcher}
             `;

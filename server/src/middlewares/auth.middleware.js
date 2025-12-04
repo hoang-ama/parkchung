@@ -1,7 +1,11 @@
+// File: server/src/middlewares/auth.middleware.js
 const jwt = require('jsonwebtoken');
 const config = require('../config');
 const User = require('../models/user.model');
 
+/**
+ * Middleware to protect routes - requires valid JWT token
+ */
 const protect = async (req, res, next) => {
     let token;
     if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
@@ -22,6 +26,9 @@ const protect = async (req, res, next) => {
     }
 };
 
+/**
+ * Middleware for optional authentication - attaches user if token present
+ */
 const optionalAuth = async (req, res, next) => {
     if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
         try {
@@ -36,4 +43,37 @@ const optionalAuth = async (req, res, next) => {
     next();
 };
 
-module.exports = { protect, optionalAuth };
+/**
+ * Middleware to restrict access to hosts only
+ * Must be used after protect middleware
+ */
+const hostOnly = (req, res, next) => {
+    if (!req.user) {
+        return res.status(401).json({ message: 'Authentication required' });
+    }
+
+    // Allow both 'host' and 'admin' roles to access host routes
+    if (req.user.role !== 'host' && req.user.role !== 'admin') {
+        return res.status(403).json({ message: 'Host access only' });
+    }
+
+    next();
+};
+
+/**
+ * Middleware to restrict access to admins only
+ * Must be used after protect middleware
+ */
+const adminOnly = (req, res, next) => {
+    if (!req.user) {
+        return res.status(401).json({ message: 'Authentication required' });
+    }
+
+    if (req.user.role !== 'admin') {
+        return res.status(403).json({ message: 'Admin access only' });
+    }
+
+    next();
+};
+
+module.exports = { protect, optionalAuth, hostOnly, adminOnly };

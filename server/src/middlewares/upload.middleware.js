@@ -1,28 +1,40 @@
+// File: server/src/middlewares/upload.middleware.js
 const multer = require('multer');
-const { CloudinaryStorage } = require('multer-storage-cloudinary');
-const cloudinary = require('cloudinary').v2;
-const config = require('../config');
+const path = require('path');
+const fs = require('fs');
 
-// Configure Cloudinary using environment variables
-cloudinary.config({
-    cloud_name: config.cloudinaryCloudName,
-    api_key: config.cloudinaryApiKey,
-    api_secret: config.cloudinaryApiSecret,
-});
+// Ensure uploads directory exists
+const uploadDir = path.join(__dirname, '../../public/uploads/spots');
+if (!fs.existsSync(uploadDir)) {
+    fs.mkdirSync(uploadDir, { recursive: true });
+}
 
-// Configure multer to use Cloudinary as storage
-const storage = new CloudinaryStorage({
-    cloudinary: cloudinary,
-    params: {
-        folder: 'parkchung_spots',
-        allowed_formats: ['jpeg', 'png', 'jpg', 'webp'],
-        transformation: [{ width: 1024, height: 768, crop: 'limit' }]
+// Configure storage
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, uploadDir);
     },
+    filename: function (req, file, cb) {
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+        cb(null, 'spot-' + uniqueSuffix + path.extname(file.originalname));
+    }
 });
 
-const upload = multer({ 
+// File filter
+const fileFilter = (req, file, cb) => {
+    if (file.mimetype.startsWith('image/')) {
+        cb(null, true);
+    } else {
+        cb(new Error('Not an image! Please upload only images.'), false);
+    }
+};
+
+const upload = multer({
     storage: storage,
-    limits: { fileSize: 1024 * 1024 * 5 } // File limit 5MB
+    limits: {
+        fileSize: 5 * 1024 * 1024 // 5MB limit
+    },
+    fileFilter: fileFilter
 });
 
 module.exports = upload;
