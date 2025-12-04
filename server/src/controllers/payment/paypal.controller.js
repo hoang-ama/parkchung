@@ -112,8 +112,8 @@ exports.checkout = async (req, res) => {
         booking.payment = payment._id;
         await booking.save();
 
-        const successBaseUrl = config.paypal.returnUrl || `${config.clientBaseUrl}/customer/payment-result.html`;
-        const cancelBaseUrl = config.paypal.cancelUrl || `${config.clientBaseUrl}/customer/payment-cancel.html`;
+        const successBaseUrl = config.paypal.returnUrl || `${config.clientBaseUrl}payment-result.html`;
+        const cancelBaseUrl = config.paypal.cancelUrl || `${config.clientBaseUrl}payment-cancel.html`;
 
         const returnUrl = paypalService.buildReturnUrl(successBaseUrl, booking._id, payment._id);
         const cancelUrl = paypalService.buildReturnUrl(cancelBaseUrl, booking._id, payment._id);
