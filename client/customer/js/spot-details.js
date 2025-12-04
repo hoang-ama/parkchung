@@ -518,7 +518,7 @@ async function initializeSpotBookingPage(spotId) {
                         alert('Booking created successfully! You can pay at the parking spot.');
                         closeModal();
                         // Optionally redirect to a confirmation page
-                        window.location.href = '/customer/index.html';
+                        window.location.href = 'index.html';
                     } catch (error) {
                         console.error('Cash booking error:', error);
                         alert(error.message || 'Failed to create booking. Please try again.');
@@ -575,7 +575,7 @@ async function initializeSpotBookingPage(spotId) {
                 const booking = await response.json();
                 alert('Booking created successfully! You can pay at the parking spot.');
                 // Optionally redirect to a confirmation page or my bookings
-                window.location.href = '/customer/my-bookings.html';
+                window.location.href = 'my-bookings.html';
             } catch (error) {
                 console.error('Cash booking error:', error);
                 alert(error.message || 'Failed to create booking. Please try again.');
