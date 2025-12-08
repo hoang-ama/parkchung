@@ -279,7 +279,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (userData) {
             nav.innerHTML = `
-            <a href="http://localhost:5173/host/login" style="text-decoration: none; color: #13b47e; font-weight: 500;">${dict.becomeHost}</a>
+            <a href="/host/login" style="text-decoration: none; color: #13b47e; font-weight: 500;">${dict.becomeHost}</a>
             <a href="my-bookings.html" style="text-decoration: none; color: #13b47e; font-weight: 500; margin-left: 15px;">${dict.myBookings}</a>
             <span style="margin: 0 15px;">|</span>
             <span>${dict.welcome}, ${userData.fullName}!</span>
@@ -288,7 +288,7 @@ document.addEventListener('DOMContentLoaded', () => {
             `;
         } else {
             nav.innerHTML = `
-            <a href="http://localhost:5173/host/login">${dict.becomeHost}</a>
+            <a href="/host/login">${dict.becomeHost}</a>
             <a href="register.html">${dict.registerText}</a>
             <a href="login.html">${dict.login}</a>
             ${langSwitcher}
