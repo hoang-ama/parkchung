@@ -1,3 +1,5 @@
+// File: server/src/server.js
+// Restart trigger
 const app = require('./app');
 const config = require('./config');
 const connectDB = require('./config/database');

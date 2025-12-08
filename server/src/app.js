@@ -44,6 +44,7 @@ app.use(express.urlencoded({ extended: true }));
 // Public thư mục 'public'
 app.use(express.static(path.join(__dirname, '../public')));
 
+
 // API Routes
 app.get('/', (req, res) => {
     res.send('Welcome to ParkChung API!');
