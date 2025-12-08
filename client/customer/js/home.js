@@ -113,6 +113,18 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    // Helper function to fetch and display suggestions
+    const fetchAndShowSuggestions = async (query) => {
+        try {
+            // Use global API_URL from config.js
+            const response = await fetch(`${API_URL}/spots/autocomplete?q=${encodeURIComponent(query)}`);
+            const suggestions = await response.json();
+            displaySuggestions(suggestions);
+        } catch (error) {
+            console.error('Error fetching suggestions:', error);
+        }
+    };
+
     locationInput.addEventListener('input', () => {
         clearTimeout(debounceTimer);
         const query = locationInput.value;
@@ -120,15 +132,25 @@ document.addEventListener('DOMContentLoaded', () => {
             suggestionsBox.style.display = 'none';
             return;
         }
-        debounceTimer = setTimeout(async () => {
-            try {
-                const response = await fetch(`${API_URL}/spots/autocomplete?q=${encodeURIComponent(query)}`);
-                const suggestions = await response.json();
-                displaySuggestions(suggestions);
-            } catch (error) {
-                console.error('Error fetching suggestions:', error);
-            }
+        debounceTimer = setTimeout(() => {
+            fetchAndShowSuggestions(query);
         }, 300);
+    });
+
+    // Fix: Show suggestions when clicking the input if it has value
+    locationInput.addEventListener('click', () => {
+        const query = locationInput.value;
+        if (query.length >= 2) {
+            fetchAndShowSuggestions(query);
+        }
+    });
+
+    // Also handle focus event to show suggestions when tabbing into the field
+    locationInput.addEventListener('focus', () => {
+        const query = locationInput.value;
+        if (query.length >= 2) {
+            fetchAndShowSuggestions(query);
+        }
     });
 
     locationInput.addEventListener('blur', () => {

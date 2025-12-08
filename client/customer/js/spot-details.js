@@ -258,6 +258,7 @@ async function initializeSpotBookingPage(spotId) {
         altInput: true,
         altFormat: "F j, Y h:i K", // VD: September 10, 2024 03:30 PM
         time_24hr: false,
+        disableMobile: true,
         onChange: updatePriceSummary,
         onReady: function (selectedDates, dateStr, instance) {
             addConfirmCancelButtons(instance);
@@ -288,6 +289,30 @@ async function initializeSpotBookingPage(spotId) {
         ...commonFlatpickrOptions,
         placeholder: "Select leaving date and time"
     });
+
+    // --- ENHANCE DATE PICKER UX ---
+    // Allow clicking anywhere in the container to open the picker
+    const arrivalContainer = bookingArrivalDateInput.closest('.booking-info-item');
+    const leavingContainer = bookingLeavingDateInput.closest('.booking-info-item');
+
+    if (arrivalContainer) {
+        arrivalContainer.style.cursor = 'pointer';
+        arrivalContainer.addEventListener('click', (e) => {
+            // Prevent reopening if clicking the input itself (Flatpickr handles that)
+            if (e.target !== bookingArrivalDateInput) {
+                arrivalFlatpickr.open();
+            }
+        });
+    }
+
+    if (leavingContainer) {
+        leavingContainer.style.cursor = 'pointer';
+        leavingContainer.addEventListener('click', (e) => {
+            if (e.target !== bookingLeavingDateInput) {
+                leavingFlatpickr.open();
+            }
+        });
+    }
 
     // --- BỘ ĐẾM NGƯỢC THỜI GIAN THANH TOÁN ---
     let timeRemaining = 15 * 60; // 15 phút tính bằng giây

@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 // ============ Types ============
 interface OverviewStats {
@@ -139,6 +140,96 @@ function getStatusBadgeClasses(status: HostBooking['status']): string {
     }
 }
 
+// ============ Sidebar Component ============
+interface SidebarProps {
+    isOpen: boolean;
+    onClose: () => void;
+}
+
+function Sidebar({ isOpen, onClose }: SidebarProps) {
+    const navigate = useNavigate();
+    const location = useLocation();
+
+    const menuItems = [
+        { label: 'Dashboard', path: '/host/dashboard', icon: '📊' },
+        { label: 'My Parking Spots', path: '/host/spots', icon: '🅿️' },
+        { label: 'Create New Spot', path: '/host/spots/new', icon: '➕' },
+        { label: 'Bookings', path: '/host/bookings', icon: '📅' },
+        { label: 'Payouts & Earnings', path: '/host/earnings', icon: '💰' },
+    ];
+
+    const handleNavClick = (path: string) => {
+        navigate(path);
+        onClose();
+    };
+
+    return (
+        <>
+            {/* Mobile overlay */}
+            {isOpen && (
+                <div
+                    className="fixed inset-0 bg-black/50 z-40 lg:hidden"
+                    onClick={onClose}
+                />
+            )}
+
+            {/* Sidebar */}
+            <aside
+                className={`
+          fixed lg:static inset-y-0 left-0 z-50
+          w-60 bg-gray-900 text-white
+          transform transition-transform duration-300 ease-in-out
+          ${isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
+        `}
+            >
+                {/* Logo */}
+                <div className="h-16 flex items-center px-6 border-b border-gray-800">
+                    <span className="text-xl font-bold text-emerald-400">ParkChung</span>
+                    <span className="ml-2 text-sm text-gray-400">Host</span>
+                </div>
+
+                {/* Navigation */}
+                <nav className="mt-6 px-3">
+                    {menuItems.map((item) => {
+                        const isActive = location.pathname === item.path;
+                        return (
+                            <button
+                                key={item.path}
+                                onClick={() => handleNavClick(item.path)}
+                                className={`
+                  w-full flex items-center gap-3 px-4 py-3 rounded-lg mb-1
+                  text-left text-sm font-medium transition-colors
+                  ${isActive
+                                        ? 'bg-emerald-600 text-white'
+                                        : 'text-gray-300 hover:bg-gray-800 hover:text-white'
+                                    }
+                `}
+                            >
+                                <span className="text-lg">{item.icon}</span>
+                                {item.label}
+                            </button>
+                        );
+                    })}
+                </nav>
+
+                {/* Logout button */}
+                <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-gray-800">
+                    <button
+                        onClick={() => {
+                            localStorage.removeItem('hostToken');
+                            navigate('/host/login');
+                        }}
+                        className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-gray-400 hover:bg-gray-800 hover:text-white transition-colors"
+                    >
+                        <span className="text-lg">🚪</span>
+                        Logout
+                    </button>
+                </div>
+            </aside>
+        </>
+    );
+}
+
 // ============ Stat Card Component ============
 interface StatCardProps {
     icon: string;
@@ -193,6 +284,7 @@ function TableRowSkeleton() {
 
 // ============ Main Dashboard Component ============
 export default function HostDashboardPage() {
+    const [sidebarOpen, setSidebarOpen] = useState(false);
     const [overview, setOverview] = useState<OverviewStats | null>(null);
     const [bookings, setBookings] = useState<HostBooking[]>([]);
     const [isLoading, setIsLoading] = useState(true);
