@@ -14,7 +14,7 @@ if (window.location.hostname === 'localhost' || window.location.hostname === '12
 // Biến điều hướng Host Portal (gắn vào window để module có thể truy cập)
 if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
     // Môi trường Local: Host chạy trên port riêng (Vite: 5174 vì 5173 đang được sử dụng)
-    window.HOST_URL = 'http://localhost:5174/host';
+    window.HOST_URL = 'http://localhost:5173/host';
 } else {
     // Môi trường Production (EC2)
     window.HOST_URL = 'https://parkchung.com/host';

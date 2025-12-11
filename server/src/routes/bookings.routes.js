@@ -8,10 +8,12 @@ const {
     getBookingPaymentStatus,
     cancelBooking,
     requestReview,
+    getLeadStatus,
 } = require('../controllers/booking.controller');
 const { protect, optionalAuth } = require('../middlewares/auth.middleware');
 router.post('/estimate-price', estimatePrice); // Route ước tính giá không cần xác thực
 router.post('/guest', createGuestBooking); // Public guest booking
+router.get('/leads/:leadId', getLeadStatus); // Public route to get guest lead status
 router.get('/:bookingId/payments/:paymentId', optionalAuth, getBookingPaymentStatus);
 router.use(protect); // Tất cả các route sau dòng này đều yêu cầu token
 router.route('/')

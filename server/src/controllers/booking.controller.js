@@ -174,6 +174,40 @@ exports.createGuestBooking = async (req, res) => {
 };
 
 /**
+ * @desc    Get guest lead status by ID
+ * @route   GET /api/bookings/leads/:leadId
+ * @access  Public
+ */
+exports.getLeadStatus = async (req, res) => {
+    const { leadId } = req.params;
+    try {
+        const lead = await Lead.findById(leadId).populate('spot', 'address');
+        if (!lead) {
+            return res.status(404).json({ message: 'Lead not found' });
+        }
+
+        // Return lead info in a format similar to booking for consistency
+        return res.json({
+            lead: {
+                _id: lead._id,
+                status: lead.status,
+                paymentStatus: lead.status === 'confirmed' ? 'UNPAID' : 'PENDING',
+                paymentMethod: lead.paymentMethod || 'CASH',
+                spot: lead.spot,
+                startTime: lead.startTime,
+                endTime: lead.endTime,
+                totalPrice: lead.totalPrice,
+                fullName: lead.fullName,
+                email: lead.email,
+                phoneNumber: lead.phoneNumber,
+            }
+        });
+    } catch (error) {
+        return res.status(500).json({ message: 'Failed to fetch lead status', error: error.message });
+    }
+};
+
+/**
  * @desc    Create new booking
  * @route   POST /api/bookings
  * @access  Private
