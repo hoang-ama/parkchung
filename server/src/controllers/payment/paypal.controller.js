@@ -55,6 +55,11 @@ exports.checkout = async (req, res) => {
             return res.status(404).json({ message: 'Parking spot not found.' });
         }
 
+        // Only allow booking approved spots
+        if (parkingSpot.status !== 'approved') {
+            return res.status(400).json({ message: 'This parking spot is not available for booking.' });
+        }
+
         const { parsedStartTime, parsedEndTime } = validateTimeRange(startTime, endTime);
 
         // Only check for confirmed bookings (pending bookings don't reserve the spot)

@@ -540,10 +540,10 @@ async function initializeSpotBookingPage(spotId) {
                             throw new Error(errorData.message || 'Failed to create booking.');
                         }
 
-                        const lead = await response.json();
+                        const booking = await response.json();
                         closeModal();
-                        // Redirect to payment result page with lead info for confirmation
-                        window.location.href = `payment-result.html?leadId=${lead._id}&paymentMethod=CASH&isGuest=true`;
+                        // Redirect to payment result page with booking info for confirmation
+                        window.location.href = `payment-result.html?bookingId=${booking._id}&paymentMethod=CASH&isGuest=true`;
                     } catch (error) {
                         console.error('Cash booking error:', error);
                         alert(error.message || 'Failed to create booking. Please try again.');

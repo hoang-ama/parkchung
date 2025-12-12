@@ -60,6 +60,11 @@ exports.createGuestBooking = async (req, res) => {
         return res.status(404).json({ message: 'Parking spot not found.' });
     }
 
+    // Only allow booking approved spots
+    if (parkingSpot.status !== 'approved') {
+        return res.status(400).json({ message: 'This parking spot is not available for booking.' });
+    }
+
     const parsedStartTime = new Date(startTime);
     const parsedEndTime = new Date(endTime);
 
@@ -91,75 +96,56 @@ exports.createGuestBooking = async (req, res) => {
     const totalPrice = calculatePrice(parsedStartTime, parsedEndTime, parkingSpot.hourlyRate);
 
     try {
-        const leadData = {
+        // Create booking with guest fields (same as logged-in user but with guest info instead of user ref)
+        const bookingData = {
             spot,
             startTime: parsedStartTime,
             endTime: parsedEndTime,
             totalPrice,
             status: 'pending',
-            fullName,
-            email,
-            phoneNumber,
-            source: 'guest',
-            paymentMethod: paymentMethod || 'OFFLINE'
+            guestFullName: fullName,
+            guestEmail: email,
+            guestPhoneNumber: phoneNumber,
+            phoneNumber: phoneNumber,
+            paymentMethod: paymentMethod === PAYMENT_METHODS.CASH ? PAYMENT_METHODS.CASH : PAYMENT_METHODS.CASH,
+            paymentStatus: BOOKING_PAYMENT_STATUS.UNPAID,
         };
 
-        // Handle Cash Payment for Guest
+        // Handle Cash Payment for Guest - confirm immediately
         if (paymentMethod === PAYMENT_METHODS.CASH) {
-            leadData.status = 'confirmed';
+            bookingData.status = 'confirmed';
         }
 
-        const lead = new Lead(leadData);
-        const createdLead = await lead.save();
+        const booking = new Booking(bookingData);
+        const createdBooking = await booking.save();
 
         // Send Emails if Confirmed (Cash)
-        if (createdLead.status === 'confirmed') {
+        if (createdBooking.status === 'confirmed') {
             try {
-                // Populate spot for email data
-                await createdLead.populate({ path: 'spot', populate: { path: 'owner' } });
-
-                // Prepare data (Lead has guestFullName etc. mapped to fullName in model, but prepareBookingData expects guestFullName)
-                // Actually prepareBookingData expects: booking.guestFullName.
-                // Lead model has: fullName.
-                // So we need to adapt the object passed to prepareBookingData or modify prepareBookingData.
-                // Let's manually construct bookingData for Lead to be safe.
-
-                const partner = createdLead.spot && createdLead.spot.owner;
-                const bookingData = {
-                    customerName: createdLead.fullName,
-                    customerEmail: createdLead.email,
-                    partnerName: partner ? partner.fullName : 'Partner',
-                    partnerEmail: partner ? partner.email : null,
-                    bookingId: createdLead._id,
-                    spotAddress: createdLead.spot ? createdLead.spot.address : 'Unknown Address',
-                    startTime: createdLead.startTime,
-                    endTime: createdLead.endTime,
-                    totalPrice: createdLead.totalPrice,
-                    phoneNumber: createdLead.phoneNumber,
-                    guestPhoneNumber: createdLead.phoneNumber
-                };
+                await ensureBookingPopulated(createdBooking);
+                const emailData = prepareBookingData(createdBooking);
 
                 // Send Customer Confirmation
-                await brevoService.sendBookingEmail(bookingData, 'bookingConfirm');
+                await brevoService.sendBookingEmail(emailData, 'bookingConfirm');
 
                 // Send Partner Confirmation
-                if (bookingData.partnerEmail) {
-                    await brevoService.sendEmailPartner(bookingData, 'partnerConfirm');
+                if (emailData.partnerEmail) {
+                    await brevoService.sendEmailPartner(emailData, 'partnerConfirm');
                 }
 
-                // Schedule Review Email (same logic)
-                const endTime = new Date(createdLead.endTime);
+                // Schedule Review Email
+                const bookingEndTime = new Date(createdBooking.endTime);
                 const now = new Date();
-                const delayMs = endTime.getTime() - now.getTime();
+                const delayMs = bookingEndTime.getTime() - now.getTime();
 
                 if (delayMs > 0) {
                     setTimeout(async () => {
                         try {
-                            await brevoService.sendReviewEmail(bookingData);
+                            await brevoService.sendReviewEmail(emailData);
                         } catch (e) { console.error(e); }
                     }, delayMs);
                 } else {
-                    try { await brevoService.sendReviewEmail(bookingData); } catch (e) { console.error(e); }
+                    try { await brevoService.sendReviewEmail(emailData); } catch (e) { console.error(e); }
                 }
 
             } catch (emailError) {
@@ -167,7 +153,7 @@ exports.createGuestBooking = async (req, res) => {
             }
         }
 
-        res.status(201).json(createdLead);
+        res.status(201).json(createdBooking);
     } catch (error) {
         res.status(400).json({ message: error.message });
     }
@@ -218,6 +204,11 @@ exports.createBooking = async (req, res) => {
     const parkingSpot = await ParkingSpot.findById(spot);
     if (!parkingSpot) {
         return res.status(404).json({ message: 'Parking spot not found.' });
+    }
+
+    // Only allow booking approved spots
+    if (parkingSpot.status !== 'approved') {
+        return res.status(400).json({ message: 'This parking spot is not available for booking.' });
     }
 
     const parsedStartTime = new Date(startTime);

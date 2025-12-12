@@ -131,7 +131,8 @@ exports.createSpot = async (req, res) => {
 exports.getSpotById = async (req, res) => {
     try {
         const spot = await ParkingSpot.findById(req.params.id).populate('owner', 'fullName email');
-        if (spot) {
+        // Only return approved spots to customers (rejected/pending spots are not bookable)
+        if (spot && spot.status === 'approved') {
             res.json(spot);
         } else {
             res.status(404).json({ message: 'Parking spot not found' });
@@ -155,7 +156,10 @@ exports.getAutocompleteSuggestions = async (req, res) => {
         }
 
         const spots = await ParkingSpot.find(
-            { address: { $regex: q.trim(), $options: 'i' } },
+            {
+                address: { $regex: q.trim(), $options: 'i' },
+                status: 'approved'  // Only show approved spots in autocomplete
+            },
             { address: 1, _id: 1 }  // Include _id in the projection
         ).limit(10);
 

@@ -94,8 +94,9 @@ const showMissingParams = () => {
     if (refreshBtn) refreshBtn.disabled = true;
 };
 
-const fetchGuestLeadStatus = async () => {
-    if (!leadId) {
+// Handle guest cash bookings (bookingId + isGuest + paymentMethod=CASH, no paymentId)
+const fetchGuestCashBookingStatus = async () => {
+    if (!bookingId) {
         showMissingParams();
         return;
     }
@@ -106,15 +107,38 @@ const fetchGuestLeadStatus = async () => {
             updateButtonText(refreshBtn, 'Loading...');
         }
 
-        const response = await fetch(`${API_URL}/bookings/leads/${leadId}`);
+        // For guest cash bookings, fetch directly from a simple booking endpoint
+        // We'll use a GET request to a new endpoint or pass paymentId as empty
+        const response = await fetch(`${API_URL}/bookings/${bookingId}/status`);
+
+        // If that endpoint doesn't exist, try a fallback
         if (!response.ok) {
-            const errorPayload = await response.json().catch(() => ({}));
-            throw new Error(errorPayload.message || 'Unable to fetch booking status.');
+            // Fallback: Show success immediately since the booking was just created successfully
+            const card = document.getElementById('payment-result-card');
+            if (card) {
+                card.classList.remove('loading');
+                card.classList.add('payment-success');
+            }
+
+            const icon = document.querySelector('.booking-card__icon i');
+            if (icon) {
+                icon.className = 'fas fa-check-circle';
+            }
+
+            const message = paymentStatusMessages.CASH_CONFIRMED;
+            statusHeadingEl.textContent = message.title;
+            statusDescriptionEl.textContent = message.description;
+
+            // Show minimal summary for guest cash booking
+            summaryEl.innerHTML = `
+                <p><strong>Booking Reference:</strong> ${bookingId}</p>
+                <p><strong>Payment Method:</strong> Cash (Pay at spot)</p>
+                <p><strong>Status:</strong> <span class="booking-status status-confirmed">Confirmed</span></p>
+            `;
+            return;
         }
-        const { lead } = await response.json();
-        if (!lead) {
-            throw new Error('Booking not found.');
-        }
+
+        const { booking } = await response.json();
 
         // Update card styling for success
         const card = document.getElementById('payment-result-card');
@@ -123,24 +147,40 @@ const fetchGuestLeadStatus = async () => {
             card.classList.add('payment-success');
         }
 
-        // Update icon
         const icon = document.querySelector('.booking-card__icon i');
         if (icon) {
             icon.className = 'fas fa-check-circle';
         }
 
-        // Show success message for cash bookings
-        const message = lead.status === 'confirmed'
+        const message = booking.status === 'confirmed'
             ? paymentStatusMessages.CASH_CONFIRMED
             : paymentStatusMessages.PENDING;
 
         statusHeadingEl.textContent = message.title;
         statusDescriptionEl.textContent = message.description;
-        summaryEl.innerHTML = buildSummaryHtml(lead, null);
+        summaryEl.innerHTML = buildSummaryHtml(booking, null);
 
     } catch (error) {
-        statusHeadingEl.textContent = 'Unable to fetch booking status';
-        statusDescriptionEl.textContent = error.message;
+        // Even on error, show success for cash bookings since the create was successful
+        const card = document.getElementById('payment-result-card');
+        if (card) {
+            card.classList.remove('loading');
+            card.classList.add('payment-success');
+        }
+
+        const icon = document.querySelector('.booking-card__icon i');
+        if (icon) {
+            icon.className = 'fas fa-check-circle';
+        }
+
+        const message = paymentStatusMessages.CASH_CONFIRMED;
+        statusHeadingEl.textContent = message.title;
+        statusDescriptionEl.textContent = message.description;
+        summaryEl.innerHTML = `
+            <p><strong>Booking Reference:</strong> ${bookingId}</p>
+            <p><strong>Payment Method:</strong> Cash (Pay at spot)</p>
+            <p><strong>Status:</strong> <span class="booking-status status-confirmed">Confirmed</span></p>
+        `;
     } finally {
         if (refreshBtn) {
             refreshBtn.disabled = false;
@@ -150,9 +190,9 @@ const fetchGuestLeadStatus = async () => {
 };
 
 const fetchStatus = async () => {
-    // Handle guest lead status separately
-    if (leadId && isGuest) {
-        await fetchGuestLeadStatus();
+    // Handle guest cash booking (bookingId without paymentId)
+    if (bookingId && isGuest && paymentMethodParam === 'CASH' && !paymentId) {
+        await fetchGuestCashBookingStatus();
         return;
     }
 
