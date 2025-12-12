@@ -64,7 +64,7 @@ function SpotCard({ spot, onEdit }: { spot: ParkingSpot; onEdit: (id: string) =>
     // Use first image or placeholder
     const imageUrl = spot.images && spot.images.length > 0
         ? (spot.images[0].startsWith('http') ? spot.images[0] : `${API_BASE_URL.replace('/api', '')}${spot.images[0]}`)
-        : 'https://via.placeholder.com/400x300?text=No+Image';
+        : '/uploads/default-parking.jpg';
 
     return (
         <div className="bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-md transition-shadow">
@@ -75,7 +75,7 @@ function SpotCard({ spot, onEdit }: { spot: ParkingSpot; onEdit: (id: string) =>
                     alt={spot.name}
                     className="w-full h-full object-cover"
                     onError={(e) => {
-                        (e.target as HTMLImageElement).src = 'https://via.placeholder.com/400x300?text=Image+Error';
+                        (e.target as HTMLImageElement).src = '/uploads/default-parking.jpg';
                     }}
                 />
                 <div className="absolute top-3 right-3">

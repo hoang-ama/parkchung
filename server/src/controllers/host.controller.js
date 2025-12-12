@@ -131,9 +131,8 @@ exports.createSpot = async (req, res) => {
             imageUrls = Array.isArray(req.body.images) ? req.body.images : [req.body.images];
         }
 
-        // Use default image if no images provided
         if (imageUrls.length === 0) {
-            imageUrls = ["../../../public/uploads/default-parking.jpg"];
+            imageUrls = ["/uploads/default-parking.jpg"];
         }
 
         // Validate required fields
