@@ -4,12 +4,14 @@ const User = require('../../models/user.model.js');
 const MyUtils = require('../../utils/MyUtils.js');
 const mongoose = require('mongoose');
 
-async function addNewSpotSheetData(sheetId, sheetTitle) {
+async function addNewSpotSheetData(sheetId, sheetTitle) {    
     // const ownerMap = {};
     const spots = [];  
     const users = [];
     const updatedData = [];
     const dataRanges = [];
+
+    const defaultPassword = await MyUtils.generateHashPassword("Parkchung@123")
     
     const formattedData = await formatGGSheetData(sheetId, sheetTitle);
     const newSpots = formattedData.newSpots;
@@ -28,11 +30,12 @@ async function addNewSpotSheetData(sheetId, sheetTitle) {
             
         //     ownerMap[ownerEmail] = userMapper._id;
         // }
-        const userMapper = mapUserData(newSpots[i]);
+        const emailFormat = newSpots[i]['Email'] || `${MyUtils.generateUniqueString()}@example.com`
+        const userMapper = mapUserData(newSpots[i], emailFormat, defaultPassword);
         users.push(userMapper);
 
         // Gắn userId vào spot
-        const spotdata = mapSpotSheetData(userMapper._id, newSpots[i]);
+        const spotdata = mapSpotSheetData(userMapper._id, newSpots[i], emailFormat);
         spots.push(spotdata);
 
         if (i === 0) {
@@ -66,7 +69,7 @@ async function addNewSpotSheetData(sheetId, sheetTitle) {
         values: [...updatedData]
     })
 
-    await insertBulkData(users, User);
+    await insertBulkData(users, User, spots);
     await insertBulkData(spots, ParkingSpot);
     // // Cap nhat lai trang thai o google sheet
     await updateSheetBatchData(dataRanges, sheetId, sheetTitle);
@@ -92,7 +95,7 @@ const updateSpotSheetData = async (sheetId, sheetTitle) => {
         let owner = await User.findById(row["ownerId"]);
         if (!owner) {
             console.warn(`No user found with ID: ${spot.owner}`);
-            owner = await User.findOne({ email: row['email_1'] || row['email_2'] });
+            owner = await User.findOne({ email: row["Email"]});
         }
 
         // const ownerData = {
@@ -110,9 +113,10 @@ const updateSpotSheetData = async (sheetId, sheetTitle) => {
     }
 }
 
-async function insertBulkData(datas, collectionName) {
+async function insertBulkData(datas, collectionName, parkingDatas) {
     const total = datas.length;
     const batchSize = 1000;
+    let allDuplicateEmails = [];
 
     for (let i = 0; i < total; i += batchSize) {
         const batch = datas.slice(i, i + batchSize);
@@ -123,49 +127,78 @@ async function insertBulkData(datas, collectionName) {
             console.log(`Batch ${batchNum} inserted.`);
         } catch (err) {
             console.error(`Batch ${batchNum} error:`, err.message);
+
+            if (collectionName === User && err.writeErrors) {
+                const emails = err.writeErrors
+                    .map(e => e.err.op.email)
+                    .filter(Boolean);
+
+                allDuplicateEmails.push(...emails);
+            }
+        }
+    }
+
+    if (collectionName === User && parkingDatas) {
+        for (let i = 0; i < allDuplicateEmails.length; i++){
+            const ownerExisted = await User.findOne({ email: allDuplicateEmails[i]});
+            for (let j = 0; j < parkingDatas.length; j++){
+                if (parkingDatas[j]?.email === allDuplicateEmails[i])
+                    parkingDatas[j].owner = ownerExisted._id;
+            }
         }
     }
 }
 
-const mapSpotSheetData = (ownerId, row) => {
+const mapSpotSheetData = (ownerId, row, emailFormat) => {
     const spot = {
         _id: new mongoose.Types.ObjectId(row['spot_id']) || new mongoose.Types.ObjectId(),
         owner: ownerId,
-        nameAddress: row['name'] || 'Unnamed Spot',
-        address: row['full_address'] || 'No Address Provided',
-        spotQuery: row['query'] || '',
-        spotCategory: row['category'] || '',
-        spotType: row['type'] || '',
-        spotPhone: row['phone'] ? MyUtils.formatPhoneNumber(row['phone']) : '',
-        workingHours: row['working_hours'] || '',
-        otherHours: row['other_hours'] || '',
+        name: row['Ward'] ? (`Bãi đỗ xe ${row["Ward"]}`) : 'Unnamed Spot',
+        phone: row['Phone'] ? MyUtils.formatPhoneNumber(row['Phone']) : '',
+        address: row['Full_address'] || 'No Address Provided',
+        ward: row['Ward'] || "",
+        street: row['Street'] || "",
+        city: row['City'] || "",
+        district: row['District'] || "",
+        country: row['Country'] || "",
         location: {
             type: "Point",
             coordinates: [
-                parseFloat(row['longitude']) || 0,
-                parseFloat(row['latitude']) || 0
+                parseFloat(row['Longitude']) || 0,
+                parseFloat(row['Latitude']) || 0
             ]
         },
+        ggRating: row['Rating'] || 0,
+        // openTime: row['Open time'] || '',
+        openTime: '',
+        // description: row['Discription'] || '',
+        description: '',
         images: [
-            row['photo'],
-            row['street_view']
+            row['Photo'],
         ],
+        mapsView: row['Maps view'] || "",
+        email: emailFormat,
         hourlyRate: parseFloat(row['hourly_rate']) || parseFloat(row['prices']) || 0,
         monthlyRate: parseFloat(row['monthly_rate']) || 0,
-        status: 'pending'
+        hasRoof: row['hasRoof'] || false,
+        // vehicleTypes: row['vehicle type'] || [],
+        vehicleTypes: ['car'],
+        numberOfSlots: row["numberOfSlots"] || 1,
+        paymentMethods: ['cash'],
+        status: 'approved',
     };
     return spot;
 }
 
-const mapUserData = (row) => {
+const mapUserData = (row, emailFormat, defaultPassword) => {
     
     const user = {
         _id: new mongoose.Types.ObjectId(row["ownerId"]) || new mongoose.Types.ObjectId(),
-        fullName: row['owner_title'] || 'No Name',
-        email: row['email_1'] || row['email_2'] || `${MyUtils.generateUniqueString()}@example.com`,
-        password: 'Parkchung@123',
+        fullName: row['Ward'] ? (`Bãi đỗ xe ${row["Ward"]}`) : 'Unnamed User',
+        email: emailFormat,
+        password: defaultPassword,
         role: 'user',
-        phone: row['phone'] ? MyUtils.formatPhoneNumber(row['phone']) : 0,
+        phone: row['Phone'] ? MyUtils.formatPhoneNumber(row['Phone']) : 0,
     }    
     return user;
 }
