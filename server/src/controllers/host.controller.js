@@ -132,7 +132,7 @@ exports.createSpot = async (req, res) => {
         }
 
         if (imageUrls.length === 0) {
-            imageUrls = ["/uploads/default-parking.jpg"];
+            imageUrls = ["../../spots/default-parking.jpg"];
         }
 
         // Validate required fields
