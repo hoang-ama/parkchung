@@ -19,8 +19,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 async function initializeSpotBookingPage(spotId) {
     let currentSpotData = null; // Để lưu dữ liệu spot hiện tại
-    let arrivalFlatpickr, leavingFlatpickr; // Biến cho Flatpickr instances
-    let countdownInterval; // Biến cho bộ đếm ngược
+    // Variables cleaned up
 
     const spotMainImage = document.getElementById('spot-main-image');
     const imageCounter = document.getElementById('spot-image-counter');
@@ -28,100 +27,9 @@ async function initializeSpotBookingPage(spotId) {
     const nextImageBtn = document.querySelector('.spot-image-nav-btn.next-btn');
     let currentImageIndex = 0;
 
-    const bookingArrivalDateInput = document.getElementById('booking-arrival-date-input');
-    const bookingLeavingDateInput = document.getElementById('booking-leaving-date-input');
-    const bookingDuration = document.getElementById('booking-duration');
-    const phoneNumberInput = document.getElementById('phone-number-input');
-    const payAndReserveBtn = document.getElementById('pay-and-reserve-btn');
-    const spotAddressDisplay = document.getElementById('spot-address');
-    const summaryParkingFee = document.getElementById('summary-parking-fee');
-    const summaryTransactionFee = document.getElementById('summary-transaction-fee');
-    const summaryFinalPrice = document.getElementById('summary-final-price');
-    const recheckedTimeDisplay = document.getElementById('rechecked-time');
-    const timerDisplay = document.getElementById('timer-display');
+    const reserveNowBtn = document.getElementById('reserve-now-btn');
 
-    // --- CÁC HÀM TIỆN ÍCH ---
-
-    function formatCurrency(amount) {
-        return `${parseInt(amount).toLocaleString('vi-VN')} VND`;
-    }
-
-    function calculateDuration(start, end) {
-        if (!start || !end || start >= end) {
-            return '--';
-        }
-        const diffMs = end.getTime() - start.getTime();
-        const diffMinutes = Math.round(diffMs / (1000 * 60));
-        const hours = Math.floor(diffMinutes / 60);
-        const minutes = diffMinutes % 60;
-
-        if (hours === 0 && minutes === 0) return '--';
-
-        let durationText = '';
-        if (hours > 0) durationText += `${hours} hour${hours > 1 ? 's' : ''}`;
-        if (minutes > 0) durationText += ` ${minutes} minute${minutes > 1 ? 's' : ''}`;
-
-        return durationText.trim();
-    }
-
-    async function updatePriceSummary() {
-        const startTime = arrivalFlatpickr.selectedDates[0];
-        const endTime = leavingFlatpickr.selectedDates[0];
-
-        // Lấy các element mới
-        const summaryUnitPrice = document.getElementById('summary-unit-price');
-        const summaryDuration = document.getElementById('summary-duration');
-        // Các element khác đã được lấy ở trên
-
-        if (!startTime || !endTime || startTime >= endTime || !currentSpotData) {
-            // Reset về trạng thái mặc định
-            summaryUnitPrice.textContent = '-- VND / hour';
-            summaryDuration.textContent = '-- hours';
-            summaryFinalPrice.textContent = formatCurrency(0);
-            payAndReserveBtn.textContent = 'Pay Now and Reserve';
-            payAndReserveBtn.disabled = true;
-            bookingDuration.textContent = '--';
-            return;
-        }
-
-        const totalHours = Math.ceil(Math.abs(endTime - startTime) / 36e5);
-
-        // Cập nhật giao diện với thông tin mới
-        summaryUnitPrice.textContent = `${currentSpotData.hourlyRate.toLocaleString('vi-VN')} VND / hour`;
-        summaryDuration.textContent = `${totalHours} hour${totalHours > 1 ? 's' : ''}`;
-        bookingDuration.textContent = calculateDuration(startTime, endTime);
-
-        try {
-            // Gọi API để lấy tổng giá cuối cùng (đã bao gồm logic tính tiền phức tạp)
-            const response = await fetch(`${API_URL}/bookings/estimate-price`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    spotId: spotId,
-                    startTime: startTime.toISOString(),
-                    endTime: endTime.toISOString()
-                })
-            });
-
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.message || 'Failed to estimate price.');
-            }
-
-            const data = await response.json();
-            const estimatedPrice = data.estimatedPrice;
-
-            // Cập nhật tổng giá
-            summaryFinalPrice.textContent = formatCurrency(estimatedPrice);
-            payAndReserveBtn.textContent = `Pay ${formatCurrency(estimatedPrice)} and Reserve`;
-            payAndReserveBtn.disabled = false;
-        } catch (error) {
-            console.error('Error updating price:', error.message);
-            alert(`Could not calculate price: ${error.message}`);
-            summaryFinalPrice.textContent = 'Error';
-            payAndReserveBtn.disabled = true;
-        }
-    }
+    // --- UTILITY FUNCTIONS REMOVED ---
 
     // --- LOGIC HIỂN THỊ ẢNH ---
     function updateSpotImageDisplay() {
@@ -152,190 +60,152 @@ async function initializeSpotBookingPage(spotId) {
         }
     });
 
-    // --- PAYMENT METHOD SELECTION ---
-    const paymentMethodRadios = document.querySelectorAll('input[name="paymentMethod"]');
-    const paymentSecurityBadges = document.getElementById('payment-security-badges');
+    // --- DATE & PAYMENT LOGIC REMOVED ---
 
-    // Handle payment method change
-    paymentMethodRadios.forEach(radio => {
-        radio.addEventListener('change', handlePaymentMethodChange);
-    });
+    // --- POPULATE SPOT INFO SECTIONS ---
+    function populateSpotInfo(spot) {
+        // Spot Name
+        const spotNameEl = document.getElementById('spot-name');
+        if (spotNameEl) spotNameEl.textContent = spot.name || 'Parking Spot';
 
-    function handlePaymentMethodChange(e) {
-        const selectedMethod = e.target.value;
+        // Address (full display)
+        const spotAddressFull = document.getElementById('spot-address-full');
+        if (spotAddressFull) spotAddressFull.innerHTML = `<span class="icon">📍</span> ${spot.address || 'Address not available'}`;
 
-        // Toggle security badges visibility
-        if (selectedMethod === 'paypal') {
-            paymentSecurityBadges?.classList.remove('hidden');
-        } else if (selectedMethod === 'cash') {
-            paymentSecurityBadges?.classList.add('hidden');
+        // Description
+        const spotDescEl = document.getElementById('spot-description');
+        if (spotDescEl) spotDescEl.textContent = spot.description || 'No description available for this parking spot.';
+
+        // Rating (dynamic from API data)
+        const ratingValueEl = document.getElementById('spot-rating-value');
+        const ratingStarsEl = document.getElementById('spot-rating-stars');
+        if (ratingValueEl && ratingStarsEl) {
+            const rating = spot.ggRating || 0;
+            ratingValueEl.textContent = rating > 0 ? rating.toFixed(1) : 'N/A';
+
+            // Generate star visualization (full ★, half ☆, empty ☆)
+            const fullStars = Math.floor(rating);
+            const hasHalfStar = (rating % 1) >= 0.5;
+            const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
+
+            let starsHTML = '★'.repeat(fullStars);
+            if (hasHalfStar) starsHTML += '⯨'; // Half star
+            starsHTML += '☆'.repeat(emptyStars);
+
+            ratingStarsEl.textContent = starsHTML;
         }
 
-        // Update button text
-        updatePayButtonText();
-    }
+        // Location Map (OpenStreetMap embed)
+        if (spot.location && spot.location.coordinates) {
+            const [lng, lat] = spot.location.coordinates;
+            const mapIframe = document.getElementById('spot-map-iframe');
+            const mapLink = document.getElementById('spot-map-link');
 
-    function updatePayButtonText() {
-        const selectedMethod = document.querySelector('input[name="paymentMethod"]:checked')?.value;
-        const startTime = arrivalFlatpickr?.selectedDates[0];
-        const endTime = leavingFlatpickr?.selectedDates[0];
+            if (mapIframe && lat && lng) {
+                // OpenStreetMap embed
+                const bbox = `${lng - 0.005},${lat - 0.003},${lng + 0.005},${lat + 0.003}`;
+                mapIframe.src = `https://www.openstreetmap.org/export/embed.html?bbox=${bbox}&layer=mapnik&marker=${lat},${lng}`;
+            }
 
-        if (!startTime || !endTime || startTime >= endTime || !currentSpotData) {
-            payAndReserveBtn.textContent = selectedMethod === 'cash' ? 'Reserve now, pay later' : 'Pay now and reserve';
-            return;
+            if (mapLink && lat && lng) {
+                mapLink.href = `https://www.google.com/maps?q=${lat},${lng}`;
+            }
         }
 
-        // Get the current price from the summary
-        const priceText = summaryFinalPrice.textContent;
-
-        if (selectedMethod === 'paypal') {
-            payAndReserveBtn.textContent = `${priceText} - Pay now and reserve`;
-        } else if (selectedMethod === 'cash') {
-            payAndReserveBtn.textContent = `${priceText} - Reserve now, pay later`;
+        // Hourly Rate
+        const hourlyRateEl = document.getElementById('spot-hourly-rate');
+        if (hourlyRateEl) {
+            hourlyRateEl.textContent = spot.hourlyRate
+                ? `${spot.hourlyRate.toLocaleString('vi-VN')} VND/hour`
+                : 'Call for price';
         }
-    }
 
-
-    // --- HELPER FUNCTION FOR FLATPICKR BUTTONS ---
-
-    /**
-     * Adds Confirm and Cancel buttons to a Flatpickr instance
-     * @param {Object} fp - The Flatpickr instance
-     */
-    function addConfirmCancelButtons(fp) {
-        let previousValue = fp.input.value;
-
-        // Create button container
-        const buttonContainer = document.createElement('div');
-        buttonContainer.className = 'flatpickr-button-container';
-
-        // Create Confirm button
-        const confirmBtn = document.createElement('button');
-        confirmBtn.type = 'button';
-        confirmBtn.className = 'flatpickr-confirm-btn';
-        confirmBtn.textContent = 'Confirm';
-        confirmBtn.addEventListener('click', () => {
-            previousValue = fp.input.value;
-            fp.close();
-        });
-
-        // Create Cancel button
-        const cancelBtn = document.createElement('button');
-        cancelBtn.type = 'button';
-        cancelBtn.className = 'flatpickr-cancel-btn';
-        cancelBtn.textContent = 'Cancel';
-        cancelBtn.addEventListener('click', () => {
-            if (previousValue) {
-                fp.input.value = previousValue;
-                // Parse the altFormat to restore the date
-                const parsedDate = fp.parseDate(previousValue, fp.config.altFormat);
-                if (parsedDate) {
-                    fp.setDate(parsedDate, false);
-                }
-            }
-            fp.close();
-        });
-
-        // Append buttons to container
-        buttonContainer.appendChild(confirmBtn);
-        buttonContainer.appendChild(cancelBtn);
-
-        // Append container to calendar
-        fp.calendarContainer.appendChild(buttonContainer);
-
-        // Store previous value when picker opens
-        fp.config.onOpen.push(() => {
-            previousValue = fp.input.value;
-        });
-    }
-
-    // --- KHỞI TẠO FLATPCKR VÀ XỬ LÝ SỰ KIỆN ---
-
-    const commonFlatpickrOptions = {
-        enableTime: true,
-        dateFormat: "Y-m-d H:i",
-        minDate: "today",
-        altInput: true,
-        altFormat: "F j, Y h:i K", // VD: September 10, 2024 03:30 PM
-        time_24hr: false,
-        disableMobile: true,
-        onChange: updatePriceSummary,
-        onReady: function (selectedDates, dateStr, instance) {
-            addConfirmCancelButtons(instance);
-        },
-        onOpen: [],
-        onClose: function (selectedDates, dateStr, instance) {
-            if (instance === arrivalFlatpickr && selectedDates.length > 0) {
-                leavingFlatpickr.set('minDate', selectedDates[0]);
-                if (leavingFlatpickr.selectedDates[0] && leavingFlatpickr.selectedDates[0] <= selectedDates[0]) {
-                    leavingFlatpickr.setDate(new Date(selectedDates[0].getTime() + 60 * 60 * 1000), true);
-                }
-            } else if (instance === leavingFlatpickr && selectedDates.length > 0) {
-                arrivalFlatpickr.set('maxDate', selectedDates[0]);
-                if (arrivalFlatpickr.selectedDates[0] && arrivalFlatpickr.selectedDates[0] >= selectedDates[0]) {
-                    arrivalFlatpickr.setDate(new Date(selectedDates[0].getTime() - 60 * 60 * 1000), true);
-                }
-            }
-            updatePriceSummary();
+        // Monthly Rate
+        const monthlyRateEl = document.getElementById('spot-monthly-rate');
+        if (monthlyRateEl) {
+            monthlyRateEl.textContent = spot.monthlyRate
+                ? `${spot.monthlyRate.toLocaleString('vi-VN')} VND/month`
+                : 'Not available';
         }
-    };
 
-    arrivalFlatpickr = flatpickr(bookingArrivalDateInput, {
-        ...commonFlatpickrOptions,
-        placeholder: "Select arrival date and time"
-    });
+        // Number of Slots
+        const slotsEl = document.getElementById('spot-slots');
+        if (slotsEl) {
+            slotsEl.textContent = spot.numberOfSlots
+                ? `${spot.numberOfSlots} slot${spot.numberOfSlots > 1 ? 's' : ''}`
+                : 'N/A';
+        }
 
-    leavingFlatpickr = flatpickr(bookingLeavingDateInput, {
-        ...commonFlatpickrOptions,
-        placeholder: "Select leaving date and time"
-    });
+        // Vehicle Types
+        const vehicleTypesContainer = document.getElementById('vehicle-types-container');
+        if (vehicleTypesContainer && spot.vehicleTypes) {
+            const vehicleIcons = {
+                'car': '🚗',
+                'motorbike': '🏍️',
+                'truck': '🚚'
+            };
+            const vehicleLabels = {
+                'car': 'Car',
+                'motorbike': 'Motorbike',
+                'truck': 'Small Truck'
+            };
 
-    // --- ENHANCE DATE PICKER UX ---
-    // Allow clicking anywhere in the container to open the picker
-    const arrivalContainer = bookingArrivalDateInput.closest('.booking-info-item');
-    const leavingContainer = bookingLeavingDateInput.closest('.booking-info-item');
+            vehicleTypesContainer.innerHTML = spot.vehicleTypes.map(type => `
+                <div class="vehicle-type-badge">
+                    <span class="icon">${vehicleIcons[type] || '🚙'}</span>
+                    <span>${vehicleLabels[type] || type}</span>
+                </div>
+            `).join('');
+        }
 
-    if (arrivalContainer) {
-        arrivalContainer.style.cursor = 'pointer';
-        arrivalContainer.addEventListener('click', (e) => {
-            // Prevent reopening if clicking the input itself (Flatpickr handles that)
-            if (e.target !== bookingArrivalDateInput) {
-                arrivalFlatpickr.open();
+        // Payment Methods
+        const paymentMethodsContainer = document.getElementById('payment-methods-container');
+        if (paymentMethodsContainer && spot.paymentMethods) {
+            const paymentInfo = {
+                'cash': { icon: '💵', name: 'Cash', desc: 'Pay at the spot' },
+                'paypal': { icon: '💳', name: 'PayPal', desc: 'Online payment' }
+            };
+
+            paymentMethodsContainer.innerHTML = spot.paymentMethods.map(method => {
+                const info = paymentInfo[method] || { icon: '💰', name: method, desc: '' };
+                return `
+                    <div class="payment-method-badge">
+                        <span class="icon">${info.icon}</span>
+                        <div class="badge-text">
+                            <span class="badge-name">${info.name}</span>
+                            <span class="badge-desc">${info.desc}</span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Features
+        const featuresContainer = document.getElementById('spot-features-container');
+        if (featuresContainer) {
+            const features = [];
+
+            if (spot.hasRoof) {
+                features.push({ icon: '☂️', label: 'Covered Parking (Has Roof)' });
+            } else {
+                features.push({ icon: '☀️', label: 'Open Air Parking' });
             }
-        });
-    }
 
-    if (leavingContainer) {
-        leavingContainer.style.cursor = 'pointer';
-        leavingContainer.addEventListener('click', (e) => {
-            if (e.target !== bookingLeavingDateInput) {
-                leavingFlatpickr.open();
+            if (spot.numberOfSlots && spot.numberOfSlots > 5) {
+                features.push({ icon: '🅿️', label: 'Large Capacity' });
             }
-        });
-    }
 
-    // --- BỘ ĐẾM NGƯỢC THỜI GIAN THANH TOÁN ---
-    let timeRemaining = 15 * 60; // 15 phút tính bằng giây
-
-    function startCountdown() {
-        clearInterval(countdownInterval);
-        timeRemaining = 15 * 60;
-
-        countdownInterval = setInterval(() => {
-            const minutes = Math.floor(timeRemaining / 60);
-            const seconds = timeRemaining % 60;
-            timerDisplay.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-
-            recheckedTimeDisplay.textContent = new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
-
-            if (timeRemaining <= 0) {
-                clearInterval(countdownInterval);
-                timerDisplay.textContent = '00:00';
-                alert('Time to complete booking has expired. Please refresh the page to try again.');
-                payAndReserveBtn.disabled = true;
+            if (spot.paymentMethods && spot.paymentMethods.includes('paypal')) {
+                features.push({ icon: '💳', label: 'Online Payment Available' });
             }
-            timeRemaining--;
-        }, 1000);
+
+            featuresContainer.innerHTML = features.map(f => `
+                <div class="feature-badge">
+                    <span class="icon">${f.icon}</span>
+                    <span>${f.label}</span>
+                </div>
+            `).join('');
+        }
     }
 
     // --- TẢI DỮ LIỆU SPOT VÀ HIỂN THỊ ---
@@ -349,26 +219,90 @@ async function initializeSpotBookingPage(spotId) {
             }
             currentSpotData = await response.json();
 
-            spotAddressDisplay.textContent = currentSpotData.address;
+            // Populate all spot information sections
+            populateSpotInfo(currentSpotData);
 
             updateSpotImageDisplay();
 
-            const queryParams = new URLSearchParams(window.location.search);
-            const arrivalQuery = queryParams.get('arrival');
-            const leavingQuery = queryParams.get('leaving');
+            // --- CONDITIONAL BUTTON DISPLAY ---
+            // Check booking type: 'call' = call only, 'online' = website only, 'both' = both options
 
+            // Check if spot has a price (hourlyRate)
+            const hasPrice = currentSpotData.hourlyRate && currentSpotData.hourlyRate > 0;
+            const bookingType = currentSpotData.bookingType || 'online'; // Default to online if not set
 
-            if (arrivalQuery && leavingQuery) {
-                arrivalFlatpickr.setDate(new Date(arrivalQuery), true);
-                leavingFlatpickr.setDate(new Date(leavingQuery), true);
+            // Force call-only if explicitly set to 'call' OR if NO PRICE is available
+            const isCallOnly = bookingType === 'call' || !hasPrice;
+
+            const allowsOnline = (bookingType === 'online' || bookingType === 'both') && hasPrice;
+            const allowsCall = bookingType === 'call' || bookingType === 'both' || !hasPrice;
+
+            const callToBookBtn = document.getElementById('call-to-book-btn');
+            const callPhoneDisplay = document.getElementById('call-phone-display');
+            const bookingFormSection = document.querySelector('.booking-form-section');
+            const priceSummary = document.querySelector('.price-breakdown');
+
+            // Get phone number: prefer contactPhone, then owner.phone
+            const phoneNumber = currentSpotData.contactPhone || currentSpotData.owner?.phone || '';
+            const isLoggedIn = !!localStorage.getItem('userToken');
+
+            if (isCallOnly) {
+                // CALL-ONLY SPOT: Show only Call button, hide online booking UI
+                reserveNowBtn.style.display = 'none';
+
+                if (callToBookBtn && phoneNumber) {
+                    if (isLoggedIn) {
+                        // LOGGED IN: Show full phone number and enable call
+                        callToBookBtn.href = `tel:${phoneNumber}`;
+                        if (callPhoneDisplay) {
+                            callPhoneDisplay.textContent = `Call ${phoneNumber}`;
+                        }
+                    } else {
+                        // NOT LOGGED IN: Mask phone number (show first 3 digits + xxxxxx)
+                        const maskedPhone = phoneNumber.length > 3
+                            ? phoneNumber.substring(0, 3) + 'xxxxxx'
+                            : phoneNumber + 'xxxxxx';
+
+                        if (callPhoneDisplay) {
+                            callPhoneDisplay.textContent = `Call ${maskedPhone}`;
+                        }
+                        // Disable actual call - redirect to login
+                        callToBookBtn.href = '#';
+                        callToBookBtn.addEventListener('click', (e) => {
+                            e.preventDefault();
+                            if (confirm('Please log in to see the full phone number and make a call. Would you like to log in now?')) {
+                                window.location.href = `login.html?redirect=${encodeURIComponent(window.location.href)}`;
+                            }
+                        });
+                    }
+                    callToBookBtn.style.display = 'block';
+                } else if (callToBookBtn) {
+                    // No phone available - show a placeholder
+                    if (callPhoneDisplay) callPhoneDisplay.textContent = 'Contact for booking';
+                    callToBookBtn.style.display = 'block';
+                    callToBookBtn.href = '#';
+                    callToBookBtn.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        alert('Please contact the parking spot owner to make a booking.');
+                    });
+                }
+
+                // Hide booking date pickers and price summary for call-only spots
+                if (bookingFormSection) bookingFormSection.style.display = 'none';
+                if (priceSummary) priceSummary.style.display = 'none';
+
+                // Update unit price display to show "Call for price"
+                const summaryUnitPrice = document.getElementById('summary-unit-price');
+                if (summaryUnitPrice) summaryUnitPrice.textContent = 'Call for pricing';
+
             } else {
-                const now = new Date();
-                const oneHourLater = new Date(now.getTime() + 60 * 60 * 1000);
-                arrivalFlatpickr.setDate(now, true);
-                leavingFlatpickr.setDate(oneHourLater, true);
+                // ONLINE BOOKING ALLOWED: Show Reserve button
+                reserveNowBtn.style.display = 'block';
+                reserveNowBtn.disabled = false; // Always enabled now
+                if (callToBookBtn) callToBookBtn.style.display = 'none';
             }
 
-            startCountdown();
+            // Countdown removed
 
         } catch (error) {
             console.error('Error loading spot details:', error);
@@ -376,239 +310,18 @@ async function initializeSpotBookingPage(spotId) {
         }
     }
 
-    // --- HELPER FUNCTIONS ---
-    function updateButtonText(button, text) {
-        if (!button) return;
-        const btnText = button.querySelector('.btn-text');
-        if (btnText) {
-            btnText.textContent = text;
-        } else {
-            button.textContent = text;
-        }
-    }
+    // --- HELPER FUNCTIONS REMOVED ---
 
-    async function initiatePaypalCheckout({ payload, token, triggerButton, defaultButtonText = 'Pay Now and Reserve' }) {
-        let success = false;
-        try {
-            if (triggerButton) {
-                triggerButton.disabled = true;
-                triggerButton.classList.add('loading');
-                updateButtonText(triggerButton, 'Redirecting to PayPal...');
-            }
+    // --- NAVIGATE TO BOOKING CONFIG PAGE ---
 
-            const headers = { 'Content-Type': 'application/json' };
-            if (token) {
-                headers['Authorization'] = `Bearer ${token}`;
-            }
+    reserveNowBtn.addEventListener('click', async () => {
+        // Navigate to booking configuration page with ONLY spot ID
+        // Dates will be selected there
+        const params = new URLSearchParams({
+            id: spotId
+        });
 
-            const response = await fetch(`${API_URL}/payments/paypal/checkout`, {
-                method: 'POST',
-                headers,
-                body: JSON.stringify(payload),
-            });
-
-            if (!response.ok) {
-                const errorData = await response.json().catch(() => ({}));
-                throw new Error(errorData.message || 'Unable to start PayPal checkout.');
-            }
-
-            const data = await response.json();
-            if (!data.redirectUrl) {
-                throw new Error('Missing PayPal approval link.');
-            }
-
-            window.open(data.redirectUrl, '_blank');
-            success = true;
-            return true;
-        } catch (error) {
-            console.error('PayPal checkout error:', error);
-            alert(error.message);
-            return false;
-        } finally {
-            if (triggerButton && !success) {
-                triggerButton.disabled = false;
-                triggerButton.classList.remove('loading');
-                updateButtonText(triggerButton, defaultButtonText);
-                updatePriceSummary();
-            }
-        }
-    }
-
-    // --- XỬ LÝ ĐẶT CHỖ ---
-
-    payAndReserveBtn.addEventListener('click', async () => {
-        const token = localStorage.getItem('userToken');
-        const startTime = arrivalFlatpickr.selectedDates[0];
-        const endTime = leavingFlatpickr.selectedDates[0];
-        if (!startTime || !endTime || startTime >= endTime) {
-            alert('Please select valid arrival and leaving times.');
-            return;
-        }
-
-        // Get the selected payment method
-        const selectedPaymentMethod = document.querySelector('input[name="paymentMethod"]:checked')?.value;
-        if (!selectedPaymentMethod) {
-            alert('Please select a payment method.');
-            return;
-        }
-
-        const basePayload = {
-            spot: spotId,
-            startTime: startTime.toISOString(),
-            endTime: endTime.toISOString(),
-        };
-
-        // If not logged in, open guest modal and handle guest booking flow
-        if (!token) {
-            const modal = document.getElementById('leadModal');
-            const fullNameEl = document.getElementById('guest-fullname');
-            const emailEl = document.getElementById('guest-email');
-            const phoneEl = document.getElementById('guest-phone');
-            const cancelBtn = document.getElementById('guest-cancel');
-            const cancelBtnSecondary = document.getElementById('guest-cancel-secondary');
-            const submitBtn = document.getElementById('guest-submit');
-
-            // Set selected times preview
-            const options = { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' };
-            const fromEl = document.getElementById('pc-time-from');
-            const toEl = document.getElementById('pc-time-to');
-            if (fromEl) fromEl.textContent = new Date(startTime).toLocaleString('vi-VN', options);
-            if (toEl) toEl.textContent = new Date(endTime).toLocaleString('vi-VN', options);
-
-            // Open modal via class for CSS animations
-            modal.classList.add('is-open');
-            if (fullNameEl) { try { fullNameEl.focus(); } catch (e) { /* ignore */ } }
-
-            const closeModal = () => { modal.classList.remove('is-open'); };
-            cancelBtn.onclick = closeModal;
-            if (cancelBtnSecondary) cancelBtnSecondary.onclick = closeModal;
-            modal.onclick = (e) => { if (e.target === modal) closeModal(); };
-            const escHandler = (e) => { if (e.key === 'Escape') { closeModal(); window.removeEventListener('keydown', escHandler); } };
-            window.addEventListener('keydown', escHandler);
-
-            submitBtn.onclick = async () => {
-                const fullName = (fullNameEl.value || '').trim();
-                const email = (emailEl.value || '').trim();
-                const phoneNumber = (phoneEl.value || '').trim();
-                if (!fullName || !email || !phoneNumber) {
-                    alert('Please fill in full name, email and phone number.');
-                    return;
-                }
-
-                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-                if (!emailRegex.test(email)) {
-                    alert('Please enter a valid email address.');
-                    return;
-                }
-
-                // Check payment method for guest users too
-                if (selectedPaymentMethod === 'paypal') {
-                    const success = await initiatePaypalCheckout({
-                        payload: {
-                            ...basePayload,
-                            fullName,
-                            email,
-                            phoneNumber,
-                            guestPhoneNumber: phoneNumber,
-                        },
-                        triggerButton: submitBtn,
-                        defaultButtonText: 'Complete Booking',
-                    });
-                    if (success) {
-                        closeModal();
-                    }
-                } else if (selectedPaymentMethod === 'cash') {
-                    // Create booking directly for cash payment (guest)
-                    try {
-                        submitBtn.disabled = true;
-                        updateButtonText(submitBtn, 'Creating booking...');
-
-                        const response = await fetch(`${API_URL}/bookings/guest`, {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({
-                                ...basePayload,
-                                fullName,
-                                email,
-                                phoneNumber,
-                                paymentMethod: 'CASH',
-                            }),
-                        });
-
-                        if (!response.ok) {
-                            const errorData = await response.json().catch(() => ({}));
-                            throw new Error(errorData.message || 'Failed to create booking.');
-                        }
-
-                        const booking = await response.json();
-                        closeModal();
-                        // Redirect to payment result page with booking info for confirmation
-                        window.location.href = `payment-result.html?bookingId=${booking._id}&paymentMethod=CASH&isGuest=true`;
-                    } catch (error) {
-                        console.error('Cash booking error:', error);
-                        alert(error.message || 'Failed to create booking. Please try again.');
-                    } finally {
-                        submitBtn.disabled = false;
-                        updateButtonText(submitBtn, 'Complete Booking');
-                    }
-                }
-            };
-            return; // Stop further processing
-        }
-
-        // For logged-in users
-        const phoneNumber = phoneNumberInput.value.trim();
-        if (!phoneNumber) {
-            alert('Please enter your phone number.');
-            return;
-        }
-
-        // Handle payment based on selected method
-        if (selectedPaymentMethod === 'paypal') {
-            await initiatePaypalCheckout({
-                payload: {
-                    ...basePayload,
-                    phoneNumber,
-                },
-                token,
-                triggerButton: payAndReserveBtn,
-            });
-        } else if (selectedPaymentMethod === 'cash') {
-            // Create booking directly for cash payment (logged-in user)
-            try {
-                payAndReserveBtn.disabled = true;
-                payAndReserveBtn.classList.add('loading');
-                updateButtonText(payAndReserveBtn, 'Creating booking...');
-
-                const response = await fetch(`${API_URL}/bookings`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`,
-                    },
-                    body: JSON.stringify({
-                        ...basePayload,
-                        phoneNumber,
-                    }),
-                });
-
-                if (!response.ok) {
-                    const errorData = await response.json().catch(() => ({}));
-                    throw new Error(errorData.message || 'Failed to create booking.');
-                }
-
-                const booking = await response.json();
-                alert('Booking created successfully! You can pay at the parking spot.');
-                // Optionally redirect to a confirmation page or my bookings
-                window.location.href = 'my-bookings.html';
-            } catch (error) {
-                console.error('Cash booking error:', error);
-                alert(error.message || 'Failed to create booking. Please try again.');
-                payAndReserveBtn.disabled = false;
-                payAndReserveBtn.classList.remove('loading');
-                updatePayButtonText();
-            }
-        }
+        window.location.href = `booking-config.html?${params.toString()}`;
     });
 
     loadSpotDetails(); // Gọi khi initializeSpotBookingPage được gọi

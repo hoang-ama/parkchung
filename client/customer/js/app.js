@@ -92,7 +92,7 @@ document.addEventListener('DOMContentLoaded', () => {
             click_upload: 'Click to Upload Image',
             no_file: 'No file chosen',
             submit_review: 'Submit for Review',
-            details_title: 'Parkchung Booking Details',
+            details_title: 'Spot Details',
             details_subtitle: "You're almost done! Just a few more details to confirm your booking.",
             details_section_title: 'Booking details',
             arriving_on: 'Arriving on',

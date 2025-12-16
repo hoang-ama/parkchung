@@ -14,6 +14,8 @@ interface SpotFormValues {
     hasRoof: boolean;
     vehicleTypes: string[];
     paymentMethods: string[]; // 'cash', 'paypal', or both
+    contactPhone: string; // Phone number for booking
+    bookingType: string; // 'call', 'online', or 'both'
 }
 
 interface FormErrors {
@@ -28,6 +30,8 @@ interface FormErrors {
     vehicleTypes?: string;
     paymentMethods?: string;
     images?: string;
+    contactPhone?: string;
+    bookingType?: string;
 }
 
 // ============ Constants ============
@@ -40,6 +44,12 @@ const VEHICLE_TYPE_OPTIONS = [
 const PAYMENT_METHOD_OPTIONS = [
     { value: 'cash', label: 'Cash', icon: '💵', description: 'Pay at the spot' },
     { value: 'paypal', label: 'PayPal', icon: '💳', description: 'Online payment' },
+];
+
+const BOOKING_TYPE_OPTIONS = [
+    { value: 'online', label: 'Online Booking', icon: '🌐', description: 'Customers can book through the website' },
+    { value: 'call', label: 'Call Booking', icon: '📞', description: 'Customers must call to book' },
+    { value: 'both', label: 'Both', icon: '✅', description: 'Allow both online and call booking' },
 ];
 
 const MAX_IMAGES = 5;
@@ -143,6 +153,18 @@ function validateForm(values: SpotFormValues, selectedFiles: File[]): FormErrors
         errors.images = `Maximum ${MAX_IMAGES} images allowed`;
     }
 
+    // Booking type validation
+    if (!values.bookingType) {
+        errors.bookingType = 'Select a booking type';
+    }
+
+    // Contact phone validation (required for call booking)
+    if (values.bookingType === 'call' || values.bookingType === 'both') {
+        if (!values.contactPhone.trim()) {
+            errors.contactPhone = 'Phone number is required for call booking';
+        }
+    }
+
     return errors;
 }
 
@@ -164,6 +186,8 @@ export default function HostCreateSpotPage() {
         hasRoof: false,
         vehicleTypes: [],
         paymentMethods: ['cash'], // Default to cash
+        contactPhone: '',
+        bookingType: 'online', // Default to online booking
     });
 
     // File state
@@ -332,6 +356,12 @@ export default function HostCreateSpotPage() {
             formValues.paymentMethods.forEach((method) => {
                 formData.append('paymentMethods[]', method);
             });
+
+            // Append booking type and contact phone
+            formData.append('bookingType', formValues.bookingType);
+            if (formValues.contactPhone.trim()) {
+                formData.append('contactPhone', formValues.contactPhone);
+            }
 
             // Append images
             selectedFiles.forEach((file) => {
@@ -752,7 +782,99 @@ export default function HostCreateSpotPage() {
                         )}
                     </div>
 
-                    {/* Section F: Images */}
+                    {/* Section F: Booking Type */}
+                    <div className="p-6 border-b border-gray-100">
+                        <h2 className="text-lg font-semibold text-gray-800 mb-2">
+                            Booking Type <span className="text-red-500">*</span>
+                        </h2>
+                        <p className="text-sm text-gray-500 mb-4">
+                            Choose how customers can book this parking spot
+                        </p>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                            {BOOKING_TYPE_OPTIONS.map((option) => (
+                                <label
+                                    key={option.value}
+                                    className={`flex items-center gap-4 p-4 border rounded-xl cursor-pointer transition-all ${formValues.bookingType === option.value
+                                        ? 'border-emerald-500 bg-emerald-50 shadow-sm'
+                                        : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
+                                        }`}
+                                >
+                                    <input
+                                        type="radio"
+                                        name="bookingType"
+                                        value={option.value}
+                                        checked={formValues.bookingType === option.value}
+                                        onChange={handleChange}
+                                        className="w-5 h-5 text-emerald-600 border-gray-300 focus:ring-emerald-500"
+                                    />
+                                    <div className="flex items-center gap-3 flex-1">
+                                        <span className="text-2xl">{option.icon}</span>
+                                        <div>
+                                            <p className={`font-medium ${formValues.bookingType === option.value
+                                                ? 'text-emerald-700'
+                                                : 'text-gray-800'
+                                                }`}>
+                                                {option.label}
+                                            </p>
+                                            <p className="text-xs text-gray-500">{option.description}</p>
+                                        </div>
+                                    </div>
+                                </label>
+                            ))}
+                        </div>
+                        {getFieldError('bookingType') && (
+                            <p className="mt-2 text-xs text-red-500">{getFieldError('bookingType')}</p>
+                        )}
+                    </div>
+
+                    {/* Section G: Contact Phone */}
+                    <div className="p-6 border-b border-gray-100">
+                        <h2 className="text-lg font-semibold text-gray-800 mb-2">
+                            Parking Spot Phone Number
+                            {(formValues.bookingType === 'call' || formValues.bookingType === 'both') && (
+                                <span className="text-red-500"> *</span>
+                            )}
+                        </h2>
+                        <p className="text-sm text-gray-500 mb-4">
+                            {formValues.bookingType === 'call'
+                                ? 'Required - Customers will call this number to book'
+                                : formValues.bookingType === 'both'
+                                    ? 'Required - Customers can call this number or book online'
+                                    : 'Optional - Provide a contact number for customer inquiries'}
+                        </p>
+
+                        <input
+                            type="tel"
+                            id="contactPhone"
+                            name="contactPhone"
+                            value={formValues.contactPhone}
+                            onChange={handleChange}
+                            onBlur={handleBlur}
+                            placeholder="e.g. 0123456789"
+                            className={`w-full sm:w-1/2 px-4 py-3 border rounded-lg text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 transition-colors ${getFieldError('contactPhone')
+                                ? 'border-red-500 focus:ring-red-200'
+                                : 'border-gray-300 focus:ring-emerald-200 focus:border-emerald-500'
+                                }`}
+                        />
+                        {getFieldError('contactPhone') && (
+                            <p className="mt-1 text-xs text-red-500">{getFieldError('contactPhone')}</p>
+                        )}
+
+                        {/* Call booking notice */}
+                        {formValues.bookingType === 'call' && (
+                            <div className="mt-4 p-3 bg-amber-50 border border-amber-200 rounded-lg">
+                                <div className="flex items-center gap-2">
+                                    <span className="text-xl">📞</span>
+                                    <span className="text-sm text-amber-700">
+                                        <strong>Call Booking Only:</strong> Customers will see this phone number and must call to reserve a spot. No online booking will be available.
+                                    </span>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Section H: Images */}
                     <div className="p-6 border-b border-gray-100">
                         <h2 className="text-lg font-semibold text-gray-800 mb-4">
                             Images <span className="text-gray-400 font-normal text-sm">(max {MAX_IMAGES})</span>

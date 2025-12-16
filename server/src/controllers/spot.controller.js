@@ -130,7 +130,7 @@ exports.createSpot = async (req, res) => {
  */
 exports.getSpotById = async (req, res) => {
     try {
-        const spot = await ParkingSpot.findById(req.params.id).populate('owner', 'fullName email');
+        const spot = await ParkingSpot.findById(req.params.id).populate('owner', 'fullName email phone');
         // Only return approved spots to customers (rejected/pending spots are not bookable)
         if (spot && spot.status === 'approved') {
             res.json(spot);

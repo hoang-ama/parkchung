@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Booking Configuration</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="/customer/css/spot-details.css">
+    <link rel="stylesheet" href="/customer/css/styles.css">
+    <link rel="stylesheet" href="/customer/css/popup.css">
+    <link rel="stylesheet" href="/customer/css/payment-method.css">
+    <link rel="icon" type="image/png" href="/assets/logo/favicon.png" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/material_blue.css">
+</head>
+
+<body>
+    <header class="main-header">
+        <div class="container header-container">
+            <div class="logo">
+                <a href="index.html">ParkChung</a>
+            </div>
+            <nav class="main-nav">
+                <ul class="nav-list">
+                    <li class="nav-item"><a href="index.html" data-i18n="nav_home">Home</a></li>
+                    <li class="nav-item"><a href="results.html" data-i18n="nav_available">Available Spots</a></li>
+                    <li class="nav-item"><a href="#" id="logout-link" data-i18n="logout">Logout</a></li>
+                    <li class="nav-item"><a href="login.html" id="login-link" data-i18n="login">Login</a></li>
+                    <li class="nav-item"><a href="register.html" id="register-link"
+                            data-i18n="becomeHostRegister">Become a Host / Register</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+    <div class="page-banner">
+        <div class="container banner-container">
+            <h1 class="banner-title" data-i18n="config_title">Complete Your Booking</h1>
+            <p class="banner-subtitle" data-i18n="config_subtitle">Just a few more details to confirm your reservation.
+            </p>
+        </div>
+        <main class="booking-page-main container">
+            <div class="booking-grid">
+                <div class="booking-details-column">
+                    <!-- Spot Summary (Read-only) -->
+                    <div class="info-card spot-summary-card">
+                        <div class="spot-summary-header">
+                            <img id="spot-thumbnail" src="" alt="Parking Spot" class="spot-thumbnail">
+                            <div class="spot-summary-info">
+                                <h3 id="spot-name">Loading...</h3>
+                                <p id="spot-address-display" class="spot-address-text">Loading address...</p>
+                                <div class="rating">
+                                    <span class="stars" id="config-rating-stars">★★★★★</span>
+                                    <span class="rating-value" id="config-rating-value">0</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Booking Details -->
+                    <div class="info-card booking-info-card">
+                        <h2 data-i18n="details_section_title">Booking Details</h2>
+                        <div class="booking-info-item">
+                            <span class="icon">📅</span>
+                            <span class="label" data-i18n="arriving_on">Arriving on</span>
+                            <input type="text" id="booking-arrival-date-input" class="flatpickr-input"
+                                placeholder="Select Date/Time" data-i18n-placeholder="ph_select_datetime">
+                        </div>
+                        <div class="booking-info-item">
+                            <span class="icon">📅</span>
+                            <span class="label" data-i18n="leaving_on">Leaving on</span>
+                            <input type="text" id="booking-leaving-date-input" class="flatpickr-input"
+                                placeholder="Select Date/Time" data-i18n-placeholder="ph_select_datetime">
+                        </div>
+                        <div class="booking-info-item">
+                            <span class="icon">⏱️</span>
+                            <span class="label" data-i18n="duration">Duration</span>
+                            <div class="value-wrapper">
+                                <span id="booking-duration" class="highlight-text">--</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Contact Information -->
+                    <div class="info-card user-contact-card">
+                        <h2 data-i18n="contact_title">Contact Information</h2>
+                        <p class="help-text" data-i18n="contact_hint">We'll use this to contact you about your booking
+                        </p>
+                        <div class="form-group">
+                            <label for="phone-number-input" class="form-label" data-i18n="contact_phone_label">Phone
+                                Number</label>
+                            <input type="tel" id="phone-number-input" placeholder="Enter your phone number"
+                                class="text-input" required>
+                        </div>
+                    </div>
+
+                    <!-- Vehicle Information -->
+                    <div class="info-card vehicle-info-card">
+                        <h2 data-i18n="vehicle_title">Vehicle Information</h2>
+                        <p class="help-text" data-i18n="vehicle_desc">Your vehicle registration will be shared with the
+                            parking operator</p>
+                        <div class="form-group">
+                            <label for="vehicle-reg-input" class="form-label" data-i18n="vehicle_reg_label">Vehicle
+                                Registration</label>
+                            <input type="text" id="vehicle-reg-input" placeholder="Enter your vehicle registration"
+                                data-i18n-placeholder="ph_vehicle_reg" class="text-input" required>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="booking-summary-column">
+                    <div class="booking-summary-card">
+                        <h3 id="spot-address" data-i18n="spot_loading">Loading Address...</h3>
+                        <div class="rating">
+                            <span class="stars">★★★★★</span>
+                            <span class="rating-value">4.9</span>
+                        </div>
+
+                        <div class="price-breakdown">
+                            <div class="price-item">
+                                <span data-i18n="unit_price">Unit Price</span>
+                                <span id="summary-unit-price" class="price-value">-- VND / hour</span>
+                            </div>
+                            <div class="price-item">
+                                <span data-i18n="parking_duration">Parking Duration</span>
+                                <span id="summary-duration" class="price-value">-- hours</span>
+                            </div>
+                            <div class="price-item total-price">
+                                <span data-i18n="total_price">Total Price</span>
+                                <span id="summary-final-price" class="price-value">0 VND</span>
+                            </div>
+                        </div>
+
+                        <p class="rechecked-info" data-i18n="rechecked">Availability rechecked in <span
+                                id="rechecked-time">--:--</span></p>
+
+                        <!-- Countdown Timer -->
+                        <div class="countdown-timer">
+                            <div class="countdown-header">
+                                <span class="countdown-icon">⏰</span>
+                                <p data-i18n="time_to_complete">Time to complete booking:</p>
+                            </div>
+                            <span id="timer-display" class="timer-value">15:00</span>
+                            <div class="countdown-progress">
+                                <div class="progress-bar"></div>
+                            </div>
+                        </div>
+
+                        <button id="pay-and-reserve-btn" class="btn btn-action" disabled data-i18n="btn_pay_reserve">Pay
+                            now and reserve</button>
+
+                        <!-- Payment Method Selection Card -->
+                        <div class="payment-method-selection-card">
+                            <h3 class="payment-selection-title">Payment Method</h3>
+                            <div class="payment-methods">
+                                <div class="payment-option" data-method="paypal">
+                                    <input type="radio" id="payment-paypal" name="paymentMethod" value="paypal" checked>
+                                    <label for="payment-paypal" class="payment-label">
+                                        <div class="payment-icon paypal-icon">
+                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="32"
+                                                height="32">
+                                                <path fill="#003087"
+                                                    d="M20.905 9.5c.21-1.342.09-2.254-.43-3.082C19.65 5.255 18.086 4.5 15.816 4.5H8.87c-.54 0-1.003.393-1.087.93L5.5 18.737c-.064.392.236.763.636.763h4.636l-.327 2.076c-.056.343.206.666.556.666h3.875c.472 0 .876-.343.95-.81l.984-6.232h1.905c3.894 0 6.285-1.88 6.285-5.7 0-.86-.203-1.588-.595-2z" />
+                                                <path fill="#0070E0"
+                                                    d="M8.87 4.5c-.54 0-1.003.393-1.087.93L5.5 18.737c-.064.392.236.763.636.763h4.636l1.164-7.379-.036.228c.084-.537.547-.93 1.087-.93h2.262c4.444 0 7.924-1.806 8.94-7.026.03-.154.055-.303.076-.448C23.37 2.417 21.686 1.5 19.09 1.5H8.87z" />
+                                            </svg>
+                                        </div>
+                                        <div class="payment-details">
+                                            <span class="payment-name">PayPal</span>
+                                            <span class="payment-desc">Pay securely online</span>
+                                        </div>
+                                        <span class="payment-badge">Instant</span>
+                                    </label>
+                                </div>
+
+                                <div class="payment-option" data-method="cash">
+                                    <input type="radio" id="payment-cash" name="paymentMethod" value="cash">
+                                    <label for="payment-cash" class="payment-label">
+                                        <div class="payment-icon cash-icon">
+                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="32"
+                                                height="32" fill="none" stroke="#13b47e" stroke-width="2"
+                                                stroke-linecap="round" stroke-linejoin="round">
+                                                <rect x="2" y="5" width="20" height="14" rx="2" />
+                                                <circle cx="12" cy="12" r="3" />
+                                                <path d="M18.5 9.5v5M5.5 9.5v5" />
+                                            </svg>
+                                        </div>
+                                        <div class="payment-details">
+                                            <span class="payment-name">Cash / Pay Later</span>
+                                            <span class="payment-desc">Pay at parking spot</span>
+                                        </div>
+                                        <span class="payment-badge">Flexible</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <p class="terms-text" data-i18n="terms">Clicking below indicates that you have read and accept
+                            the <a href="#">Terms & Conditions</a></p>
+                        <div class="trust-item">
+                            <span class="icon">✅</span> <span data-i18n="trust_best_price">Best Price Guaranteed</span>
+                        </div>
+                        <div class="trust-item">
+                            <span class="icon">⭐</span> <span data-i18n="trust_reviews">163,000+ reviews</span>
+                        </div>
+                        <div class="trust-item">
+                            <span class="icon">🔒</span> <span data-i18n="trust_trusted">Trusted by 10m drivers</span>
+                        </div>
+                        <div class="trust-item">
+                            <span class="icon">⏰</span> <span data-i18n="trust_free_cancel">Free cancellation up to 24
+                                hours before arrival</span>
+                        </div>
+                        <div class="trust-item">
+                            <span class="icon">🏆</span> <span data-i18n="trust_award">Award-winning customer
+                                service</span>
+                        </div>
+                        <div class="trust-item trustpilot">
+                            <span data-i18n="trust_excellent">Excellent</span> <span class="stars">★★★★★</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+        <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+        <script src="/customer/js/custom-modal.js"></script>
+        <script src="/customer/js/config.js"></script>
+        <script src="/customer/js/utils.js"></script>
+        <script type="module" src="/customer/js/app.js"></script>
+        <script src="/customer/js/booking-config.js"></script>
+
+        <!-- Guest Booking Modal -->
+        <div id="leadModal" class="guest-modal">
+            <div class="guest-modal__overlay"></div>
+            <div class="guest-modal__container">
+                <div class="guest-modal__header">
+                    <h2 class="guest-modal__title" data-i18n="popup_title">Complete Your Booking</h2>
+                    <button id="guest-cancel" class="guest-modal__close" aria-label="Close">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                    </button>
+                </div>
+
+                <div class="guest-modal__content">
+                    <div class="booking-summary">
+                        <div class="booking-summary__title" data-i18n="popup_booking_summary">Booking Summary</div>
+                        <div class="booking-summary__times">
+                            <div class="time-item">
+                                <div class="time-label" data-i18n="popup_from">From</div>
+                                <div class="time-value" id="pc-time-from">--</div>
+                            </div>
+                            <div class="time-separator">→</div>
+                            <div class="time-item">
+                                <div class="time-label" data-i18n="popup_to">To</div>
+                                <div class="time-value" id="pc-time-to">--</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="guest-form">
+                        <div class="form-section">
+                            <h3 class="form-section__title" data-i18n="popup_contact_info">Contact Information</h3>
+                            <p class="form-section__description" data-i18n="popup_contact_desc">We'll use this
+                                information to confirm your booking</p>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="guest-fullname" class="form-label" data-i18n="popup_fullname">Full Name</label>
+                            <input id="guest-fullname" class="form-input" type="text" placeholder="Enter your full name"
+                                required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="guest-email" class="form-label" data-i18n="popup_email">Email Address</label>
+                            <input id="guest-email" class="form-input" type="email"
+                                placeholder="Enter your email address" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="guest-phone" class="form-label" data-i18n="popup_phone">Phone Number</label>
+                            <input id="guest-phone" class="form-input" type="tel" placeholder="Enter your phone number"
+                                required>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="guest-modal__footer">
+                    <button id="guest-cancel-secondary" class="btn btn-secondary"
+                        data-i18n="popup_cancel">Cancel</button>
+                    <button id="guest-submit" class="btn btn-primary" data-i18n="popup_send">
+                        <span class="btn-text">Complete Booking</span>
+                        <svg class="btn-icon" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2">
+                            <path d="M5 12h14M12 5l7 7-7 7" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+</body>
+
+</html>

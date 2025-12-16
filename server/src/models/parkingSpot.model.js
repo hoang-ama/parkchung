@@ -29,8 +29,19 @@ const parkingSpotSchema = new mongoose.Schema({
         }
     },
     hourlyRate: {
-        type: Number,
-        required: true
+        type: Number
+        // Optional: if not set or 0, spot is "call-only" booking
+    },
+    contactPhone: {
+        type: String,
+        trim: true
+        // Phone number for spots that only support call booking
+    },
+    bookingType: {
+        type: String,
+        enum: ['call', 'online', 'both'],
+        default: 'online'
+        // 'call' = Call Booking only, 'online' = Online Booking, 'both' = Both allowed
     },
     monthlyRate: {
         type: Number
@@ -58,6 +69,13 @@ const parkingSpotSchema = new mongoose.Schema({
     images: [{
         type: String // URLs of spot images
     }],
+    ggRating: {
+        type: Number,
+        min: 0,
+        max: 5,
+        default: 0
+        // Google rating for the parking spot (0-5 stars, can be decimal like 4.9)
+    },
     status: {
         type: String,
         enum: ['pending', 'approved', 'rejected', 'archived'],
