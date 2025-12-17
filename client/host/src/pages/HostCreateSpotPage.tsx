@@ -15,7 +15,9 @@ interface SpotFormValues {
     vehicleTypes: string[];
     paymentMethods: string[]; // 'cash', 'paypal', or both
     contactPhone: string; // Phone number for booking
-    bookingType: string; // 'call', 'online', or 'both'
+    openTime: string; // Operating hours, e.g., "08:00-22:00"
+    bookingTypes: string[]; // ['online'], ['call'], or ['online', 'call']
+    addOnServices: string[]; // ['valet', etc.]
 }
 
 interface FormErrors {
@@ -31,7 +33,9 @@ interface FormErrors {
     paymentMethods?: string;
     images?: string;
     contactPhone?: string;
-    bookingType?: string;
+    openTime?: string;
+    bookingTypes?: string;
+    addOnServices?: string;
 }
 
 // ============ Constants ============
@@ -49,7 +53,10 @@ const PAYMENT_METHOD_OPTIONS = [
 const BOOKING_TYPE_OPTIONS = [
     { value: 'online', label: 'Online Booking', icon: '🌐', description: 'Customers can book through the website' },
     { value: 'call', label: 'Call Booking', icon: '📞', description: 'Customers must call to book' },
-    { value: 'both', label: 'Both', icon: '✅', description: 'Allow both online and call booking' },
+];
+
+const ADDON_SERVICE_OPTIONS = [
+    { value: 'valet', label: 'Valet Parking', icon: '🚗', description: 'Free valet service', price: 'Free' },
 ];
 
 const MAX_IMAGES = 5;
@@ -153,16 +160,14 @@ function validateForm(values: SpotFormValues, selectedFiles: File[]): FormErrors
         errors.images = `Maximum ${MAX_IMAGES} images allowed`;
     }
 
-    // Booking type validation
-    if (!values.bookingType) {
-        errors.bookingType = 'Select a booking type';
+    // Booking types validation
+    if (values.bookingTypes.length === 0) {
+        errors.bookingTypes = 'Select at least one booking type';
     }
 
-    // Contact phone validation (required for call booking)
-    if (values.bookingType === 'call' || values.bookingType === 'both') {
-        if (!values.contactPhone.trim()) {
-            errors.contactPhone = 'Phone number is required for call booking';
-        }
+    // Contact phone validation (required)
+    if (!values.contactPhone.trim()) {
+        errors.contactPhone = 'Phone number is required';
     }
 
     return errors;
@@ -187,7 +192,9 @@ export default function HostCreateSpotPage() {
         vehicleTypes: [],
         paymentMethods: ['cash'], // Default to cash
         contactPhone: '',
-        bookingType: 'online', // Default to online booking
+        openTime: '', // Operating hours
+        bookingTypes: ['online'], // Default to online booking
+        addOnServices: [], // No add-on services by default
     });
 
     // File state
@@ -240,6 +247,27 @@ export default function HostCreateSpotPage() {
             return { ...prev, paymentMethods: newMethods };
         });
         setTouched((prev) => ({ ...prev, paymentMethods: true }));
+    };
+
+    // Handle booking type toggle (multi-select)
+    const handleBookingTypeChange = (type: string) => {
+        setFormValues((prev) => ({
+            ...prev,
+            bookingTypes: prev.bookingTypes.includes(type)
+                ? prev.bookingTypes.filter((t) => t !== type)
+                : [...prev.bookingTypes, type],
+        }));
+        setTouched((prev) => ({ ...prev, bookingTypes: true }));
+    };
+
+    // Handle add-on service toggle
+    const handleAddOnServiceChange = (service: string) => {
+        setFormValues((prev) => ({
+            ...prev,
+            addOnServices: prev.addOnServices.includes(service)
+                ? prev.addOnServices.filter((s) => s !== service)
+                : [...prev.addOnServices, service],
+        }));
     };
 
     // Handle file selection
@@ -357,11 +385,25 @@ export default function HostCreateSpotPage() {
                 formData.append('paymentMethods[]', method);
             });
 
-            // Append booking type and contact phone
-            formData.append('bookingType', formValues.bookingType);
+            // Append booking types (array)
+            formValues.bookingTypes.forEach((type) => {
+                formData.append('bookingTypes[]', type);
+            });
+
+            // Append open time
+            if (formValues.openTime.trim()) {
+                formData.append('openTime', formValues.openTime);
+            }
+
+            // Append contact phone
             if (formValues.contactPhone.trim()) {
                 formData.append('contactPhone', formValues.contactPhone);
             }
+
+            // Append add-on services
+            formValues.addOnServices.forEach((service) => {
+                formData.append('addOnServices[]', service);
+            });
 
             // Append images
             selectedFiles.forEach((file) => {
@@ -477,6 +519,44 @@ export default function HostCreateSpotPage() {
                             )}
                         </div>
 
+                        {/* Phone Number */}
+                        <div className="mb-4">
+                            <label htmlFor="contactPhone" className="block text-sm font-medium text-gray-700 mb-1">
+                                Phone Number <span className="text-red-500">*</span>
+                            </label>
+                            <p className="text-xs text-gray-500 mb-2">
+                                Provide a contact number for customer inquiries and call bookings
+                            </p>
+                            <input
+                                type="tel"
+                                id="contactPhone"
+                                name="contactPhone"
+                                value={formValues.contactPhone}
+                                onChange={handleChange}
+                                onBlur={handleBlur}
+                                placeholder="e.g. 0123456789"
+                                className={`w-full px-4 py-3 border rounded-lg text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 transition-colors ${getFieldError('contactPhone')
+                                    ? 'border-red-500 focus:ring-red-200'
+                                    : 'border-gray-300 focus:ring-emerald-200 focus:border-emerald-500'
+                                    }`}
+                            />
+                            {getFieldError('contactPhone') && (
+                                <p className="mt-1 text-xs text-red-500">{getFieldError('contactPhone')}</p>
+                            )}
+
+                            {/* Call booking only notice */}
+                            {formValues.bookingTypes.includes('call') && !formValues.bookingTypes.includes('online') && (
+                                <div className="mt-3 p-3 bg-amber-50 border border-amber-200 rounded-lg">
+                                    <div className="flex items-center gap-2">
+                                        <span className="text-xl">📞</span>
+                                        <span className="text-sm text-amber-700">
+                                            <strong>Call Booking Only:</strong> Customers must call to reserve.
+                                        </span>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+
                         {/* Description */}
                         <div>
                             <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1">
@@ -495,7 +575,58 @@ export default function HostCreateSpotPage() {
                         </div>
                     </div>
 
-                    {/* Section B: Location */}
+                    {/* Section B: Images */}
+                    <div className="p-6 border-b border-gray-100">
+                        <h2 className="text-lg font-semibold text-gray-800 mb-4">
+                            Images <span className="text-gray-400 font-normal text-sm">(max {MAX_IMAGES})</span>
+                        </h2>
+
+                        {/* File Input */}
+                        <div className="mb-4">
+                            <input
+                                ref={fileInputRef}
+                                type="file"
+                                accept="image/*"
+                                multiple
+                                onChange={handleFileChange}
+                                className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100 cursor-pointer"
+                            />
+                            <p className="mt-1 text-xs text-gray-500">
+                                Upload photos of your parking spot. Clear images help attract more customers.
+                            </p>
+                            {getFieldError('images') && (
+                                <p className="mt-1 text-xs text-red-500">{getFieldError('images')}</p>
+                            )}
+                        </div>
+
+                        {/* Selected Files List */}
+                        {selectedFiles.length > 0 && (
+                            <div className="space-y-2">
+                                <p className="text-sm font-medium text-gray-700">Selected files:</p>
+                                {selectedFiles.map((file, index) => (
+                                    <div
+                                        key={`${file.name}-${index}`}
+                                        className="flex items-center justify-between px-3 py-2 bg-gray-50 rounded-lg"
+                                    >
+                                        <span className="text-sm text-gray-600 truncate max-w-[200px] sm:max-w-none">
+                                            {file.name}
+                                        </span>
+                                        <button
+                                            type="button"
+                                            onClick={() => removeFile(index)}
+                                            className="ml-2 text-red-500 hover:text-red-700"
+                                        >
+                                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                            </svg>
+                                        </button>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Section C: Location */}
                     <div className="p-6 border-b border-gray-100">
                         <div className="flex items-center justify-between mb-4">
                             <h2 className="text-lg font-semibold text-gray-800">Location</h2>
@@ -596,7 +727,28 @@ export default function HostCreateSpotPage() {
                         )}
                     </div>
 
-                    {/* Section C: Pricing & Capacity */}
+                    {/* Section D: Open Time */}
+                    <div className="p-6 border-b border-gray-100">
+                        <h2 className="text-lg font-semibold text-gray-800 mb-2">Open Time</h2>
+                        <p className="text-sm text-gray-500 mb-4">
+                            Specify the operating hours for this parking spot
+                        </p>
+                        <input
+                            type="text"
+                            id="openTime"
+                            name="openTime"
+                            value={formValues.openTime}
+                            onChange={handleChange}
+                            onBlur={handleBlur}
+                            placeholder="e.g. 08:00-22:00 or 24/7"
+                            className="w-full sm:w-1/2 px-4 py-3 border border-gray-300 rounded-lg text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-200 focus:border-emerald-500 transition-colors"
+                        />
+                        <p className="mt-1 text-xs text-gray-500">
+                            Enter operating hours (e.g., "08:00-22:00") or "24/7" if open all day
+                        </p>
+                    </div>
+
+                    {/* Section E: Pricing & Capacity */}
                     <div className="p-6 border-b border-gray-100">
                         <h2 className="text-lg font-semibold text-gray-800 mb-4">Pricing & Capacity</h2>
 
@@ -689,7 +841,7 @@ export default function HostCreateSpotPage() {
                         </label>
                     </div>
 
-                    {/* Section D: Vehicle Types */}
+                    {/* Section F: Vehicle Types */}
                     <div className="p-6 border-b border-gray-100">
                         <h2 className="text-lg font-semibold text-gray-800 mb-4">
                             Vehicle Types <span className="text-red-500">*</span>
@@ -719,7 +871,70 @@ export default function HostCreateSpotPage() {
                         )}
                     </div>
 
-                    {/* Section E: Payment Methods */}
+                    {/* Section G: Booking Type */}
+                    <div className="p-6 border-b border-gray-100">
+                        <h2 className="text-lg font-semibold text-gray-800 mb-2">
+                            Booking Type <span className="text-red-500">*</span>
+                        </h2>
+                        <p className="text-sm text-gray-500 mb-4">
+                            Select how customers can book this parking spot (you can choose both)
+                        </p>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            {BOOKING_TYPE_OPTIONS.map((option) => (
+                                <label
+                                    key={option.value}
+                                    className={`flex items-center gap-4 p-4 border rounded-xl cursor-pointer transition-all ${formValues.bookingTypes.includes(option.value)
+                                        ? 'border-emerald-500 bg-emerald-50 shadow-sm'
+                                        : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
+                                        }`}
+                                >
+                                    <input
+                                        type="checkbox"
+                                        checked={formValues.bookingTypes.includes(option.value)}
+                                        onChange={() => handleBookingTypeChange(option.value)}
+                                        className="w-5 h-5 text-emerald-600 border-gray-300 rounded focus:ring-emerald-500"
+                                    />
+                                    <div className="flex items-center gap-3 flex-1">
+                                        <span className="text-2xl">{option.icon}</span>
+                                        <div>
+                                            <p className={`font-medium ${formValues.bookingTypes.includes(option.value)
+                                                ? 'text-emerald-700'
+                                                : 'text-gray-800'
+                                                }`}>
+                                                {option.label}
+                                            </p>
+                                            <p className="text-xs text-gray-500">{option.description}</p>
+                                        </div>
+                                    </div>
+                                    {formValues.bookingTypes.includes(option.value) && (
+                                        <svg className="w-5 h-5 text-emerald-500" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                                        </svg>
+                                    )}
+                                </label>
+                            ))}
+                        </div>
+                        {getFieldError('bookingTypes') && (
+                            <p className="mt-2 text-xs text-red-500">{getFieldError('bookingTypes')}</p>
+                        )}
+
+                        {/* Both selected indicator */}
+                        {formValues.bookingTypes.length === 2 && (
+                            <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                                <div className="flex items-center gap-2">
+                                    <svg className="w-5 h-5 text-blue-500" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+                                    </svg>
+                                    <span className="text-sm text-blue-700">
+                                        Both booking types enabled - Customers can choose to book online or call
+                                    </span>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Section H: Payment Methods */}
                     <div className="p-6 border-b border-gray-100">
                         <h2 className="text-lg font-semibold text-gray-800 mb-2">
                             Accepted Payment Methods <span className="text-red-500">*</span>
@@ -782,148 +997,58 @@ export default function HostCreateSpotPage() {
                         )}
                     </div>
 
-                    {/* Section F: Booking Type */}
+                    {/* Section I: Add-on Services */}
                     <div className="p-6 border-b border-gray-100">
                         <h2 className="text-lg font-semibold text-gray-800 mb-2">
-                            Booking Type <span className="text-red-500">*</span>
+                            Add-on Services
                         </h2>
                         <p className="text-sm text-gray-500 mb-4">
-                            Choose how customers can book this parking spot
+                            Select additional services offered at this parking spot
                         </p>
 
-                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                            {BOOKING_TYPE_OPTIONS.map((option) => (
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            {ADDON_SERVICE_OPTIONS.map((option) => (
                                 <label
                                     key={option.value}
-                                    className={`flex items-center gap-4 p-4 border rounded-xl cursor-pointer transition-all ${formValues.bookingType === option.value
+                                    className={`flex items-center gap-4 p-4 border rounded-xl cursor-pointer transition-all ${formValues.addOnServices.includes(option.value)
                                         ? 'border-emerald-500 bg-emerald-50 shadow-sm'
                                         : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
                                         }`}
                                 >
                                     <input
-                                        type="radio"
-                                        name="bookingType"
-                                        value={option.value}
-                                        checked={formValues.bookingType === option.value}
-                                        onChange={handleChange}
-                                        className="w-5 h-5 text-emerald-600 border-gray-300 focus:ring-emerald-500"
+                                        type="checkbox"
+                                        checked={formValues.addOnServices.includes(option.value)}
+                                        onChange={() => handleAddOnServiceChange(option.value)}
+                                        className="w-5 h-5 text-emerald-600 border-gray-300 rounded focus:ring-emerald-500"
                                     />
                                     <div className="flex items-center gap-3 flex-1">
                                         <span className="text-2xl">{option.icon}</span>
                                         <div>
-                                            <p className={`font-medium ${formValues.bookingType === option.value
+                                            <p className={`font-medium ${formValues.addOnServices.includes(option.value)
                                                 ? 'text-emerald-700'
                                                 : 'text-gray-800'
                                                 }`}>
                                                 {option.label}
                                             </p>
                                             <p className="text-xs text-gray-500">{option.description}</p>
+                                            <span className="text-xs font-medium text-emerald-600">{option.price}</span>
                                         </div>
                                     </div>
+                                    {formValues.addOnServices.includes(option.value) && (
+                                        <svg className="w-5 h-5 text-emerald-500" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                                        </svg>
+                                    )}
                                 </label>
                             ))}
                         </div>
-                        {getFieldError('bookingType') && (
-                            <p className="mt-2 text-xs text-red-500">{getFieldError('bookingType')}</p>
-                        )}
                     </div>
 
-                    {/* Section G: Contact Phone */}
-                    <div className="p-6 border-b border-gray-100">
-                        <h2 className="text-lg font-semibold text-gray-800 mb-2">
-                            Parking Spot Phone Number
-                            {(formValues.bookingType === 'call' || formValues.bookingType === 'both') && (
-                                <span className="text-red-500"> *</span>
-                            )}
-                        </h2>
-                        <p className="text-sm text-gray-500 mb-4">
-                            {formValues.bookingType === 'call'
-                                ? 'Required - Customers will call this number to book'
-                                : formValues.bookingType === 'both'
-                                    ? 'Required - Customers can call this number or book online'
-                                    : 'Optional - Provide a contact number for customer inquiries'}
-                        </p>
 
-                        <input
-                            type="tel"
-                            id="contactPhone"
-                            name="contactPhone"
-                            value={formValues.contactPhone}
-                            onChange={handleChange}
-                            onBlur={handleBlur}
-                            placeholder="e.g. 0123456789"
-                            className={`w-full sm:w-1/2 px-4 py-3 border rounded-lg text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 transition-colors ${getFieldError('contactPhone')
-                                ? 'border-red-500 focus:ring-red-200'
-                                : 'border-gray-300 focus:ring-emerald-200 focus:border-emerald-500'
-                                }`}
-                        />
-                        {getFieldError('contactPhone') && (
-                            <p className="mt-1 text-xs text-red-500">{getFieldError('contactPhone')}</p>
-                        )}
 
-                        {/* Call booking notice */}
-                        {formValues.bookingType === 'call' && (
-                            <div className="mt-4 p-3 bg-amber-50 border border-amber-200 rounded-lg">
-                                <div className="flex items-center gap-2">
-                                    <span className="text-xl">📞</span>
-                                    <span className="text-sm text-amber-700">
-                                        <strong>Call Booking Only:</strong> Customers will see this phone number and must call to reserve a spot. No online booking will be available.
-                                    </span>
-                                </div>
-                            </div>
-                        )}
-                    </div>
 
-                    {/* Section H: Images */}
-                    <div className="p-6 border-b border-gray-100">
-                        <h2 className="text-lg font-semibold text-gray-800 mb-4">
-                            Images <span className="text-gray-400 font-normal text-sm">(max {MAX_IMAGES})</span>
-                        </h2>
 
-                        {/* File Input */}
-                        <div className="mb-4">
-                            <input
-                                ref={fileInputRef}
-                                type="file"
-                                accept="image/*"
-                                multiple
-                                onChange={handleFileChange}
-                                className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100 cursor-pointer"
-                            />
-                            <p className="mt-1 text-xs text-gray-500">
-                                Upload photos of your parking spot. Clear images help attract more customers.
-                            </p>
-                            {getFieldError('images') && (
-                                <p className="mt-1 text-xs text-red-500">{getFieldError('images')}</p>
-                            )}
-                        </div>
 
-                        {/* Selected Files List */}
-                        {selectedFiles.length > 0 && (
-                            <div className="space-y-2">
-                                <p className="text-sm font-medium text-gray-700">Selected files:</p>
-                                {selectedFiles.map((file, index) => (
-                                    <div
-                                        key={`${file.name}-${index}`}
-                                        className="flex items-center justify-between px-3 py-2 bg-gray-50 rounded-lg"
-                                    >
-                                        <span className="text-sm text-gray-600 truncate max-w-[200px] sm:max-w-none">
-                                            {file.name}
-                                        </span>
-                                        <button
-                                            type="button"
-                                            onClick={() => removeFile(index)}
-                                            className="ml-2 text-red-500 hover:text-red-700"
-                                        >
-                                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                                            </svg>
-                                        </button>
-                                    </div>
-                                ))}
-                            </div>
-                        )}
-                    </div>
 
                     {/* Form Actions */}
                     <div className="p-6 bg-gray-50 flex flex-col sm:flex-row gap-3 sm:justify-end">

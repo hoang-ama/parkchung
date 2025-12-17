@@ -99,7 +99,7 @@ document.addEventListener('DOMContentLoaded', () => {
             leaving_on: 'Leaving on',
             ph_select_datetime: 'Select Date/Time',
             duration: 'Duration',
-            contact_title: "Let's get started",
+            contact_title: "Customer's information",
             contact_phone_label: 'Phone Number',
             contact_hint: 'We\'ll use this to contact you about your booking',
             vehicle_title: 'Vehicle Information',

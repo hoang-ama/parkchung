@@ -107,13 +107,13 @@ const fetchGuestCashBookingStatus = async () => {
             updateButtonText(refreshBtn, 'Loading...');
         }
 
-        // For guest cash bookings, fetch directly from a simple booking endpoint
-        // We'll use a GET request to a new endpoint or pass paymentId as empty
-        const response = await fetch(`${API_URL}/bookings/${bookingId}/status`);
+        // Try to get booking data from sessionStorage first
+        const storedData = sessionStorage.getItem('guestBookingData');
+        let guestData = storedData ? JSON.parse(storedData) : null;
 
-        // If that endpoint doesn't exist, try a fallback
-        if (!response.ok) {
-            // Fallback: Show success immediately since the booking was just created successfully
+        // If we have stored data and it matches the bookingId, use it
+        if (guestData && guestData._id === bookingId) {
+            // Update card styling for success
             const card = document.getElementById('payment-result-card');
             if (card) {
                 card.classList.remove('loading');
@@ -129,7 +129,46 @@ const fetchGuestCashBookingStatus = async () => {
             statusHeadingEl.textContent = message.title;
             statusDescriptionEl.textContent = message.description;
 
-            // Show minimal summary for guest cash booking
+            // Build detailed summary with all 11 fields in required order
+            summaryEl.innerHTML = `
+                <p><strong>Spot:</strong> ${guestData.spotName || 'N/A'}</p>
+                <p><strong>Customer:</strong> ${guestData.customerName || 'Guest'}</p>
+                <p><strong>Email:</strong> ${guestData.customerEmail || 'N/A'}</p>
+                <p><strong>Phone:</strong> ${guestData.customerPhone || 'N/A'}</p>
+                <p><strong>From:</strong> ${formatDate(guestData.startTime)}</p>
+                <p><strong>To:</strong> ${formatDate(guestData.endTime)}</p>
+                <p><strong>Order Time:</strong> ${formatDate(guestData.orderTime)}</p>
+                <p><strong>Booking Status:</strong> <span class="booking-status status-${(guestData.bookingStatus || 'confirmed').toLowerCase()}">${guestData.bookingStatus || 'Confirmed'}</span></p>
+                <p><strong>Payment Method:</strong> Cash (Pay at spot)</p>
+                <p><strong>Payment Status:</strong> <span class="booking-status status-${(guestData.paymentStatus || 'unpaid').toLowerCase()}">${guestData.paymentStatus || 'UNPAID'}</span></p>
+                <p><strong>Payment Total:</strong> ${formatCurrency(guestData.totalPrice)}</p>
+            `;
+
+            // Clear sessionStorage after displaying
+            sessionStorage.removeItem('guestBookingData');
+            return;
+        }
+
+        // Fallback: Try to fetch from backend endpoint
+        const response = await fetch(`${API_URL}/bookings/${bookingId}/status`);
+
+        if (!response.ok) {
+            // Show minimal success since the booking was created
+            const card = document.getElementById('payment-result-card');
+            if (card) {
+                card.classList.remove('loading');
+                card.classList.add('payment-success');
+            }
+
+            const icon = document.querySelector('.booking-card__icon i');
+            if (icon) {
+                icon.className = 'fas fa-check-circle';
+            }
+
+            const message = paymentStatusMessages.CASH_CONFIRMED;
+            statusHeadingEl.textContent = message.title;
+            statusDescriptionEl.textContent = message.description;
+
             summaryEl.innerHTML = `
                 <p><strong>Booking Reference:</strong> ${bookingId}</p>
                 <p><strong>Payment Method:</strong> Cash (Pay at spot)</p>

@@ -37,12 +37,21 @@ const parkingSpotSchema = new mongoose.Schema({
         trim: true
         // Phone number for spots that only support call booking
     },
-    bookingType: {
+    openTime: {
         type: String,
-        enum: ['call', 'online', 'both'],
-        default: 'online'
-        // 'call' = Call Booking only, 'online' = Online Booking, 'both' = Both allowed
+        trim: true
+        // Operating hours, e.g., "08:00-22:00" or "24/7"
     },
+    bookingTypes: [{
+        type: String,
+        enum: ['call', 'online']
+        // Array: can be ['online'], ['call'], or ['online', 'call']
+    }],
+    addOnServices: [{
+        type: String,
+        enum: ['valet', 'carwash', 'ev_charging']
+        // Add-on services: valet = Valet Parking (free)
+    }],
     monthlyRate: {
         type: Number
     },

@@ -1701,3 +1701,871 @@ input:focus {
     font-size: 26px;
   }
 }
+
+/* ============================================= */
+/* === BOOKING CONFIG: CONDITIONAL LAYOUTS === */
+/* ============================================= */
+
+/* --- GUEST LAYOUT (Not Logged In) - Sample-Inspired Design --- */
+
+/* Main container with light gray background */
+.guest-layout {
+  background: #f5f5f5;
+}
+
+.guest-layout .booking-page-main {
+  background: #f5f5f5;
+  padding: 32px 0;
+}
+
+/* Two-column grid: Left sidebar (350px) + Right main form */
+.guest-layout .booking-grid {
+  display: grid;
+  grid-template-columns: 350px 1fr;
+  gap: 24px;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+/* Left sidebar: Spot summary + Price details (stacked vertically) */
+.guest-layout .booking-summary-column {
+  width: 100%;
+  order: -1;
+  /* Move to left */
+}
+
+/* Right main area: Customer form */
+.guest-layout .booking-details-column {
+  width: 100%;
+}
+
+/* Hide guest fields in logged-in layout */
+.logged-in-layout .guest-only-field {
+  display: none;
+}
+
+/* Show guest-only fields */
+.guest-layout .guest-only-field {
+  display: block;
+}
+
+/* === LEFT SIDEBAR STYLING === */
+
+/* Spot Summary Card (top of sidebar) */
+.guest-layout .spot-summary-card {
+  background: var(--white);
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 20px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e0e0e0;
+}
+
+.guest-layout .spot-summary-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.guest-layout .spot-thumbnail {
+  width: 100%;
+  max-width: 280px;
+  height: 180px;
+  object-fit: cover;
+  border-radius: 8px;
+  margin-bottom: 16px;
+}
+
+.guest-layout .spot-summary-info h3 {
+  font-size: 20px;
+  font-weight: 700;
+  color: #00897b;
+  /* Teal color like sample */
+  margin: 0 0 4px 0;
+  text-transform: uppercase;
+}
+
+.guest-layout .spot-address-text {
+  font-size: 12px;
+  color: #757575;
+  margin: 0 0 12px 0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.guest-layout .rating {
+  margin-bottom: 12px;
+}
+
+/* Spot specifications/details */
+.guest-layout .spot-specs {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid #e0e0e0;
+}
+
+.guest-layout .spec-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: #424242;
+}
+
+.guest-layout .spec-item .icon {
+  font-size: 16px;
+  color: #757575;
+}
+
+/* Price Details Card (below spot summary) */
+.guest-layout .booking-summary-card {
+  background: var(--white);
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e0e0e0;
+}
+
+.guest-layout .booking-summary-card h3 {
+  font-size: 14px;
+  font-weight: 700;
+  color: #424242;
+  margin: 0 0 16px 0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.guest-layout .price-breakdown {
+  margin-bottom: 16px;
+}
+
+.guest-layout .price-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  font-size: 14px;
+  color: #424242;
+}
+
+.guest-layout .price-item:not(:last-child) {
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.guest-layout .price-item.total-price {
+  border-top: 2px solid #e0e0e0;
+  border-bottom: none;
+  padding-top: 12px;
+  margin-top: 8px;
+  font-size: 16px;
+  font-weight: 700;
+  color: #212121;
+}
+
+.guest-layout .price-value {
+  font-weight: 600;
+  color: #212121;
+}
+
+/* === RIGHT MAIN FORM STYLING === */
+
+/* Main form cards */
+.guest-layout .info-card {
+  background: var(--white);
+  border-radius: 8px;
+  padding: 24px;
+  margin-bottom: 20px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e0e0e0;
+}
+
+/* Section headers */
+.guest-layout .info-card h2 {
+  font-size: 16px;
+  font-weight: 700;
+  color: #424242;
+  margin: 0 0 8px 0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.guest-layout .help-text {
+  font-size: 13px;
+  color: #757575;
+  margin: 0 0 20px 0;
+  line-height: 1.5;
+}
+
+/* Form groups */
+.guest-layout .form-group {
+  margin-bottom: 16px;
+}
+
+.guest-layout .form-label {
+  display: block;
+  font-size: 14px;
+  font-weight: 500;
+  color: #424242;
+  margin-bottom: 6px;
+}
+
+/* Form inputs - clean, minimal style */
+.guest-layout .text-input,
+.guest-layout .flatpickr-input,
+.guest-layout textarea {
+  width: 100%;
+  padding: 10px 12px;
+  font-size: 14px;
+  font-weight: 400;
+  color: #212121;
+  background: var(--white);
+  border: 1px solid #d0d0d0;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.guest-layout .text-input:hover,
+.guest-layout .flatpickr-input:hover,
+.guest-layout textarea:hover {
+  border-color: #b0b0b0;
+}
+
+.guest-layout .text-input:focus,
+.guest-layout .flatpickr-input:focus,
+.guest-layout textarea:focus {
+  border-color: #00897b;
+  /* Teal focus color */
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(0, 137, 123, 0.1);
+}
+
+.guest-layout textarea {
+  min-height: 80px;
+  resize: vertical;
+  font-family: inherit;
+}
+
+/* Booking info items (date pickers) */
+.guest-layout .booking-info-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.guest-layout .booking-info-item .icon {
+  font-size: 18px;
+  color: #757575;
+  flex-shrink: 0;
+}
+
+.guest-layout .booking-info-item .label {
+  font-size: 14px;
+  font-weight: 500;
+  color: #424242;
+  min-width: 100px;
+}
+
+.guest-layout .booking-info-item .flatpickr-input {
+  flex: 1;
+}
+
+.guest-layout .booking-info-item .value-wrapper {
+  flex: 1;
+}
+
+.guest-layout .highlight-text {
+  font-size: 15px;
+  font-weight: 600;
+  color: #00897b;
+}
+
+/* Payment method selection */
+.guest-layout .payment-method-selection-card {
+  padding: 24px;
+}
+
+.guest-layout .payment-options {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.guest-layout .payment-option {
+  position: relative;
+  padding: 16px;
+  border: 1px solid #d0d0d0;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background: var(--white);
+}
+
+.guest-layout .payment-option:hover {
+  border-color: #00897b;
+  background: #f0f9f8;
+}
+
+.guest-layout .payment-option input[type="radio"] {
+  position: absolute;
+  opacity: 0;
+}
+
+.guest-layout .payment-option:has(input[type="radio"]:checked) {
+  border-color: #00897b;
+  background: #e0f2f1;
+  border-width: 2px;
+}
+
+.guest-layout .payment-option label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #212121;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.guest-layout .payment-option .payment-description {
+  font-size: 12px;
+  color: #00897b;
+  margin-top: 4px;
+  font-weight: 500;
+}
+
+/* Action buttons */
+.guest-layout .booking-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.guest-layout #pay-and-reserve-btn {
+  flex: 1;
+  padding: 14px 24px;
+  font-size: 15px;
+  font-weight: 600;
+  background: #00897b;
+  /* Teal primary color */
+  color: var(--white);
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.guest-layout #pay-and-reserve-btn:hover {
+  background: #00796b;
+  box-shadow: 0 2px 8px rgba(0, 137, 123, 0.3);
+}
+
+.guest-layout #pay-and-reserve-btn:active {
+  transform: translateY(1px);
+}
+
+.guest-layout .btn-secondary {
+  flex: 1;
+  padding: 14px 24px;
+  font-size: 15px;
+  font-weight: 600;
+  background: #e0e0e0;
+  color: #424242;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.guest-layout .btn-secondary:hover {
+  background: #d0d0d0;
+}
+
+/* Countdown timer */
+.guest-layout .countdown-timer {
+  background: #fff3e0;
+  border: 1px solid #ffb74d;
+  border-radius: 4px;
+  padding: 12px;
+  margin-bottom: 16px;
+  text-align: center;
+}
+
+.guest-layout .countdown-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.guest-layout .countdown-header p {
+  font-size: 13px;
+  color: #e65100;
+  margin: 0;
+}
+
+.guest-layout .countdown-icon {
+  font-size: 18px;
+}
+
+.guest-layout .timer-value {
+  font-size: 20px;
+  font-weight: 700;
+  color: #e65100;
+}
+
+/* --- LOGGED-IN LAYOUT (Two Columns) --- */
+.logged-in-layout .booking-grid {
+  display: grid;
+  grid-template-columns: 1fr 400px;
+  gap: 24px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.logged-in-layout .booking-details-column {
+  width: 100%;
+}
+
+.logged-in-layout .booking-summary-column {
+  width: 100%;
+}
+
+/* Logged-in layout: Sticky sidebar */
+.logged-in-layout .booking-summary-card {
+  position: sticky;
+  top: 100px;
+}
+
+/* --- RESPONSIVE ADJUSTMENTS --- */
+
+/* Tablet and below: Both layouts become single column */
+@media (max-width: 1024px) {
+
+  .guest-layout .booking-grid,
+  .logged-in-layout .booking-grid {
+    grid-template-columns: 1fr;
+    max-width: 800px;
+  }
+
+  .guest-layout .booking-summary-column,
+  .logged-in-layout .booking-summary-column {
+    order: 1;
+    /* Move sidebar below form on mobile */
+  }
+
+  .guest-layout .booking-summary-card,
+  .logged-in-layout .booking-summary-card {
+    position: relative;
+    top: 0;
+  }
+}
+
+/* Mobile: Adjust spacing */
+@media (max-width: 640px) {
+  .guest-layout .booking-info-item {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .guest-layout .booking-info-item .label {
+    min-width: auto;
+  }
+
+  .guest-layout .booking-actions {
+    flex-direction: column;
+  }
+
+  .guest-layout .spot-thumbnail {
+    height: 150px;
+  }
+}
+
+.guest-layout .booking-details-column {
+  width: 100%;
+}
+
+.guest-layout .booking-summary-column {
+  width: 100%;
+}
+
+/* Guest layout: Sticky price summary sidebar */
+.guest-layout .booking-summary-card {
+  position: sticky;
+  top: 100px;
+  background: var(--white);
+  border-radius: var(--radius-xl);
+  padding: 24px;
+  box-shadow: var(--shadow-lg);
+  border: 1px solid var(--border);
+}
+
+/* Show guest-only fields */
+.guest-layout .guest-only-field {
+  display: block;
+}
+
+/* Hide guest fields in logged-in layout */
+.logged-in-layout .guest-only-field {
+  display: none;
+}
+
+/* Guest layout: Enhanced card styling */
+.guest-layout .info-card {
+  background: var(--white);
+  border-radius: var(--radius-xl);
+  padding: 28px;
+  margin-bottom: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  border: 1px solid #e5e7eb;
+  transition: var(--transition);
+}
+
+.guest-layout .info-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+/* Guest layout: Section titles */
+.guest-layout .info-card h2 {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text);
+  margin: 0 0 20px 0;
+  padding-bottom: 16px;
+  border-bottom: 2px solid var(--primary-lighter);
+}
+
+/* Guest layout: Form fields */
+.guest-layout .form-group {
+  margin-bottom: 20px;
+}
+
+.guest-layout .form-label {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 8px;
+}
+
+.guest-layout .text-input,
+.guest-layout .flatpickr-input {
+  width: 100%;
+  padding: 14px 16px;
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--text);
+  background: #f9fafb;
+  border: 2px solid #e5e7eb;
+  border-radius: var(--radius);
+  transition: all 0.2s ease;
+}
+
+.guest-layout .text-input:hover,
+.guest-layout .flatpickr-input:hover {
+  background: var(--white);
+  border-color: #d1d5db;
+}
+
+.guest-layout .text-input:focus,
+.guest-layout .flatpickr-input:focus {
+  background: var(--white);
+  border-color: var(--primary);
+  outline: none;
+  box-shadow: 0 0 0 4px var(--primary-lighter);
+}
+
+/* Guest layout: Help text */
+.guest-layout .help-text {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin: 0 0 16px 0;
+  line-height: 1.5;
+}
+
+/* Guest layout: Spot summary card */
+.guest-layout .spot-summary-card {
+  background: linear-gradient(135deg, var(--primary-lighter) 0%, #e0f2fe 100%);
+  border: 2px solid var(--primary);
+  padding: 20px;
+  margin-bottom: 24px;
+}
+
+.guest-layout .spot-summary-header {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+}
+
+.guest-layout .spot-thumbnail {
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+  border-radius: var(--radius-lg);
+  border: 2px solid var(--white);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.guest-layout .spot-summary-info h3 {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text);
+  margin: 0 0 8px 0;
+}
+
+.guest-layout .spot-address-text {
+  font-size: 14px;
+  color: var(--text-muted);
+  margin: 0 0 8px 0;
+}
+
+/* Guest layout: Booking info items */
+.guest-layout .booking-info-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+  padding: 12px;
+  background: #f9fafb;
+  border-radius: var(--radius);
+}
+
+.guest-layout .booking-info-item .icon {
+  font-size: 20px;
+  flex-shrink: 0;
+}
+
+.guest-layout .booking-info-item .label {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-light);
+  min-width: 100px;
+}
+
+.guest-layout .booking-info-item .flatpickr-input {
+  flex: 1;
+  background: var(--white);
+  margin: 0;
+}
+
+.guest-layout .booking-info-item .value-wrapper {
+  flex: 1;
+}
+
+.guest-layout .highlight-text {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--primary-dark);
+}
+
+/* Guest layout: Payment method selection */
+.guest-layout .payment-method-selection-card {
+  padding: 28px;
+}
+
+.guest-layout .payment-options {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+
+.guest-layout .payment-option {
+  position: relative;
+  padding: 20px;
+  border: 2px solid #e5e7eb;
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: center;
+  background: #f9fafb;
+}
+
+.guest-layout .payment-option:hover {
+  border-color: var(--primary);
+  background: var(--white);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.guest-layout .payment-option input[type="radio"] {
+  position: absolute;
+  opacity: 0;
+}
+
+.guest-layout .payment-option input[type="radio"]:checked+label {
+  color: var(--primary-dark);
+}
+
+.guest-layout .payment-option input[type="radio"]:checked~* {
+  border-color: var(--primary);
+}
+
+.guest-layout .payment-option:has(input[type="radio"]:checked) {
+  border-color: var(--primary);
+  background: var(--primary-lighter);
+  box-shadow: 0 0 0 4px rgba(5, 150, 105, 0.1);
+}
+
+/* Guest layout: Price summary sidebar */
+.guest-layout .price-breakdown {
+  margin-bottom: 20px;
+}
+
+.guest-layout .price-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid #e5e7eb;
+  font-size: 14px;
+}
+
+.guest-layout .price-item.total-price {
+  border-bottom: none;
+  border-top: 2px solid var(--primary);
+  padding-top: 16px;
+  margin-top: 8px;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--primary-dark);
+}
+
+.guest-layout .price-value {
+  font-weight: 600;
+  color: var(--text);
+}
+
+/* Guest layout: Complete booking button */
+.guest-layout #pay-and-reserve-btn {
+  width: 100%;
+  padding: 16px;
+  font-size: 16px;
+  font-weight: 700;
+  background: var(--primary);
+  color: var(--white);
+  border: none;
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-top: 16px;
+}
+
+.guest-layout #pay-and-reserve-btn:hover {
+  background: var(--primary-dark);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(5, 150, 105, 0.3);
+}
+
+.guest-layout #pay-and-reserve-btn:active {
+  transform: translateY(0);
+}
+
+/* Guest layout: Countdown timer */
+.guest-layout .countdown-timer {
+  background: #fef3c7;
+  border: 2px solid #fbbf24;
+  border-radius: var(--radius-lg);
+  padding: 16px;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.guest-layout .countdown-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.guest-layout .countdown-icon {
+  font-size: 20px;
+}
+
+.guest-layout .timer-value {
+  font-size: 24px;
+  font-weight: 700;
+  color: #92400e;
+}
+
+/* --- LOGGED-IN LAYOUT (Two Columns) --- */
+.logged-in-layout .booking-grid {
+  display: grid;
+  grid-template-columns: 1fr 400px;
+  gap: 24px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.logged-in-layout .booking-details-column {
+  width: 100%;
+}
+
+.logged-in-layout .booking-summary-column {
+  width: 100%;
+}
+
+/* Logged-in layout: Sticky sidebar */
+.logged-in-layout .booking-summary-card {
+  position: sticky;
+  top: 100px;
+}
+
+/* --- RESPONSIVE ADJUSTMENTS --- */
+
+/* Tablet and below: Both layouts become single column */
+@media (max-width: 1024px) {
+
+  .guest-layout .booking-grid,
+  .logged-in-layout .booking-grid {
+    grid-template-columns: 1fr;
+    max-width: 800px;
+  }
+
+  .guest-layout .booking-summary-column,
+  .logged-in-layout .booking-summary-column {
+    order: 999;
+  }
+
+  .guest-layout .booking-summary-card,
+  .logged-in-layout .booking-summary-card {
+    position: relative;
+    top: 0;
+  }
+}
+
+/* Mobile: Stack payment options vertically */
+@media (max-width: 640px) {
+  .guest-layout .payment-options {
+    grid-template-columns: 1fr;
+  }
+
+  .guest-layout .booking-info-item {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .guest-layout .booking-info-item .label {
+    min-width: auto;
+  }
+
+  .guest-layout .spot-summary-header {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .guest-layout .spot-thumbnail {
+    width: 80px;
+    height: 80px;
+  }
+}

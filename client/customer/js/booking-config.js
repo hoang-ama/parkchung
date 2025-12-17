@@ -38,6 +38,25 @@ async function initializeBookingConfigPage(spotId, arrivalParam, leavingParam) {
     const spotNameDisplay = document.getElementById('spot-name');
     const spotAddressTextDisplay = document.getElementById('spot-address-display');
 
+    // Guest-only fields
+    const guestFullnameInput = document.getElementById('guest-fullname-input');
+    const guestEmailInput = document.getElementById('guest-email-input');
+
+    // --- LOGIN DETECTION & LAYOUT CONTROL ---
+    const userToken = localStorage.getItem('userToken');
+    const isLoggedIn = !!userToken;
+
+    // Apply CSS class to body for conditional layout
+    if (isLoggedIn) {
+        document.body.classList.add('logged-in-layout');
+        document.body.classList.remove('guest-layout');
+    } else {
+        document.body.classList.add('guest-layout');
+        document.body.classList.remove('logged-in-layout');
+    }
+
+    console.log(`Booking Config - User ${isLoggedIn ? 'logged in' : 'not logged in (guest)'}, layout class applied.`);
+
     // --- UTILITY FUNCTIONS ---
 
     function formatCurrency(amount) {
@@ -408,97 +427,113 @@ async function initializeBookingConfigPage(spotId, arrivalParam, leavingParam) {
             endTime: endTime.toISOString(),
         };
 
-        // Guest checkout flow
+        // Guest checkout flow - Use inline fields instead of modal
         if (!token) {
-            const modal = document.getElementById('leadModal');
-            const fullNameEl = document.getElementById('guest-fullname');
-            const emailEl = document.getElementById('guest-email');
-            const phoneEl = document.getElementById('guest-phone');
-            const cancelBtn = document.getElementById('guest-cancel');
-            const cancelBtnSecondary = document.getElementById('guest-cancel-secondary');
-            const submitBtn = document.getElementById('guest-submit');
+            // Validate guest inline fields
+            const guestFullname = (guestFullnameInput?.value || '').trim();
+            const guestEmail = (guestEmailInput?.value || '').trim();
+            const guestPhone = (phoneNumberInput?.value || '').trim();
+            const vehicleReg = (vehicleRegInput?.value || '').trim();
 
-            const options = { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' };
-            const fromEl = document.getElementById('pc-time-from');
-            const toEl = document.getElementById('pc-time-to');
-            if (fromEl) fromEl.textContent = new Date(startTime).toLocaleString('vi-VN', options);
-            if (toEl) toEl.textContent = new Date(endTime).toLocaleString('vi-VN', options);
+            if (!guestFullname) {
+                alert('Please enter your full name.');
+                guestFullnameInput?.focus();
+                return;
+            }
 
-            modal.classList.add('is-open');
-            if (fullNameEl) { try { fullNameEl.focus(); } catch (e) { /* ignore */ } }
+            if (!guestEmail) {
+                alert('Please enter your email address.');
+                guestEmailInput?.focus();
+                return;
+            }
 
-            const closeModal = () => { modal.classList.remove('is-open'); };
-            cancelBtn.onclick = closeModal;
-            if (cancelBtnSecondary) cancelBtnSecondary.onclick = closeModal;
-            modal.onclick = (e) => { if (e.target === modal) closeModal(); };
-            const escHandler = (e) => { if (e.key === 'Escape') { closeModal(); window.removeEventListener('keydown', escHandler); } };
-            window.addEventListener('keydown', escHandler);
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(guestEmail)) {
+                alert('Please enter a valid email address.');
+                guestEmailInput?.focus();
+                return;
+            }
 
-            submitBtn.onclick = async () => {
-                const fullName = (fullNameEl.value || '').trim();
-                const email = (emailEl.value || '').trim();
-                const phoneNumber = (phoneEl.value || '').trim();
+            if (!guestPhone) {
+                alert('Please enter your phone number.');
+                phoneNumberInput?.focus();
+                return;
+            }
 
-                if (!fullName || !email || !phoneNumber) {
-                    alert('Please fill in full name, email and phone number.');
-                    return;
-                }
+            if (!vehicleReg) {
+                alert('Please enter your vehicle registration.');
+                vehicleRegInput?.focus();
+                return;
+            }
 
-                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-                if (!emailRegex.test(email)) {
-                    alert('Please enter a valid email address.');
-                    return;
-                }
+            // Guest booking with inline fields
+            if (selectedPaymentMethod === 'paypal') {
+                await initiatePaypalCheckout({
+                    payload: {
+                        ...basePayload,
+                        fullName: guestFullname,
+                        email: guestEmail,
+                        phoneNumber: guestPhone,
+                        guestPhoneNumber: guestPhone,
+                        vehicleRegistration: vehicleReg,
+                    },
+                    triggerButton: payAndReserveBtn,
+                    defaultButtonText: 'Complete Booking',
+                });
+            } else if (selectedPaymentMethod === 'cash') {
+                try {
+                    payAndReserveBtn.disabled = true;
+                    updateButtonText(payAndReserveBtn, 'Creating booking...');
 
-                if (selectedPaymentMethod === 'paypal') {
-                    const success = await initiatePaypalCheckout({
-                        payload: {
+                    const response = await fetch(`${API_URL}/bookings/guest`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
                             ...basePayload,
-                            fullName,
-                            email,
-                            phoneNumber,
-                            guestPhoneNumber: phoneNumber,
-                        },
-                        triggerButton: submitBtn,
-                        defaultButtonText: 'Complete Booking',
+                            fullName: guestFullname,
+                            email: guestEmail,
+                            phoneNumber: guestPhone,
+                            vehicleRegistration: vehicleReg,
+                            paymentMethod: 'CASH',
+                        }),
                     });
-                    if (success) {
-                        closeModal();
+
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        throw new Error(errorData.message || 'Failed to create booking.');
                     }
-                } else if (selectedPaymentMethod === 'cash') {
-                    try {
-                        submitBtn.disabled = true;
-                        updateButtonText(submitBtn, 'Creating booking...');
 
-                        const response = await fetch(`${API_URL}/bookings/guest`, {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({
-                                ...basePayload,
-                                fullName,
-                                email,
-                                phoneNumber,
-                                paymentMethod: 'CASH',
-                            }),
-                        });
+                    const data = await response.json();
 
-                        if (!response.ok) {
-                            const errorData = await response.json().catch(() => ({}));
-                            throw new Error(errorData.message || 'Failed to create booking.');
-                        }
+                    // Store guest booking data in sessionStorage for payment-result page
+                    const guestBookingData = {
+                        _id: data._id,
+                        spotName: currentSpotData?.name || 'Parking Spot',
+                        spotAddress: currentSpotData?.address || 'N/A',
+                        customerName: guestFullname,
+                        customerEmail: guestEmail,
+                        customerPhone: guestPhone,
+                        vehicleRegistration: vehicleReg,
+                        startTime: basePayload.startTime,
+                        endTime: basePayload.endTime,
+                        orderTime: new Date().toISOString(),
+                        bookingStatus: data.status || 'confirmed',
+                        paymentMethod: 'CASH',
+                        paymentStatus: data.paymentStatus || 'UNPAID',
+                        totalPrice: data.totalPrice || 0,
+                    };
+                    sessionStorage.setItem('guestBookingData', JSON.stringify(guestBookingData));
 
-                        const booking = await response.json();
-                        closeModal();
-                        window.location.href = `payment-result.html?bookingId=${booking._id}&paymentMethod=CASH&isGuest=true`;
-                    } catch (error) {
-                        console.error('Cash booking error:', error);
-                        alert(error.message || 'Failed to create booking. Please try again.');
-                    } finally {
-                        submitBtn.disabled = false;
-                        updateButtonText(submitBtn, 'Complete Booking');
-                    }
+                    alert('Booking created successfully! You will receive a confirmation email.');
+                    window.location.href = `payment-result.html?success=true&bookingId=${data._id}&isGuest=true&paymentMethod=CASH`;
+                } catch (error) {
+                    console.error('Cash booking error:', error);
+                    alert(error.message);
+                } finally {
+                    payAndReserveBtn.disabled = false;
+                    updateButtonText(payAndReserveBtn, 'Complete Booking');
                 }
-            };
+            }
             return;
         }
 
