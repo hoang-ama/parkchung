@@ -487,7 +487,7 @@ p {
 }
 
 .booking-info-item .value-wrapper {
-  margin-left: auto;
+  margin-left: 70px;
   text-align: right;
 }
 
@@ -614,9 +614,8 @@ p {
 
 .rating {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 8px;
-  margin-bottom: 24px;
 }
 
 .stars {
@@ -629,6 +628,21 @@ p {
   color: var(--text);
   font-size: 17px;
   letter-spacing: -0.01em;
+}
+
+.rating-source {
+  display: flex;
+  flex-direction: column;
+  /* QUAN TRỌNG: Xếp các phần tử theo chiều dọc */
+  align-items: flex-start;
+  /* QUAN TRỌNG: Căn thẳng lề trái */
+  gap: 5px;
+  /* Khoảng cách giữa dòng sao và dòng chữ GoogleRating */
+  font-size: 0.5em;
+  color: #999;
+  /* Màu xám nhạt giống ảnh */
+  margin-bottom: 10px;
+  padding-left: 2px;
 }
 
 /* ================= PRICE BREAKDOWN ================= */
@@ -1263,7 +1277,6 @@ input:focus {
   display: flex;
   align-items: center;
   gap: 16px;
-  margin-bottom: 16px;
 }
 
 .spot-address {
