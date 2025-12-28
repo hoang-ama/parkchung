@@ -1,7 +1,7 @@
 import { api } from './apiService.js';
 
 document.addEventListener('DOMContentLoaded', () => {
-   //register
+    //register
     const registerForm = document.getElementById('register-form');
     if (registerForm) {
         registerForm.addEventListener('submit', async (e) => {
@@ -31,7 +31,7 @@ document.addEventListener('DOMContentLoaded', () => {
             try {
                 const data = await api.login(email, password);
                 localStorage.setItem('userToken', data.token);
-                localStorage.setItem('userData', JSON.stringify({ fullName: data.fullName, email: data.email }));
+                localStorage.setItem('userData', JSON.stringify({ fullName: data.fullName, email: data.email, phone: data.phone }));
                 alert('Login successful!');
                 window.location.href = 'index.html';
             } catch (error) {

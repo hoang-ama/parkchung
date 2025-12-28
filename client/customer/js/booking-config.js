@@ -57,6 +57,19 @@ async function initializeBookingConfigPage(spotId, arrivalParam, leavingParam) {
 
     console.log(`Booking Config - User ${isLoggedIn ? 'logged in' : 'not logged in (guest)'}, layout class applied.`);
 
+    // --- AUTO-FILL USER DATA FOR LOGGED-IN USERS ---
+    if (isLoggedIn) {
+        try {
+            const userData = JSON.parse(localStorage.getItem('userData') || '{}');
+            if (userData.phone && phoneNumberInput) {
+                phoneNumberInput.value = userData.phone;
+                console.log('Auto-filled phone number from user data.');
+            }
+        } catch (e) {
+            console.warn('Could not parse userData from localStorage:', e);
+        }
+    }
+
     // --- UTILITY FUNCTIONS ---
 
     function formatCurrency(amount) {
