@@ -131,9 +131,7 @@ async function initializeSpotBookingPage(spotId) {
         // Number of Slots
         const slotsEl = document.getElementById('spot-slots');
         if (slotsEl) {
-            slotsEl.textContent = spot.numberOfSlots
-                ? `${spot.numberOfSlots} slot${spot.numberOfSlots > 1 ? 's' : ''}`
-                : 'N/A';
+            slotsEl.textContent = 'Unknown';
         }
 
         // Vehicle Types
@@ -180,31 +178,30 @@ async function initializeSpotBookingPage(spotId) {
             }).join('');
         }
 
-        // Features
-        const featuresContainer = document.getElementById('spot-features-container');
-        if (featuresContainer) {
-            const features = [];
+        // Services (from addOnServices field)
+        const servicesContainer = document.getElementById('spot-services-container');
+        if (servicesContainer) {
+            const serviceInfo = {
+                'valet': { icon: '🚗', label: 'Valet Parking' },
+                'carwash': { icon: '🧼', label: 'Car Washing' },
+                'ev_charging': { icon: '⚡', label: 'Electric Vehicle Charging' }
+            };
 
-            if (spot.hasRoof) {
-                features.push({ icon: '☂️', label: 'Covered Parking (Has Roof)' });
+            if (spot.addOnServices && spot.addOnServices.length > 0) {
+                servicesContainer.innerHTML = spot.addOnServices.map(service => {
+                    const info = serviceInfo[service] || { icon: '✓', label: service };
+                    return `
+                        <div class="service-badge">
+                            <span class="icon">${info.icon}</span>
+                            <span>${info.label}</span>
+                        </div>
+                    `;
+                }).join('');
             } else {
-                features.push({ icon: '☀️', label: 'Open Air Parking' });
+                servicesContainer.innerHTML = `
+                    <p class="no-services">No additional services available</p>
+                `;
             }
-
-            if (spot.numberOfSlots && spot.numberOfSlots > 5) {
-                features.push({ icon: '🅿️', label: 'Large Capacity' });
-            }
-
-            if (spot.paymentMethods && spot.paymentMethods.includes('paypal')) {
-                features.push({ icon: '💳', label: 'Online Payment Available' });
-            }
-
-            featuresContainer.innerHTML = features.map(f => `
-                <div class="feature-badge">
-                    <span class="icon">${f.icon}</span>
-                    <span>${f.label}</span>
-                </div>
-            `).join('');
         }
     }
 

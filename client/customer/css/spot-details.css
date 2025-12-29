@@ -1472,17 +1472,21 @@ input:focus {
   font-weight: 400;
 }
 
-/* Features Card */
+
+/* Services Card (formerly Features Card) */
+.spot-services-card,
 .spot-features-card {
   padding: 24px;
 }
 
+.services-grid,
 .features-grid {
   display: flex;
   flex-wrap: wrap;
   gap: 12px;
 }
 
+.service-badge,
 .feature-badge {
   display: flex;
   align-items: center;
@@ -1496,8 +1500,17 @@ input:focus {
   color: var(--primary-darker);
 }
 
+.service-badge .icon,
 .feature-badge .icon {
   font-size: 18px;
+}
+
+/* No services message */
+.no-services {
+  font-size: 14px;
+  color: var(--text-muted);
+  font-style: italic;
+  margin: 0;
 }
 
 /* Trust Badges */

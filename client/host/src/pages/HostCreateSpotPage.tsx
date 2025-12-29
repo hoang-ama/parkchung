@@ -18,6 +18,7 @@ interface SpotFormValues {
     openTime: string; // Operating hours, e.g., "08:00-22:00"
     bookingTypes: string[]; // ['online'], ['call'], or ['online', 'call']
     addOnServices: string[]; // ['valet', etc.]
+    servicePricing: { [key: string]: string }; // Pricing for each service
 }
 
 interface FormErrors {
@@ -42,7 +43,8 @@ interface FormErrors {
 const VEHICLE_TYPE_OPTIONS = [
     { value: 'car', label: 'Car' },
     { value: 'motorbike', label: 'Motorbike' },
-    { value: 'truck', label: 'Small truck' },
+    { value: 'bicycle', label: 'Bicycle' },
+    { value: 'truck', label: 'Truck / Large Vehicle' },
 ];
 
 const PAYMENT_METHOD_OPTIONS = [
@@ -56,7 +58,9 @@ const BOOKING_TYPE_OPTIONS = [
 ];
 
 const ADDON_SERVICE_OPTIONS = [
-    { value: 'valet', label: 'Valet Parking', icon: '🚗', description: 'Free valet service', price: 'Free' },
+    { value: 'valet', label: 'Valet Parking', icon: '🚗', description: 'Professional valet service for customers' },
+    { value: 'carwash', label: 'Car Washing', icon: '🧼', description: 'Car wash service available' },
+    { value: 'ev_charging', label: 'Electric Vehicle Charging', icon: '⚡', description: 'EV charging stations available' },
 ];
 
 const MAX_IMAGES = 5;
@@ -195,6 +199,7 @@ export default function HostCreateSpotPage() {
         openTime: '', // Operating hours
         bookingTypes: ['online'], // Default to online booking
         addOnServices: [], // No add-on services by default
+        servicePricing: {}, // Pricing for each service
     });
 
     // File state
@@ -262,11 +267,34 @@ export default function HostCreateSpotPage() {
 
     // Handle add-on service toggle
     const handleAddOnServiceChange = (service: string) => {
+        setFormValues((prev) => {
+            const isRemoving = prev.addOnServices.includes(service);
+            const newServices = isRemoving
+                ? prev.addOnServices.filter((s) => s !== service)
+                : [...prev.addOnServices, service];
+
+            // Remove pricing if service is being removed
+            const newPricing = { ...prev.servicePricing };
+            if (isRemoving) {
+                delete newPricing[service];
+            }
+
+            return {
+                ...prev,
+                addOnServices: newServices,
+                servicePricing: newPricing,
+            };
+        });
+    };
+
+    // Handle service pricing change
+    const handleServicePricingChange = (service: string, price: string) => {
         setFormValues((prev) => ({
             ...prev,
-            addOnServices: prev.addOnServices.includes(service)
-                ? prev.addOnServices.filter((s) => s !== service)
-                : [...prev.addOnServices, service],
+            servicePricing: {
+                ...prev.servicePricing,
+                [service]: price,
+            },
         }));
     };
 
@@ -404,6 +432,11 @@ export default function HostCreateSpotPage() {
             formValues.addOnServices.forEach((service) => {
                 formData.append('addOnServices[]', service);
             });
+
+            // Append service pricing (as JSON string)
+            if (Object.keys(formValues.servicePricing).length > 0) {
+                formData.append('servicePricing', JSON.stringify(formValues.servicePricing));
+            }
 
             // Append images
             selectedFiles.forEach((file) => {
@@ -1010,34 +1043,57 @@ export default function HostCreateSpotPage() {
                             {ADDON_SERVICE_OPTIONS.map((option) => (
                                 <label
                                     key={option.value}
-                                    className={`flex items-center gap-4 p-4 border rounded-xl cursor-pointer transition-all ${formValues.addOnServices.includes(option.value)
+                                    className={`flex flex-col gap-3 p-4 border rounded-xl cursor-pointer transition-all ${formValues.addOnServices.includes(option.value)
                                         ? 'border-emerald-500 bg-emerald-50 shadow-sm'
                                         : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
                                         }`}
                                 >
-                                    <input
-                                        type="checkbox"
-                                        checked={formValues.addOnServices.includes(option.value)}
-                                        onChange={() => handleAddOnServiceChange(option.value)}
-                                        className="w-5 h-5 text-emerald-600 border-gray-300 rounded focus:ring-emerald-500"
-                                    />
-                                    <div className="flex items-center gap-3 flex-1">
-                                        <span className="text-2xl">{option.icon}</span>
-                                        <div>
-                                            <p className={`font-medium ${formValues.addOnServices.includes(option.value)
-                                                ? 'text-emerald-700'
-                                                : 'text-gray-800'
-                                                }`}>
-                                                {option.label}
-                                            </p>
-                                            <p className="text-xs text-gray-500">{option.description}</p>
-                                            <span className="text-xs font-medium text-emerald-600">{option.price}</span>
+                                    <div className="flex items-center gap-4">
+                                        <input
+                                            type="checkbox"
+                                            checked={formValues.addOnServices.includes(option.value)}
+                                            onChange={() => handleAddOnServiceChange(option.value)}
+                                            className="w-5 h-5 text-emerald-600 border-gray-300 rounded focus:ring-emerald-500"
+                                        />
+                                        <div className="flex items-center gap-3 flex-1">
+                                            <span className="text-2xl">{option.icon}</span>
+                                            <div>
+                                                <p className={`font-medium ${formValues.addOnServices.includes(option.value)
+                                                    ? 'text-emerald-700'
+                                                    : 'text-gray-800'
+                                                    }`}>
+                                                    {option.label}
+                                                </p>
+                                                <p className="text-xs text-gray-500">{option.description}</p>
+                                            </div>
                                         </div>
+                                        {formValues.addOnServices.includes(option.value) && (
+                                            <svg className="w-5 h-5 text-emerald-500" fill="currentColor" viewBox="0 0 20 20">
+                                                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                                            </svg>
+                                        )}
                                     </div>
+
+                                    {/* Pricing input field - shown when service is selected */}
                                     {formValues.addOnServices.includes(option.value) && (
-                                        <svg className="w-5 h-5 text-emerald-500" fill="currentColor" viewBox="0 0 20 20">
-                                            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                                        </svg>
+                                        <div className="ml-9 mt-2">
+                                            <label htmlFor={`price-${option.value}`} className="block text-sm font-medium text-gray-700 mb-1">
+                                                Price (VND) <span className="text-gray-500 font-normal">- Optional</span>
+                                            </label>
+                                            <input
+                                                type="number"
+                                                id={`price-${option.value}`}
+                                                value={formValues.servicePricing[option.value] || ''}
+                                                onChange={(e) => handleServicePricingChange(option.value, e.target.value)}
+                                                onClick={(e) => e.stopPropagation()}
+                                                min="0"
+                                                placeholder="Enter price (leave empty if free)"
+                                                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-200 focus:border-emerald-500 transition-colors"
+                                            />
+                                            <p className="mt-1 text-xs text-gray-500">
+                                                Leave empty if this service is free
+                                            </p>
+                                        </div>
                                     )}
                                 </label>
                             ))}

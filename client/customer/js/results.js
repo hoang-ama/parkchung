@@ -4,8 +4,16 @@ import { api } from './apiService.js';
 
 // Pagination state
 let allSpots = [];
+let filteredSpots = []; // Spots after filtering
 let currentPage = 1;
 const spotsPerPage = 6;
+
+// Filter state
+let activeFilters = {
+    vehicleTypes: [],
+    bookingTypes: [],
+    paymentMethods: []
+};
 
 document.addEventListener('DOMContentLoaded', async () => {
     const resultsGrid = document.getElementById('results-grid');
@@ -19,6 +27,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     };
 
     await loadAndDisplaySpots(criteria, resultsGrid, params);
+    setupFilterListeners();
 });
 
 async function loadAndDisplaySpots(criteria, container, params) {
@@ -38,6 +47,10 @@ async function loadAndDisplaySpots(criteria, container, params) {
 
         // Store all spots in state
         allSpots = spots;
+        filteredSpots = spots; // Initially, all spots are shown
+
+        // Update results count
+        updateResultsCount();
 
         // Display first page
         displaySpots(params);
@@ -51,15 +64,136 @@ async function loadAndDisplaySpots(criteria, container, params) {
     }
 }
 
+// Setup filter event listeners
+function setupFilterListeners() {
+    // Vehicle type filters
+    document.querySelectorAll('input[name="vehicleType"]').forEach(checkbox => {
+        checkbox.addEventListener('change', (e) => {
+            if (e.target.checked) {
+                activeFilters.vehicleTypes.push(e.target.value);
+            } else {
+                activeFilters.vehicleTypes = activeFilters.vehicleTypes.filter(v => v !== e.target.value);
+            }
+            applyFilters();
+        });
+    });
+
+    // Booking type filters
+    document.querySelectorAll('input[name="bookingType"]').forEach(checkbox => {
+        checkbox.addEventListener('change', (e) => {
+            if (e.target.checked) {
+                activeFilters.bookingTypes.push(e.target.value);
+            } else {
+                activeFilters.bookingTypes = activeFilters.bookingTypes.filter(v => v !== e.target.value);
+            }
+            applyFilters();
+        });
+    });
+
+    // Payment method filters
+    document.querySelectorAll('input[name="paymentMethod"]').forEach(checkbox => {
+        checkbox.addEventListener('change', (e) => {
+            if (e.target.checked) {
+                activeFilters.paymentMethods.push(e.target.value);
+            } else {
+                activeFilters.paymentMethods = activeFilters.paymentMethods.filter(v => v !== e.target.value);
+            }
+            applyFilters();
+        });
+    });
+
+    // Clear filters button
+    const clearBtn = document.getElementById('clear-filters-btn');
+    if (clearBtn) {
+        clearBtn.addEventListener('click', () => {
+            // Uncheck all checkboxes
+            document.querySelectorAll('.filter-option input[type="checkbox"]').forEach(cb => {
+                cb.checked = false;
+            });
+
+            // Reset filters
+            activeFilters = {
+                vehicleTypes: [],
+                bookingTypes: [],
+                paymentMethods: []
+            };
+
+            applyFilters();
+        });
+    }
+}
+
+// Apply filters to spots
+function applyFilters() {
+    filteredSpots = allSpots.filter(spot => {
+        // Vehicle type filter
+        if (activeFilters.vehicleTypes.length > 0) {
+            const hasMatchingVehicle = activeFilters.vehicleTypes.some(type =>
+                spot.vehicleTypes && spot.vehicleTypes.includes(type)
+            );
+            if (!hasMatchingVehicle) return false;
+        }
+
+        // Booking type filter
+        if (activeFilters.bookingTypes.length > 0) {
+            const hasMatchingBookingType = activeFilters.bookingTypes.some(type =>
+                spot.bookingTypes && spot.bookingTypes.includes(type)
+            );
+            if (!hasMatchingBookingType) return false;
+        }
+
+        // Payment method filter
+        if (activeFilters.paymentMethods.length > 0) {
+            const hasMatchingPayment = activeFilters.paymentMethods.some(method =>
+                spot.paymentMethods && spot.paymentMethods.includes(method)
+            );
+            if (!hasMatchingPayment) return false;
+        }
+
+        return true;
+    });
+
+    // Reset to first page when filters change
+    currentPage = 1;
+
+    // Update results count
+    updateResultsCount();
+
+    // Re-display spots
+    const params = new URLSearchParams(window.location.search);
+    displaySpots(params);
+}
+
+// Update results count display
+function updateResultsCount() {
+    const countEl = document.getElementById('results-count');
+    if (countEl) {
+        const total = allSpots.length;
+        const filtered = filteredSpots.length;
+
+        if (filtered === total) {
+            countEl.textContent = `Showing ${total} parking spot${total !== 1 ? 's' : ''}`;
+        } else {
+            countEl.textContent = `Showing ${filtered} of ${total} parking spot${total !== 1 ? 's' : ''}`;
+        }
+    }
+}
+
 function displaySpots(params) {
     const resultsGrid = document.getElementById('results-grid');
     resultsGrid.innerHTML = '';
 
+    // Check if there are any filtered spots
+    if (filteredSpots.length === 0) {
+        resultsGrid.innerHTML = '<p class="no-results">No parking spots match your selected filters.</p>';
+        return;
+    }
+
     // Calculate pagination
-    const totalPages = Math.ceil(allSpots.length / spotsPerPage);
+    const totalPages = Math.ceil(filteredSpots.length / spotsPerPage);
     const startIndex = (currentPage - 1) * spotsPerPage;
     const endIndex = startIndex + spotsPerPage;
-    const spotsToDisplay = allSpots.slice(startIndex, endIndex);
+    const spotsToDisplay = filteredSpots.slice(startIndex, endIndex);
 
     // Display spots for current page
     spotsToDisplay.forEach((spot, index) => {

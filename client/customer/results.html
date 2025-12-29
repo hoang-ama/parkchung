@@ -7,6 +7,7 @@
     <title>Search Results - ParkChung</title>
     <link rel="icon" type="image/png" href="/assets/logo/favicon.png" />
     <link rel="stylesheet" href="css/styles.css" />
+    <link rel="stylesheet" href="css/results-filters.css" />
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap"
         rel="stylesheet" />
 </head>
@@ -27,17 +28,84 @@
     </header>
 
     <main class="results-page-main">
-        <div class="results-header">
-            <h2 data-i18n="results_title">Available Parking Spots</h2>
-            <p data-i18n="results_desc">Choose the best spot for you and book in seconds.</p>
-        </div>
-        <div id="results-grid" class="results-grid">
-            <p>Loading...</p>
+        <div class="results-container">
+            <!-- Filter Sidebar -->
+            <aside class="filters-sidebar">
+                <div class="filters-header">
+                    <h3>Filters</h3>
+                    <button id="clear-filters-btn" class="clear-filters-btn">Clear All</button>
+                </div>
+
+                <!-- Vehicle Type Filter -->
+                <div class="filter-section">
+                    <h4>Vehicle Type</h4>
+                    <div class="filter-options">
+                        <label class="filter-option">
+                            <input type="checkbox" name="vehicleType" value="car">
+                            <span>🚗 Car</span>
+                        </label>
+                        <label class="filter-option">
+                            <input type="checkbox" name="vehicleType" value="motorbike">
+                            <span>🏍️ Motorbike</span>
+                        </label>
+                        <label class="filter-option">
+                            <input type="checkbox" name="vehicleType" value="bicycle">
+                            <span>🚲 Bicycle</span>
+                        </label>
+                        <label class="filter-option">
+                            <input type="checkbox" name="vehicleType" value="truck">
+                            <span>🚚 Truck / Large Vehicle</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Booking Type Filter -->
+                <div class="filter-section">
+                    <h4>Booking Type</h4>
+                    <div class="filter-options">
+                        <label class="filter-option">
+                            <input type="checkbox" name="bookingType" value="online">
+                            <span>🌐 Online Booking</span>
+                        </label>
+                        <label class="filter-option">
+                            <input type="checkbox" name="bookingType" value="call">
+                            <span>📞 Call Booking</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Payment Method Filter -->
+                <div class="filter-section">
+                    <h4>Payment Methods</h4>
+                    <div class="filter-options">
+                        <label class="filter-option">
+                            <input type="checkbox" name="paymentMethod" value="cash">
+                            <span>💵 Cash</span>
+                        </label>
+                        <label class="filter-option">
+                            <input type="checkbox" name="paymentMethod" value="paypal">
+                            <span>💳 PayPal</span>
+                        </label>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- Results Content -->
+            <div class="results-content">
+                <div class="results-header">
+                    <h2 data-i18n="results_title">Available Parking Spots</h2>
+                    <p data-i18n="results_desc">Choose the best spot for you and book in seconds.</p>
+                    <div id="results-count" class="results-count"></div>
+                </div>
+                <div id="results-grid" class="results-grid">
+                    <p>Loading...</p>
+                </div>
+            </div>
         </div>
         <div id="spots-container"></div>
     </main>
     <script src="/customer/js/custom-modal.js"></script>
-  <script src="/customer/js/config.js"></script>
+    <script src="/customer/js/config.js"></script>
     <script type="module" src="/customer/js/app.js"></script>
     <script type="module" src="/customer/js/results.js"></script>
 </body>

@@ -340,6 +340,25 @@ async function initializeBookingConfigPage(spotId, arrivalParam, leavingParam) {
                 configRatingStarsEl.textContent = starsHTML;
             }
 
+            // Trustpilot rating badge (bottom of page)
+            const trustpilotRatingValueEl = document.getElementById('trustpilot-rating-value');
+            const trustpilotRatingStarsEl = document.getElementById('trustpilot-rating-stars');
+            if (trustpilotRatingValueEl && trustpilotRatingStarsEl && currentSpotData.ggRating !== undefined) {
+                const rating = currentSpotData.ggRating || 0;
+                trustpilotRatingValueEl.textContent = rating > 0 ? rating.toFixed(1) : 'N/A';
+
+                // Generate star visualization
+                const fullStars = Math.floor(rating);
+                const hasHalfStar = (rating % 1) >= 0.5;
+                const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
+
+                let starsHTML = '★'.repeat(fullStars);
+                if (hasHalfStar) starsHTML += '⯨';
+                starsHTML += '☆'.repeat(emptyStars);
+
+                trustpilotRatingStarsEl.textContent = starsHTML;
+            }
+
             // Set dates from URL params or defaults
             if (arrivalParam && leavingParam) {
                 arrivalFlatpickr.setDate(new Date(arrivalParam), true);
