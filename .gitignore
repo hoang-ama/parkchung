@@ -21,4 +21,3 @@ Thumbs.db
 *.pem
 #Bypass thư mục Parkchung_Resource chứa các tài nguyên của Parkchung
 Parkchung_Resource/
-File Nginx.txt

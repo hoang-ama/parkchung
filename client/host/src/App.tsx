@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import HostRegisterPage from './pages/HostRegisterPage';
 import HostDashboardPage from './pages/HostDashboardPage';
 import HostCreateSpotPage from './pages/HostCreateSpotPage';
+import HostEditSpotPage from './pages/HostEditSpotPage';
 import HostLoginPage from './pages/HostLoginPage';
 import HostSpotsPage from './pages/HostSpotsPage';
 import HostBookingsPage from './pages/HostBookingsPage';
@@ -32,6 +33,7 @@ function App() {
                     <Route path="/host/dashboard" element={<HostDashboardPage />} />
                     <Route path="/host/spots" element={<HostSpotsPage />} />
                     <Route path="/host/spots/new" element={<HostCreateSpotPage />} />
+                    <Route path="/host/spots/:id/edit" element={<HostEditSpotPage />} />
                     <Route path="/host/bookings" element={<HostBookingsPage />} />
                     <Route path="/host/earnings" element={<HostEarningsPage />} />
                 </Route>

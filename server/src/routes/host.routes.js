@@ -7,6 +7,7 @@ const { protect, hostOnly } = require('../middlewares/auth.middleware');
 const {
     getHostMe,
     getMySpots,
+    getSpotById,
     createSpot,
     updateSpot,
     updateHostProfile
@@ -37,6 +38,7 @@ const upload = require('../middlewares/upload.middleware');
 // ============ Host Spots Routes ============
 router.get('/spots', getMySpots);
 router.post('/spots', upload.array('images', 5), createSpot);
+router.get('/spots/:id', getSpotById);
 router.put('/spots/:id', upload.array('images', 5), updateSpot);
 
 // ============ Host Bookings Routes ============

@@ -122,17 +122,19 @@ exports.createSpot = async (req, res) => {
             paymentMethods
         } = req.body;
 
-        // Process uploaded images
+        // Process uploaded images (Cloudinary URLs from multer-storage-cloudinary)
         let imageUrls = [];
         if (req.files && req.files.length > 0) {
-            imageUrls = req.files.map(file => `/uploads/spots/${file.filename}`);
+            // multer-storage-cloudinary provides full Cloudinary URL in file.path
+            imageUrls = req.files.map(file => file.path);
         } else if (req.body.images) {
-            // Handle case where images might be passed as strings (though less likely with FormData)
+            // Handle case where images might be passed as strings
             imageUrls = Array.isArray(req.body.images) ? req.body.images : [req.body.images];
         }
 
         if (imageUrls.length === 0) {
-            imageUrls = ["../../spots/default-parking.jpg"];
+            // Use Cloudinary placeholder or keep empty for frontend to handle
+            imageUrls = [];
         }
 
         // Validate required fields
@@ -229,6 +231,9 @@ exports.updateSpot = async (req, res) => {
             return res.status(403).json({ message: 'Not authorized to update this spot' });
         }
 
+        // Build update object first (fix: declare before using)
+        const updates = {};
+
         // Define allowed fields for update
         const allowedFields = [
             'name',
@@ -239,25 +244,38 @@ exports.updateSpot = async (req, res) => {
             'hasRoof',
             'vehicleTypes',
             'numberOfSlots',
-            'numberOfSlots',
-            'paymentMethods'
+            'paymentMethods',
+            'contactPhone',
+            'openTime',
+            'bookingTypes',
+            'addOnServices'
         ];
 
-        // Process new images if uploaded
-        if (req.files && req.files.length > 0) {
-            const newImageUrls = req.files.map(file => `/uploads/spots/${file.filename}`);
-            // You might want to append to existing images or replace them. 
-            // For now, let's assume we append if 'images' field is also sent, or replace.
-            // But simpler logic: if files uploaded, add them to updates.
-            updates.images = newImageUrls;
-            // Note: Real-world logic would be more complex (keeping old images vs replacing)
-        }
-
         // Build update object with only allowed fields
-        const updates = {};
         for (const field of allowedFields) {
             if (req.body[field] !== undefined) {
                 updates[field] = req.body[field];
+            }
+        }
+
+
+        // Process new images if uploaded (Cloudinary URLs from multer-storage-cloudinary)
+        if (req.files && req.files.length > 0) {
+            // multer-storage-cloudinary provides full Cloudinary URL in file.path
+            const newImageUrls = req.files.map(file => file.path);
+            // Replace images with new ones
+            updates.images = newImageUrls;
+        } else if (req.body.existingImages) {
+            // If existingImages are passed (as JSON string or array), keep them
+            try {
+                const existingImages = typeof req.body.existingImages === 'string'
+                    ? JSON.parse(req.body.existingImages)
+                    : req.body.existingImages;
+                if (Array.isArray(existingImages)) {
+                    updates.images = existingImages;
+                }
+            } catch (e) {
+                // Ignore parse errors
             }
         }
 
@@ -295,6 +313,34 @@ exports.updateSpot = async (req, res) => {
 
     } catch (error) {
         console.error('Update spot error:', error);
+        res.status(500).json({ message: 'Server error', error: error.message });
+    }
+};
+
+/**
+ * @desc    Get a single parking spot by ID (for host editing)
+ * @route   GET /api/host/spots/:id
+ * @access  Private (Host only)
+ */
+exports.getSpotById = async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        const spot = await ParkingSpot.findById(id);
+
+        if (!spot) {
+            return res.status(404).json({ message: 'Parking spot not found' });
+        }
+
+        // Verify ownership
+        if (spot.owner.toString() !== req.user._id.toString()) {
+            return res.status(403).json({ message: 'Not authorized to view this spot' });
+        }
+
+        res.json(spot);
+
+    } catch (error) {
+        console.error('Get spot by ID error:', error);
         res.status(500).json({ message: 'Server error', error: error.message });
     }
 };

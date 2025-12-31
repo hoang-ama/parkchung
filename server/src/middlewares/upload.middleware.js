@@ -1,23 +1,30 @@
 // File: server/src/middlewares/upload.middleware.js
 const multer = require('multer');
-const path = require('path');
-const fs = require('fs');
+const cloudinary = require('cloudinary').v2;
+const { CloudinaryStorage } = require('multer-storage-cloudinary');
+const config = require('../config');
 
-// Ensure uploads directory exists
-const uploadDir = path.join(__dirname, '../../public/uploads/spots');
-if (!fs.existsSync(uploadDir)) {
-    fs.mkdirSync(uploadDir, { recursive: true });
-}
+// Configure Cloudinary
+cloudinary.config({
+    cloud_name: config.cloudinaryCloudName,
+    api_key: config.cloudinaryApiKey,
+    api_secret: config.cloudinaryApiSecret,
+});
 
-// Configure storage
-const storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-        cb(null, uploadDir);
+// Configure Cloudinary Storage for Multer
+const storage = new CloudinaryStorage({
+    cloudinary: cloudinary,
+    params: {
+        folder: 'parkchung/spots', // Cloudinary folder path
+        allowed_formats: ['jpg', 'jpeg', 'png', 'gif', 'webp'],
+        transformation: [{ width: 1200, height: 800, crop: 'limit' }], // Resize large images
+        public_id: (req, file) => {
+            // Generate unique filename
+            const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+            const nameWithoutExt = file.originalname.replace(/\.[^/.]+$/, '');
+            return `spot-${uniqueSuffix}-${nameWithoutExt}`;
+        }
     },
-    filename: function (req, file, cb) {
-        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-        cb(null, 'spot-' + uniqueSuffix + path.extname(file.originalname));
-    }
 });
 
 // File filter
@@ -32,7 +39,7 @@ const fileFilter = (req, file, cb) => {
 const upload = multer({
     storage: storage,
     limits: {
-        fileSize: 5 * 1024 * 1024 // 5MB limit
+        fileSize: 10 * 1024 * 1024 // 10MB limit for Cloudinary
     },
     fileFilter: fileFilter
 });

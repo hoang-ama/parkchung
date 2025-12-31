@@ -312,11 +312,23 @@ async function initializeSpotBookingPage(spotId) {
     // --- NAVIGATE TO BOOKING CONFIG PAGE ---
 
     reserveNowBtn.addEventListener('click', async () => {
-        // Navigate to booking configuration page with ONLY spot ID
-        // Dates will be selected there
+        // Navigate to booking configuration page with spot ID and time parameters
+        // Read the arrival/leaving times from URL params (passed from results page)
+        const urlParams = new URLSearchParams(window.location.search);
+        const arrivalParam = urlParams.get('arrival');
+        const leavingParam = urlParams.get('leaving');
+
         const params = new URLSearchParams({
             id: spotId
         });
+
+        // Pass along the arrival and leaving times if they exist
+        if (arrivalParam) {
+            params.set('arrival', arrivalParam);
+        }
+        if (leavingParam) {
+            params.set('leaving', leavingParam);
+        }
 
         window.location.href = `booking-config.html?${params.toString()}`;
     });

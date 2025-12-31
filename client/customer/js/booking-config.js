@@ -115,7 +115,8 @@ async function initializeBookingConfigPage(spotId, arrivalParam, leavingParam) {
 
         summaryUnitPrice.textContent = `${currentSpotData.hourlyRate.toLocaleString('vi-VN')} VND / hour`;
         summaryDuration.textContent = `${totalHours} hour${totalHours > 1 ? 's' : ''}`;
-        bookingDuration.textContent = calculateDuration(startTime, endTime);
+        // Use the same billable hours on the left side for consistency
+        bookingDuration.textContent = `${totalHours} hour${totalHours > 1 ? 's' : ''}`;
 
         try {
             const response = await fetch(`${API_URL}/bookings/estimate-price`, {
@@ -317,8 +318,28 @@ async function initializeBookingConfigPage(spotId, arrivalParam, leavingParam) {
             spotAddressDisplay.textContent = currentSpotData.address;
             if (spotNameDisplay) spotNameDisplay.textContent = currentSpotData.name || currentSpotData.address;
             if (spotAddressTextDisplay) spotAddressTextDisplay.textContent = currentSpotData.address;
-            if (spotThumbnail && currentSpotData.images && currentSpotData.images.length > 0) {
-                spotThumbnail.src = currentSpotData.images[0];
+
+            // Handle spot thumbnail image
+            if (spotThumbnail) {
+                let imageUrl = '/assets/image/parking-area.jpg'; // Default fallback
+
+                if (currentSpotData.images && currentSpotData.images.length > 0) {
+                    const firstImage = currentSpotData.images[0];
+                    // Check if it's a full URL (Cloudinary) or a local path
+                    if (firstImage.startsWith('http')) {
+                        imageUrl = firstImage;
+                    } else {
+                        // Local path - prepend API base URL
+                        imageUrl = API_URL.replace('/api', '') + firstImage;
+                    }
+                }
+
+                spotThumbnail.src = imageUrl;
+
+                // Add error handler to show fallback if image fails to load
+                spotThumbnail.onerror = function () {
+                    this.src = '/assets/image/parking-area.jpg';
+                };
             }
 
             // Rating (dynamic from API data)

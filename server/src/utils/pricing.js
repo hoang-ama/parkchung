@@ -1,5 +1,6 @@
 /**
  * Calculate booking price based on duration and hourly rate.
+ * Rounds UP to the nearest hour (minimum 1 hour charge).
  * @param {Date} startTime
  * @param {Date} endTime
  * @param {number} hourlyRate
@@ -9,14 +10,13 @@ const calculatePrice = (startTime, endTime, hourlyRate) => {
     const durationMs = endTime.getTime() - startTime.getTime();
     if (durationMs <= 0) return 0;
 
-    const durationHours = durationMs / (1000 * 60 * 60);
-    let totalPrice = durationHours * hourlyRate;
+    // Round UP to the nearest hour (minimum 1 hour)
+    const durationHours = Math.ceil(durationMs / (1000 * 60 * 60));
+    const totalPrice = durationHours * hourlyRate;
 
-    const transactionFee = 0.99;
-    totalPrice += transactionFee;
-
-    return parseFloat(totalPrice.toFixed(2));
+    return totalPrice;
 };
+
 
 module.exports = { calculatePrice };
 

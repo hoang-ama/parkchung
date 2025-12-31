@@ -9,6 +9,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     const bookingListContainer = document.querySelector('.booking-list');
     const token = localStorage.getItem('userToken');
 
+    // Set Host Portal link from config
+    const hostLink = document.getElementById('host-link');
+    if (hostLink && window.HOST_URL) {
+        hostLink.href = window.HOST_URL + '/login';
+    }
+
     if (!token) {
         alert('Please login to view your bookings');
         window.location.href = 'login.html';

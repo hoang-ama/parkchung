@@ -109,6 +109,7 @@ exports.updateSpotImage = async (req, res) => {
             return res.status(404).json({ message: 'Spot not found' });
         }
 
+        // multer-storage-cloudinary provides full Cloudinary URL in file.path
         spot.images = [req.file.path];
         const updatedSpot = await spot.save();
         res.json(updatedSpot);

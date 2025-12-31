@@ -187,9 +187,7 @@ export default function HostSpotsPage() {
     };
 
     const handleEdit = (id: string) => {
-        // Navigate to edit page (to be implemented)
-        // navigate(`/host/spots/${id}/edit`);
-        alert(`Edit feature coming soon! (Spot ID: ${id})`);
+        navigate(`/host/spots/${id}/edit`);
     };
 
     return (
