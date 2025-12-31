@@ -364,10 +364,16 @@
                 <span class="logo-slogan">Seamless Smart Parking, Safe & Easy</span>
             </div>
             <nav class="nav-menu">
-                <a href="#" class="nav-item" id="host-link">Host</a>
-                <a href="#" class="nav-item active">My Bookings</a>
+                <a href="#" class="nav-item" id="host-link" data-i18n="becomeHost">Host</a>
+                <a href="#" class="nav-item active" data-i18n="my_bookings">My Bookings</a>
                 <a href="index.html" class="nav-item" id="user-welcome">Welcome</a>
-                <a href="login.html" class="nav-item" id="logout-link">Logout</a>
+                <a href="login.html" class="nav-item" id="logout-link" data-i18n="logout">Logout</a>
+                <span style="margin: 0 10px; color: #ccc;">|</span>
+                <button id="lang-en" class="lang-btn"
+                    style="background:none;border:none;cursor:pointer;font-weight:500;padding:5px 8px;">EN</button>
+                <span style="color:#aaa;">/</span>
+                <button id="lang-vi" class="lang-btn"
+                    style="background:none;border:none;cursor:pointer;font-weight:500;padding:5px 8px;">VI</button>
             </nav>
         </div>
     </header>
@@ -375,9 +381,9 @@
     <!-- Page Title Section -->
     <div class="page-title-section">
         <div class="container page-title-content">
-            <h1 class="page-title">My Bookings</h1>
+            <h1 class="page-title" data-i18n="my_bookings">My Bookings</h1>
             <a href="index.html" class="back-link">
-                <span>&#8592;</span> Back to Home
+                <span>&#8592;</span> <span data-i18n="back_home">Back to Home</span>
             </a>
         </div>
     </div>

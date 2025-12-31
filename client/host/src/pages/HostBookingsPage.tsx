@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
+import { useTranslations } from '../i18n';
 
 // ============ Types ============
 interface Booking {
@@ -78,6 +79,7 @@ async function cancelBooking(bookingId: string, reason: string): Promise<void> {
 // ============ Components ============
 
 function StatusBadge({ status }: { status: string }) {
+    const t = useTranslations();
     const styles: Record<string, string> = {
         pending: 'bg-yellow-100 text-yellow-800',
         confirmed: 'bg-blue-100 text-blue-800',
@@ -85,16 +87,22 @@ function StatusBadge({ status }: { status: string }) {
         cancelled: 'bg-red-100 text-red-800',
     };
 
-    const label = status.charAt(0).toUpperCase() + status.slice(1);
+    const labels: Record<string, string> = {
+        pending: t.pending,
+        confirmed: t.confirmed,
+        completed: t.completed,
+        cancelled: t.cancelled,
+    };
 
     return (
         <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium ${styles[status] || 'bg-gray-100 text-gray-800'}`}>
-            {label}
+            {labels[status] || status}
         </span>
     );
 }
 
 function PaymentBadge({ status }: { status: string }) {
+    const t = useTranslations();
     const styles: Record<string, string> = {
         paid: 'text-green-600 bg-green-50 border-green-200',
         pending: 'text-yellow-600 bg-yellow-50 border-yellow-200',
@@ -102,15 +110,23 @@ function PaymentBadge({ status }: { status: string }) {
         refunded: 'text-gray-600 bg-gray-50 border-gray-200',
     };
 
+    const labels: Record<string, string> = {
+        paid: t.paid,
+        pending: t.pending,
+        failed: t.paymentFailed,
+        refunded: t.refunded,
+    };
+
     return (
         <span className={`px-2 py-0.5 rounded text-xs border ${styles[status] || 'text-gray-600 border-gray-200'}`}>
-            {status.toUpperCase()}
+            {labels[status]?.toUpperCase() || status.toUpperCase()}
         </span>
     );
 }
 
 // ============ Main Page ============
 export default function HostBookingsPage() {
+    const t = useTranslations();
     const [searchParams, setSearchParams] = useSearchParams();
 
     // Data State
@@ -216,8 +232,8 @@ export default function HostBookingsPage() {
     return (
         <div className="min-h-screen bg-gray-50 p-4 lg:p-8">
             <div className="mb-8">
-                <h1 className="text-2xl font-bold text-gray-900">All Bookings</h1>
-                <p className="text-gray-500 mt-1">View and manage all your parking reservations</p>
+                <h1 className="text-2xl font-bold text-gray-900">{t.bookingsTitle}</h1>
+                <p className="text-gray-500 mt-1">{t.bookingsTitle}</p>
             </div>
 
             {/* Filters Card */}
@@ -225,29 +241,29 @@ export default function HostBookingsPage() {
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                     {/* Status Filter */}
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">{t.status}</label>
                         <select
                             value={statusFilter}
                             onChange={(e) => setStatusFilter(e.target.value)}
                             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-emerald-500 focus:border-emerald-500"
                         >
-                            <option value="">All Statuses</option>
-                            <option value="pending">Pending</option>
-                            <option value="confirmed">Confirmed</option>
-                            <option value="completed">Completed</option>
-                            <option value="cancelled">Cancelled</option>
+                            <option value="">{t.allStatuses}</option>
+                            <option value="pending">{t.pending}</option>
+                            <option value="confirmed">{t.confirmed}</option>
+                            <option value="completed">{t.completed}</option>
+                            <option value="cancelled">{t.cancelled}</option>
                         </select>
                     </div>
 
                     {/* Spot Filter */}
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Parking Spot</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">{t.spot}</label>
                         <select
                             value={spotFilter}
                             onChange={(e) => setSpotFilter(e.target.value)}
                             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-emerald-500 focus:border-emerald-500"
                         >
-                            <option value="">All Spots</option>
+                            <option value="">{t.allSpots}</option>
                             {spots.map(spot => (
                                 <option key={spot._id} value={spot._id}>{spot.name}</option>
                             ))}
@@ -256,7 +272,7 @@ export default function HostBookingsPage() {
 
                     {/* Date Range */}
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">From Date</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">{t.dateTime}</label>
                         <input
                             type="date"
                             value={dateFrom}
@@ -265,7 +281,7 @@ export default function HostBookingsPage() {
                         />
                     </div>
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">To Date</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">{t.dateTime}</label>
                         <input
                             type="date"
                             value={dateTo}
@@ -280,13 +296,13 @@ export default function HostBookingsPage() {
                         onClick={clearFilters}
                         className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
                     >
-                        Clear Filters
+                        {t.clearFilters}
                     </button>
                     <button
                         onClick={applyFilters}
                         className="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors"
                     >
-                        Apply Filters
+                        {t.applyFilters}
                     </button>
                 </div>
             </div>
@@ -294,26 +310,26 @@ export default function HostBookingsPage() {
             {/* Bookings Table */}
             <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
                 {isLoading ? (
-                    <div className="p-8 text-center text-gray-500">Loading bookings...</div>
+                    <div className="p-8 text-center text-gray-500">{t.loadingBookings}</div>
                 ) : error ? (
                     <div className="p-8 text-center text-red-500">{error}</div>
                 ) : bookings.length === 0 ? (
                     <div className="p-12 text-center">
                         <div className="text-4xl mb-3">📅</div>
-                        <h3 className="text-lg font-medium text-gray-900">No bookings found</h3>
-                        <p className="text-gray-500">Try adjusting your filters or wait for new reservations.</p>
+                        <h3 className="text-lg font-medium text-gray-900">{t.noBookingsFound}</h3>
+                        <p className="text-gray-500">{t.noBookingsFound}</p>
                     </div>
                 ) : (
                     <div className="overflow-x-auto">
                         <table className="w-full text-left">
                             <thead className="bg-gray-50 border-b border-gray-200">
                                 <tr>
-                                    <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Booking Info</th>
-                                    <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Customer</th>
-                                    <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Time & Date</th>
-                                    <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Price</th>
-                                    <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Status</th>
-                                    <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Actions</th>
+                                    <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">{t.spot}</th>
+                                    <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">{t.customer}</th>
+                                    <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">{t.dateTime}</th>
+                                    <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">{t.amount}</th>
+                                    <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">{t.status}</th>
+                                    <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">{t.actions}</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-gray-200">
@@ -352,7 +368,7 @@ export default function HostBookingsPage() {
                                                     onClick={() => openCancelModal(booking.id)}
                                                     className="text-red-600 hover:text-red-800 text-sm font-medium hover:underline"
                                                 >
-                                                    Cancel
+                                                    {t.cancel}
                                                 </button>
                                             )}
                                         </td>
@@ -367,7 +383,7 @@ export default function HostBookingsPage() {
                 {!isLoading && bookings.length > 0 && (
                     <div className="px-6 py-4 border-t border-gray-200 flex items-center justify-between">
                         <div className="text-sm text-gray-500">
-                            Showing page <span className="font-medium">{pagination.page}</span> of <span className="font-medium">{pagination.totalPages}</span>
+                            {t.showing} {t.page} <span className="font-medium">{pagination.page}</span> {t.of} <span className="font-medium">{pagination.totalPages}</span>
                         </div>
                         <div className="flex gap-2">
                             <button
@@ -375,14 +391,14 @@ export default function HostBookingsPage() {
                                 disabled={pagination.page <= 1}
                                 className="px-3 py-1 border border-gray-300 rounded hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
                             >
-                                Previous
+                                {t.previous}
                             </button>
                             <button
                                 onClick={() => handlePageChange(pagination.page + 1)}
                                 disabled={pagination.page >= pagination.totalPages}
                                 className="px-3 py-1 border border-gray-300 rounded hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
                             >
-                                Next
+                                {t.next}
                             </button>
                         </div>
                     </div>
@@ -393,21 +409,21 @@ export default function HostBookingsPage() {
             {isCancelModalOpen && (
                 <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
                     <div className="bg-white rounded-xl max-w-md w-full p-6">
-                        <h3 className="text-lg font-bold text-gray-900 mb-2">Cancel Booking</h3>
+                        <h3 className="text-lg font-bold text-gray-900 mb-2">{t.cancelBooking}</h3>
                         <p className="text-gray-600 mb-4">
-                            Are you sure you want to cancel this booking? This action cannot be undone.
+                            {t.confirmCancellation}
                         </p>
 
                         <div className="mb-4">
                             <label className="block text-sm font-medium text-gray-700 mb-1">
-                                Reason for cancellation <span className="text-red-500">*</span>
+                                {t.cancelReason} <span className="text-red-500">*</span>
                             </label>
                             <textarea
                                 value={cancelReason}
                                 onChange={(e) => setCancelReason(e.target.value)}
                                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-red-500 focus:border-red-500"
                                 rows={3}
-                                placeholder="e.g. Parking spot unavailable due to maintenance"
+                                placeholder={t.cancelReason}
                             />
                         </div>
 
@@ -416,14 +432,14 @@ export default function HostBookingsPage() {
                                 onClick={() => setIsCancelModalOpen(false)}
                                 className="px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg"
                             >
-                                Keep Booking
+                                {t.cancel}
                             </button>
                             <button
                                 onClick={handleCancelBooking}
                                 disabled={!cancelReason.trim() || isCancelling}
                                 className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
                             >
-                                {isCancelling ? 'Cancelling...' : 'Confirm Cancellation'}
+                                {isCancelling ? t.cancelling : t.confirmCancellation}
                             </button>
                         </div>
                     </div>

@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useTranslations } from '../i18n';
 
 // ============ Types ============
 interface OverviewStats {
@@ -194,6 +195,7 @@ function TableRowSkeleton() {
 
 // ============ Main Dashboard Component ============
 export default function HostDashboardPage() {
+    const t = useTranslations();
     const [overview, setOverview] = useState<OverviewStats | null>(null);
     const [bookings, setBookings] = useState<HostBooking[]>([]);
     const [isLoading, setIsLoading] = useState(true);
@@ -231,10 +233,10 @@ export default function HostDashboardPage() {
         <div className="p-4 lg:p-8">
             <div className="mb-8">
                 <h1 className="text-2xl font-bold text-gray-800">
-                    Welcome back, <span className="text-emerald-600">Host Partner</span>
+                    {t.welcomeHost}, <span className="text-emerald-600">Host Partner</span>
                 </h1>
                 <p className="text-gray-500 mt-1">
-                    Here's what's happening with your parking spots today.
+                    {t.dashboardTitle}
                 </p>
             </div>
 
@@ -265,26 +267,27 @@ export default function HostDashboardPage() {
                         <>
                             <StatCard
                                 icon="💰"
-                                label="Revenue this month"
+                                label={t.totalEarnings}
                                 value={formatCurrency(overview.totalRevenueMonth)}
+                                subtext={t.thisMonth}
                             />
                             <StatCard
                                 icon="📅"
-                                label="Bookings this month"
+                                label={t.activeBookings}
                                 value={overview.totalBookingsMonth}
-                                subtext="Total confirmed bookings"
+                                subtext={t.confirmed}
                             />
                             <StatCard
                                 icon="📈"
-                                label="Occupancy rate"
+                                label={t.occupancyRate}
                                 value={`${Math.round(overview.occupancyRate * 100)}%`}
-                                subtext="Average across all spots"
+                                subtext={t.thisMonth}
                             />
                             <StatCard
                                 icon="🅿️"
-                                label="Active spots"
+                                label={t.totalSpots}
                                 value={overview.spotsCount}
-                                subtext="Approved and visible"
+                                subtext={t.statusApproved}
                             />
                         </>
                     ) : null}
@@ -293,8 +296,8 @@ export default function HostDashboardPage() {
                 {/* Recent Bookings Table */}
                 <div className="bg-white rounded-xl shadow-sm border border-gray-100">
                     <div className="px-6 py-4 border-b border-gray-100">
-                        <h2 className="text-lg font-semibold text-gray-800">Recent Bookings</h2>
-                        <p className="text-sm text-gray-500">Latest booking activity across your parking spots</p>
+                        <h2 className="text-lg font-semibold text-gray-800">{t.recentBookings}</h2>
+                        <p className="text-sm text-gray-500">{t.recentActivity}</p>
                     </div>
 
                     <div className="overflow-x-auto">
@@ -302,19 +305,19 @@ export default function HostDashboardPage() {
                             <thead>
                                 <tr className="bg-gray-50">
                                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Spot
+                                        {t.spot}
                                     </th>
                                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Customer
+                                        {t.customer}
                                     </th>
                                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Time
+                                        {t.dateTime}
                                     </th>
                                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Total
+                                        {t.amount}
                                     </th>
                                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Status
+                                        {t.status}
                                     </th>
                                 </tr>
                             </thead>
@@ -332,8 +335,8 @@ export default function HostDashboardPage() {
                                         <td colSpan={5} className="px-6 py-12 text-center text-gray-500">
                                             <div className="flex flex-col items-center">
                                                 <span className="text-4xl mb-2">📭</span>
-                                                <p>No bookings yet</p>
-                                                <p className="text-sm text-gray-400">Your recent bookings will appear here</p>
+                                                <p>{t.noBookingsYet}</p>
+                                                <p className="text-sm text-gray-400">{t.recentActivity}</p>
                                             </div>
                                         </td>
                                     </tr>
@@ -367,7 +370,11 @@ export default function HostDashboardPage() {
                                             </td>
                                             <td className="px-6 py-4">
                                                 <span className={getStatusBadgeClasses(booking.status)}>
-                                                    {booking.status.charAt(0).toUpperCase() + booking.status.slice(1)}
+                                                    {booking.status === 'confirmed' ? t.confirmed :
+                                                        booking.status === 'pending' ? t.pending :
+                                                            booking.status === 'cancelled' ? t.cancelled :
+                                                                booking.status === 'completed' ? t.completed :
+                                                                    booking.status}
                                                 </span>
                                             </td>
                                         </tr>
@@ -381,7 +388,7 @@ export default function HostDashboardPage() {
                     {bookings.length > 0 && (
                         <div className="px-6 py-4 border-t border-gray-100">
                             <button className="text-sm text-emerald-600 hover:text-emerald-700 font-medium">
-                                <a href="/host/bookings">View all bookings →</a>
+                                <a href="/host/bookings">{t.viewAll} →</a>
                             </button>
                         </div>
                     )}

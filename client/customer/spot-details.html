@@ -72,7 +72,7 @@
                         <span class="rating-value" id="spot-rating-value">0</span>
                     </div>
                 </div>
-                <div class="rating-source">By GoogleRating</div>
+                <div class="rating-source" data-i18n="by_google_rating">By GoogleRating</div>
                 <p id="spot-address-full" class="spot-address"><span class="icon">📍</span> Loading address...</p>
             </div>
         </section>
@@ -81,45 +81,46 @@
         <section class="spot-info-grid">
             <!-- Description -->
             <div class="info-card spot-description-card">
-                <h3 class="section-title">📝 Description</h3>
-                <p id="spot-description" class="description-text">No description available.</p>
+                <h3 class="section-title">📝 <span data-i18n="spot_description">Description</span></h3>
+                <p id="spot-description" class="description-text" data-i18n="no_description">No description available
+                    for this parking spot.</p>
             </div>
 
             <!-- Location Map -->
             <div class="info-card spot-location-card">
-                <h3 class="section-title">📍 Location</h3>
+                <h3 class="section-title">📍 <span data-i18n="spot_location">Location</span></h3>
                 <div id="spot-map-container" class="map-container">
                     <iframe id="spot-map-iframe" src="" width="100%" height="200" style="border:0; border-radius: 12px;"
                         allowfullscreen="" loading="lazy">
                     </iframe>
                 </div>
                 <a id="spot-map-link" href="#" target="_blank" class="map-link">
-                    🗺️ View on Google Maps
+                    🗺️ <span data-i18n="view_on_maps">View on Google Maps</span>
                 </a>
             </div>
 
             <!-- Pricing & Capacity -->
             <div class="info-card spot-pricing-card">
-                <h3 class="section-title">💰 Pricing & Capacity</h3>
+                <h3 class="section-title">💰 <span data-i18n="pricing_capacity">Pricing & Capacity</span></h3>
                 <div class="pricing-grid">
                     <div class="pricing-item">
                         <span class="pricing-icon">⏱️</span>
                         <div class="pricing-info">
-                            <span class="pricing-label">Hourly Rate</span>
+                            <span class="pricing-label" data-i18n="hourly_rate_label">Hourly Rate</span>
                             <span id="spot-hourly-rate" class="pricing-value">-- VND/hour</span>
                         </div>
                     </div>
                     <div class="pricing-item">
                         <span class="pricing-icon">📅</span>
                         <div class="pricing-info">
-                            <span class="pricing-label">Monthly Rate</span>
+                            <span class="pricing-label" data-i18n="monthly_rate_label">Monthly Rate</span>
                             <span id="spot-monthly-rate" class="pricing-value">-- VND/month</span>
                         </div>
                     </div>
                     <div class="pricing-item">
                         <span class="pricing-icon">🅿️</span>
                         <div class="pricing-info">
-                            <span class="pricing-label">Available Slots</span>
+                            <span class="pricing-label" data-i18n="available_slots">Available Slots</span>
                             <span id="spot-slots" class="pricing-value">-- slots</span>
                         </div>
                     </div>
@@ -128,7 +129,7 @@
 
             <!-- Vehicle Types -->
             <div class="info-card spot-vehicles-card">
-                <h3 class="section-title">🚗 Vehicle Types Accepted</h3>
+                <h3 class="section-title">🚗 <span data-i18n="vehicle_types_accepted">Vehicle Types Accepted</span></h3>
                 <div id="vehicle-types-container" class="vehicle-types-grid">
                     <!-- Populated by JS -->
                 </div>
@@ -136,7 +137,8 @@
 
             <!-- Payment Methods -->
             <div class="info-card spot-payments-card">
-                <h3 class="section-title">💳 Accepted Payment Methods</h3>
+                <h3 class="section-title">💳 <span data-i18n="accepted_payment_methods">Accepted Payment Methods</span>
+                </h3>
                 <div id="payment-methods-container" class="payment-methods-grid">
                     <!-- Populated by JS -->
                 </div>
@@ -144,7 +146,7 @@
 
             <!-- Services -->
             <div class="info-card spot-services-card">
-                <h3 class="section-title">Services</h3>
+                <h3 class="section-title" data-i18n="services_title">Services</h3>
                 <div id="spot-services-container" class="services-grid">
                     <!-- Populated by JS -->
                 </div>

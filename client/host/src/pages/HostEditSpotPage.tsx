@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { useTranslations } from '../i18n';
 
 // ============ Types ============
 interface SpotFormValues {
@@ -156,9 +157,34 @@ function validateForm(values: SpotFormValues): FormErrors {
 
 // ============ Component ============
 export default function HostEditSpotPage() {
+    const t = useTranslations();
     const navigate = useNavigate();
     const { id } = useParams<{ id: string }>();
     const fileInputRef = useRef<HTMLInputElement>(null);
+
+    // Define options with translations
+    const VEHICLE_TYPE_OPTIONS = [
+        { value: 'car', label: t.car },
+        { value: 'motorbike', label: t.motorbike },
+        { value: 'bicycle', label: t.bicycle },
+        { value: 'truck', label: t.truck },
+    ];
+
+    const PAYMENT_METHOD_OPTIONS = [
+        { value: 'cash', label: t.cash, icon: '💵' },
+        { value: 'paypal', label: t.paypal, icon: '💳' },
+    ];
+
+    const BOOKING_TYPE_OPTIONS = [
+        { value: 'online', label: t.onlineBooking, icon: '🌐' },
+        { value: 'call', label: t.callBooking, icon: '📞' },
+    ];
+
+    const ADDON_SERVICE_OPTIONS = [
+        { value: 'valet', label: t.valetParking, icon: '🚗' },
+        { value: 'carwash', label: t.carWashing, icon: '🧼' },
+        { value: 'ev_charging', label: t.evCharging, icon: '⚡' },
+    ];
 
     const [isLoadingSpot, setIsLoadingSpot] = useState(true);
     const [loadError, setLoadError] = useState<string | null>(null);
@@ -352,18 +378,19 @@ export default function HostEditSpotPage() {
 
     return (
         <div className="min-h-screen bg-gray-50 py-8 px-4">
-            <div className="max-w-3xl mx-auto">
+            <div className="max-w-3xl mx-auto p-4 lg:p-8">
                 {/* Header */}
-                <div className="mb-8 flex items-center justify-between">
+                <div className="mb-6 flex items-center justify-between">
                     <div>
-                        <h1 className="text-2xl font-bold text-gray-800">Edit Parking Spot</h1>
-                        <p className="text-gray-600 mt-1">Update the details for your parking spot.</p>
+                        <h1 className="text-2xl font-bold text-gray-800">{t.editSpotTitle}</h1>
+                        <p className="text-gray-500 mt-1">{t.editSpotTitle}</p>
                     </div>
                     <button
+                        type="button"
                         onClick={() => navigate('/host/spots')}
-                        className="text-gray-600 hover:text-gray-800 flex items-center gap-1"
+                        className="px-4 py-2 text-sm text-gray-600 hover:text-gray-800 font-medium"
                     >
-                        ← Back
+                        ← {t.back}
                     </button>
                 </div>
 
@@ -383,13 +410,13 @@ export default function HostEditSpotPage() {
                 <form onSubmit={handleSubmit} className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
                     {/* Basic Info Section */}
                     <div className="p-6 border-b border-gray-100">
-                        <h2 className="text-lg font-semibold text-gray-800 mb-4">Basic Information</h2>
+                        <h2 className="text-lg font-semibold text-gray-800 mb-4">{t.basicInfo}</h2>
 
                         <div className="space-y-4">
                             {/* Name */}
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                                    Spot Name <span className="text-red-500">*</span>
+                                    {t.spotName} <span className="text-red-500">*</span>
                                 </label>
                                 <input
                                     type="text"
@@ -405,7 +432,7 @@ export default function HostEditSpotPage() {
                             {/* Address */}
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                                    Address <span className="text-red-500">*</span>
+                                    {t.address} <span className="text-red-500">*</span>
                                 </label>
                                 <input
                                     type="text"
@@ -421,7 +448,7 @@ export default function HostEditSpotPage() {
                             {/* Phone */}
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                                    Contact Phone <span className="text-red-500">*</span>
+                                    {t.contactPhone} <span className="text-red-500">*</span>
                                 </label>
                                 <input
                                     type="tel"
@@ -436,7 +463,7 @@ export default function HostEditSpotPage() {
 
                             {/* Description */}
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">{t.description}</label>
                                 <textarea
                                     name="description"
                                     value={formValues.description}
@@ -450,12 +477,12 @@ export default function HostEditSpotPage() {
 
                     {/* Images Section */}
                     <div className="p-6 border-b border-gray-100">
-                        <h2 className="text-lg font-semibold text-gray-800 mb-4">Images</h2>
+                        <h2 className="text-lg font-semibold text-gray-800 mb-4">{t.images}</h2>
 
                         {/* Existing Images */}
                         {existingImages.length > 0 && (
                             <div className="mb-4">
-                                <p className="text-sm text-gray-600 mb-2">Current images:</p>
+                                <p className="text-sm text-gray-600 mb-2">{t.images}:</p>
                                 <div className="flex flex-wrap gap-2">
                                     {existingImages.map((img, i) => (
                                         <div key={i} className="relative w-20 h-20 rounded-lg overflow-hidden border">
@@ -496,10 +523,10 @@ export default function HostEditSpotPage() {
 
                     {/* Location Section */}
                     <div className="p-6 border-b border-gray-100">
-                        <h2 className="text-lg font-semibold text-gray-800 mb-4">Location</h2>
+                        <h2 className="text-lg font-semibold text-gray-800 mb-4">{t.location}</h2>
                         <div className="grid grid-cols-2 gap-4">
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Latitude *</label>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">{t.latitude} *</label>
                                 <input
                                     type="number"
                                     name="latitude"
@@ -512,7 +539,7 @@ export default function HostEditSpotPage() {
                                 {getFieldError('latitude') && <p className="mt-1 text-xs text-red-500">{getFieldError('latitude')}</p>}
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Longitude *</label>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">{t.longitude} *</label>
                                 <input
                                     type="number"
                                     name="longitude"
@@ -529,10 +556,10 @@ export default function HostEditSpotPage() {
 
                     {/* Pricing Section */}
                     <div className="p-6 border-b border-gray-100">
-                        <h2 className="text-lg font-semibold text-gray-800 mb-4">Pricing & Capacity</h2>
+                        <h2 className="text-lg font-semibold text-gray-800 mb-4">{t.pricingCapacity}</h2>
                         <div className="grid grid-cols-3 gap-4">
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Hourly Rate (VND) *</label>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">{t.hourlyRate} (VND) *</label>
                                 <input
                                     type="number"
                                     name="hourlyRate"
@@ -544,7 +571,7 @@ export default function HostEditSpotPage() {
                                 {getFieldError('hourlyRate') && <p className="mt-1 text-xs text-red-500">{getFieldError('hourlyRate')}</p>}
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Monthly Rate (VND)</label>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">{t.monthlyRate} (VND)</label>
                                 <input
                                     type="number"
                                     name="monthlyRate"
@@ -554,7 +581,7 @@ export default function HostEditSpotPage() {
                                 />
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Slots *</label>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">{t.numberOfSlots} *</label>
                                 <input
                                     type="number"
                                     name="numberOfSlots"
@@ -570,7 +597,7 @@ export default function HostEditSpotPage() {
 
                         {/* Open Time */}
                         <div className="mt-4">
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Operating Hours</label>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">{t.operatingHours}</label>
                             <input
                                 type="text"
                                 name="openTime"
@@ -591,14 +618,14 @@ export default function HostEditSpotPage() {
                                     onChange={handleChange}
                                     className="w-4 h-4 text-emerald-600 rounded"
                                 />
-                                <span className="text-sm text-gray-700">This spot has a roof (covered parking)</span>
+                                <span className="text-sm text-gray-700">{t.hasRoof}</span>
                             </label>
                         </div>
                     </div>
 
                     {/* Vehicle Types */}
                     <div className="p-6 border-b border-gray-100">
-                        <h2 className="text-lg font-semibold text-gray-800 mb-4">Vehicle Types *</h2>
+                        <h2 className="text-lg font-semibold text-gray-800 mb-4">{t.vehicleTypes} *</h2>
                         <div className="flex flex-wrap gap-3">
                             {VEHICLE_TYPE_OPTIONS.map((opt) => (
                                 <label
@@ -620,7 +647,7 @@ export default function HostEditSpotPage() {
 
                     {/* Booking Types */}
                     <div className="p-6 border-b border-gray-100">
-                        <h2 className="text-lg font-semibold text-gray-800 mb-4">Booking Methods *</h2>
+                        <h2 className="text-lg font-semibold text-gray-800 mb-4">{t.bookingMethods} *</h2>
                         <div className="flex flex-wrap gap-3">
                             {BOOKING_TYPE_OPTIONS.map((opt) => (
                                 <label
@@ -642,7 +669,7 @@ export default function HostEditSpotPage() {
 
                     {/* Payment Methods */}
                     <div className="p-6 border-b border-gray-100">
-                        <h2 className="text-lg font-semibold text-gray-800 mb-4">Payment Methods *</h2>
+                        <h2 className="text-lg font-semibold text-gray-800 mb-4">{t.paymentMethods} *</h2>
                         <div className="flex flex-wrap gap-3">
                             {PAYMENT_METHOD_OPTIONS.map((opt) => (
                                 <label
@@ -664,7 +691,7 @@ export default function HostEditSpotPage() {
 
                     {/* Add-on Services */}
                     <div className="p-6 border-b border-gray-100">
-                        <h2 className="text-lg font-semibold text-gray-800 mb-4">Add-on Services</h2>
+                        <h2 className="text-lg font-semibold text-gray-800 mb-4">{t.addOnServices}</h2>
                         <div className="flex flex-wrap gap-3">
                             {ADDON_SERVICE_OPTIONS.map((opt) => (
                                 <label
@@ -690,7 +717,7 @@ export default function HostEditSpotPage() {
                             disabled={isLoading}
                             className="w-full py-3 px-6 bg-emerald-600 text-white font-semibold rounded-lg hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                         >
-                            {isLoading ? 'Saving Changes...' : 'Save Changes'}
+                            {isLoading ? t.savingChanges : t.saveChanges}
                         </button>
                     </div>
                 </form>

@@ -164,17 +164,31 @@ async function initializeBookingConfigPage(spotId, arrivalParam, leavingParam) {
         const startTime = arrivalFlatpickr?.selectedDates[0];
         const endTime = leavingFlatpickr?.selectedDates[0];
 
+        // Get current language for translations
+        const currentLang = localStorage.getItem('lang') || 'en';
+        const translations = {
+            en: {
+                payNow: 'Pay now and reserve',
+                reserveNow: 'Reserve now, pay later'
+            },
+            vi: {
+                payNow: 'Thanh toán và giữ chỗ',
+                reserveNow: 'Đặt trước, thanh toán sau'
+            }
+        };
+        const t = translations[currentLang] || translations.en;
+
         if (!startTime || !endTime || startTime >= endTime || !currentSpotData) {
-            payAndReserveBtn.textContent = selectedMethod === 'cash' ? 'Reserve now, pay later' : 'Pay now and reserve';
+            payAndReserveBtn.textContent = selectedMethod === 'cash' ? t.reserveNow : t.payNow;
             return;
         }
 
         const priceText = summaryFinalPrice.textContent;
 
         if (selectedMethod === 'paypal') {
-            payAndReserveBtn.textContent = `${priceText} - Pay now and reserve`;
+            payAndReserveBtn.textContent = `${priceText} - ${t.payNow}`;
         } else if (selectedMethod === 'cash') {
-            payAndReserveBtn.textContent = `${priceText} - Reserve now, pay later`;
+            payAndReserveBtn.textContent = `${priceText} - ${t.reserveNow}`;
         }
     }
 

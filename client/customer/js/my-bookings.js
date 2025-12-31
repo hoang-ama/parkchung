@@ -1,5 +1,87 @@
 // File: client/customer/js/my-bookings.js
 
+// Translations for my-bookings page
+const translations = {
+    en: {
+        my_bookings: 'My Bookings',
+        back_home: 'Back to Home',
+        becomeHost: 'Host',
+        logout: 'Logout',
+        loading: 'Loading your bookings...',
+        no_bookings: 'No bookings found. Start exploring parking spots!',
+        explore_spots: 'Explore Spots',
+        booking_confirmed: 'Confirmed',
+        booking_pending: 'Pending',
+        booking_cancelled: 'Cancelled',
+        booking_completed: 'Completed',
+        arrival: 'Arrival',
+        departure: 'Departure',
+        duration: 'Duration',
+        total: 'Total',
+        hours: 'hours',
+        view_details: 'View Details',
+        cancel_booking: 'Cancel Booking'
+    },
+    vi: {
+        my_bookings: 'Đặt chỗ của tôi',
+        back_home: 'Về Trang chủ',
+        becomeHost: 'Đăng bãi',
+        logout: 'Đăng xuất',
+        loading: 'Đang tải danh sách đặt chỗ...',
+        no_bookings: 'Không có đặt chỗ nào. Bắt đầu khám phá các bãi đỗ xe!',
+        explore_spots: 'Khám phá Bãi đỗ',
+        booking_confirmed: 'Đã xác nhận',
+        booking_pending: 'Đang chờ',
+        booking_cancelled: 'Đã hủy',
+        booking_completed: 'Hoàn thành',
+        arrival: 'Đến',
+        departure: 'Rời đi',
+        duration: 'Thời lượng',
+        total: 'Tổng cộng',
+        hours: 'giờ',
+        view_details: 'Xem chi tiết',
+        cancel_booking: 'Hủy đặt chỗ'
+    }
+};
+
+let currentLang = localStorage.getItem('lang') || 'en';
+
+function getTranslation(key) {
+    return translations[currentLang]?.[key] || translations.en[key] || key;
+}
+
+function applyTranslations() {
+    const t = translations[currentLang] || translations.en;
+
+    // Apply data-i18n translations
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        if (t[key]) el.textContent = t[key];
+    });
+
+    // Update language button styles
+    const langEnBtn = document.getElementById('lang-en');
+    const langViBtn = document.getElementById('lang-vi');
+    if (langEnBtn) {
+        langEnBtn.style.color = currentLang === 'en' ? '#13b47e' : '#555';
+        langEnBtn.style.fontWeight = currentLang === 'en' ? '700' : '500';
+    }
+    if (langViBtn) {
+        langViBtn.style.color = currentLang === 'vi' ? '#13b47e' : '#555';
+        langViBtn.style.fontWeight = currentLang === 'vi' ? '700' : '500';
+    }
+}
+
+function setLanguage(lang) {
+    localStorage.setItem('lang', lang);
+    currentLang = lang;
+    applyTranslations();
+    // Re-render bookings with new language
+    if (allBookings.length > 0) {
+        renderBookings(allBookings);
+    }
+}
+
 // Pagination state
 let allBookings = [];
 let currentPage = 1;
@@ -15,6 +97,15 @@ document.addEventListener('DOMContentLoaded', async () => {
         hostLink.href = window.HOST_URL + '/login';
     }
 
+    // Setup language switcher
+    const langEnBtn = document.getElementById('lang-en');
+    const langViBtn = document.getElementById('lang-vi');
+    if (langEnBtn) langEnBtn.addEventListener('click', () => setLanguage('en'));
+    if (langViBtn) langViBtn.addEventListener('click', () => setLanguage('vi'));
+
+    // Apply initial translations
+    applyTranslations();
+
     if (!token) {
         alert('Please login to view your bookings');
         window.location.href = 'login.html';
@@ -22,7 +113,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     // Show loading state
-    bookingListContainer.innerHTML = '<p style="text-align: center; color: white; font-size: 18px;">Loading your bookings...</p>';
+    bookingListContainer.innerHTML = `<p style="text-align: center; color: white; font-size: 18px;">${getTranslation('loading')}</p>`;
 
     try {
         // Fetch user's bookings

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslations } from '../i18n';
 
 // ============ Types ============
 interface ParkingSpot {
@@ -37,6 +38,7 @@ async function fetchMySpots(): Promise<ParkingSpot[]> {
 // ============ Components ============
 
 function StatusBadge({ status }: { status: ParkingSpot['status'] }) {
+    const t = useTranslations();
     const styles = {
         pending: 'bg-yellow-100 text-yellow-800 border-yellow-200',
         approved: 'bg-green-100 text-green-800 border-green-200',
@@ -45,10 +47,10 @@ function StatusBadge({ status }: { status: ParkingSpot['status'] }) {
     };
 
     const labels = {
-        pending: 'Pending Review',
-        approved: 'Active',
-        rejected: 'Rejected',
-        archived: 'Archived',
+        pending: t.statusPending,
+        approved: t.statusApproved,
+        rejected: t.statusRejected,
+        archived: t.statusArchived,
     };
 
     return (
@@ -60,6 +62,7 @@ function StatusBadge({ status }: { status: ParkingSpot['status'] }) {
 
 function SpotCard({ spot, onEdit }: { spot: ParkingSpot; onEdit: (id: string) => void }) {
     const navigate = useNavigate();
+    const t = useTranslations();
 
     // Use first image or placeholder
     const imageUrl = spot.images && spot.images.length > 0
@@ -88,13 +91,13 @@ function SpotCard({ spot, onEdit }: { spot: ParkingSpot; onEdit: (id: string) =>
                         onClick={() => onEdit(spot._id)}
                         className="px-4 py-2 bg-white text-gray-900 rounded-lg font-medium hover:bg-gray-50 transition-colors"
                     >
-                        Edit Details
+                        {t.editDetails}
                     </button>
                     <button
                         onClick={() => navigate(`/host/bookings?spotId=${spot._id}`)}
                         className="px-4 py-2 bg-emerald-600 text-white rounded-lg font-medium hover:bg-emerald-700 transition-colors"
                     >
-                        View Bookings
+                        {t.viewBookings}
                     </button>
                 </div>
             </div>
@@ -114,7 +117,7 @@ function SpotCard({ spot, onEdit }: { spot: ParkingSpot; onEdit: (id: string) =>
                 <div className="flex items-center gap-4 text-sm text-gray-600 mb-4">
                     <div className="flex items-center gap-1">
                         <span>🚗</span>
-                        <span>{spot.numberOfSlots} slots</span>
+                        <span>{spot.numberOfSlots} {t.slots}</span>
                     </div>
                     <div className="flex items-center gap-1">
                         <span>💰</span>
@@ -131,7 +134,7 @@ function SpotCard({ spot, onEdit }: { spot: ParkingSpot; onEdit: (id: string) =>
                             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
                             </svg>
-                            Covered
+                            {t.covered}
                         </span>
                     )}
                 </div>
@@ -142,13 +145,14 @@ function SpotCard({ spot, onEdit }: { spot: ParkingSpot; onEdit: (id: string) =>
 
 function EmptyState() {
     const navigate = useNavigate();
+    const t = useTranslations();
     return (
         <div className="text-center py-16 bg-white rounded-xl border border-gray-200 border-dashed">
             <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4">
                 <span className="text-3xl">🅿️</span>
             </div>
-            <h3 className="text-lg font-medium text-gray-900 mb-1">No parking spots yet</h3>
-            <p className="text-gray-500 mb-6">Get started by listing your first parking spot.</p>
+            <h3 className="text-lg font-medium text-gray-900 mb-1">{t.noSpotsYet}</h3>
+            <p className="text-gray-500 mb-6">{t.createFirstSpot}</p>
             <button
                 onClick={() => navigate('/host/spots/new')}
                 className="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors font-medium inline-flex items-center gap-2"
@@ -156,7 +160,7 @@ function EmptyState() {
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                 </svg>
-                Create New Spot
+                {t.addNewSpot}
             </button>
         </div>
     );
@@ -165,6 +169,7 @@ function EmptyState() {
 // ============ Main Page Component ============
 export default function HostSpotsPage() {
     const navigate = useNavigate();
+    const t = useTranslations();
     const [spots, setSpots] = useState<ParkingSpot[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -195,8 +200,8 @@ export default function HostSpotsPage() {
             {/* Header */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
                 <div>
-                    <h1 className="text-2xl font-bold text-gray-900">My Parking Spots</h1>
-                    <p className="text-gray-500 mt-1">Manage your listings and view their status</p>
+                    <h1 className="text-2xl font-bold text-gray-900">{t.mySpotsTitle}</h1>
+                    <p className="text-gray-500 mt-1">{t.mySpotsTitle}</p>
                 </div>
                 <button
                     onClick={() => navigate('/host/spots/new')}
@@ -205,7 +210,7 @@ export default function HostSpotsPage() {
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                     </svg>
-                    Add New Spot
+                    {t.addNewSpot}
                 </button>
             </div>
 

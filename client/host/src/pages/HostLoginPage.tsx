@@ -1,5 +1,7 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import { useTranslations } from '../i18n';
+import LanguageSwitcher from '../components/LanguageSwitcher';
 
 // ============ Types ============
 interface LoginFormValues {
@@ -50,6 +52,7 @@ async function loginHost(email: string, password: string): Promise<LoginResponse
 // ============ Main Component ============
 export default function HostLoginPage() {
     const navigate = useNavigate();
+    const t = useTranslations();
 
     // Form state
     const [formValues, setFormValues] = useState<LoginFormValues>({
@@ -143,9 +146,12 @@ export default function HostLoginPage() {
                 <div className="bg-white rounded-2xl shadow-lg p-8">
                     {/* Header */}
                     <div className="text-center mb-8">
-                        <h1 className="text-2xl font-bold text-gray-800">Host Login</h1>
+                        <div className="flex justify-end mb-4">
+                            <LanguageSwitcher />
+                        </div>
+                        <h1 className="text-2xl font-bold text-gray-800">{t.loginTitle}</h1>
                         <p className="text-gray-600 mt-2">
-                            Sign in to manage your parking spots
+                            {t.loginSubtitle}
                         </p>
                     </div>
 
@@ -166,7 +172,7 @@ export default function HostLoginPage() {
                         {/* Email */}
                         <div>
                             <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-                                Email Address
+                                {t.email}
                             </label>
                             <input
                                 type="email"
@@ -190,7 +196,7 @@ export default function HostLoginPage() {
                         {/* Password */}
                         <div>
                             <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
-                                Password
+                                {t.password}
                             </label>
                             <input
                                 type="password"
@@ -214,7 +220,7 @@ export default function HostLoginPage() {
                         {/* Forgot Password Link */}
                         <div className="text-right">
                             <a href="#" className="text-sm text-emerald-600 hover:text-emerald-700">
-                                Forgot password?
+                                {t.forgotPassword}
                             </a>
                         </div>
 
@@ -233,10 +239,10 @@ export default function HostLoginPage() {
                                         <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                                         <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                                     </svg>
-                                    Signing in...
+                                    {t.loading}
                                 </span>
                             ) : (
-                                'Sign In'
+                                t.loginButton
                             )}
                         </button>
                     </form>
@@ -244,12 +250,12 @@ export default function HostLoginPage() {
                     {/* Divider */}
                     <div className="mt-8 pt-6 border-t border-gray-200">
                         <p className="text-center text-sm text-gray-600">
-                            Don't have a Host account?{' '}
+                            {t.noAccount}{' '}
                             <Link
                                 to="/host/register"
                                 className="font-medium text-emerald-600 hover:text-emerald-700"
                             >
-                                Register here
+                                {t.registerHere}
                             </Link>
                         </p>
                     </div>
