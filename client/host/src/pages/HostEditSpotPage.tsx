@@ -56,30 +56,6 @@ interface ParkingSpot {
     status: string;
 }
 
-// ============ Constants ============
-const VEHICLE_TYPE_OPTIONS = [
-    { value: 'car', label: 'Car' },
-    { value: 'motorbike', label: 'Motorbike' },
-    { value: 'bicycle', label: 'Bicycle' },
-    { value: 'truck', label: 'Truck / Large Vehicle' },
-];
-
-const PAYMENT_METHOD_OPTIONS = [
-    { value: 'cash', label: 'Cash', icon: '💵' },
-    { value: 'paypal', label: 'PayPal', icon: '💳' },
-];
-
-const BOOKING_TYPE_OPTIONS = [
-    { value: 'online', label: 'Online Booking', icon: '🌐' },
-    { value: 'call', label: 'Call Booking', icon: '📞' },
-];
-
-const ADDON_SERVICE_OPTIONS = [
-    { value: 'valet', label: 'Valet Parking', icon: '🚗' },
-    { value: 'carwash', label: 'Car Washing', icon: '🧼' },
-    { value: 'ev_charging', label: 'EV Charging', icon: '⚡' },
-];
-
 const MAX_IMAGES = 5;
 const API_BASE_URL = import.meta.env.VITE_API_URL || '/api';
 
