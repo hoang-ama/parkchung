@@ -2,6 +2,7 @@
 const User = require('../models/user.model');
 const HostProfile = require('../models/hostProfile.model');
 const ParkingSpot = require('../models/parkingSpot.model');
+const Booking = require('../models/booking.model');
 
 /**
  * @desc    Get current host's profile and user info
@@ -445,6 +446,55 @@ exports.updateHostProfile = async (req, res) => {
 
     } catch (error) {
         console.error('Update host profile error:', error);
+        res.status(500).json({ message: 'Server error', error: error.message });
+    }
+};
+
+/**
+ * @desc    Delete (archive) a parking spot
+ * @route   DELETE /api/host/spots/:id
+ * @access  Private (Host only)
+ */
+exports.deleteSpot = async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        // Find the spot
+        const spot = await ParkingSpot.findById(id);
+
+        if (!spot) {
+            return res.status(404).json({ message: 'Parking spot not found' });
+        }
+
+        // Verify ownership
+        if (spot.owner.toString() !== req.user._id.toString()) {
+            return res.status(403).json({ message: 'Not authorized to delete this spot' });
+        }
+
+        // Check if there are any active or confirmed bookings for this spot
+        const activeBookings = await Booking.countDocuments({
+            spot: spot._id,
+            status: { $in: ['pending', 'confirmed'] },
+            endTime: { $gte: new Date() } // Future or ongoing bookings
+        });
+
+        if (activeBookings > 0) {
+            return res.status(400).json({
+                message: `Cannot delete spot with ${activeBookings} active booking(s). Please wait until all bookings are completed or cancel them first.`
+            });
+        }
+
+        // Archive the spot instead of hard delete (preserves data integrity)
+        spot.status = 'archived';
+        await spot.save();
+
+        res.json({
+            message: 'Parking spot deleted successfully',
+            spotId: spot._id
+        });
+
+    } catch (error) {
+        console.error('Delete spot error:', error);
         res.status(500).json({ message: 'Server error', error: error.message });
     }
 };

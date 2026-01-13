@@ -35,6 +35,20 @@ async function fetchMySpots(): Promise<ParkingSpot[]> {
     return result.data || [];
 }
 
+async function deleteSpotAPI(spotId: string): Promise<void> {
+    const response = await fetch(`${API_BASE_URL}/host/spots/${spotId}`, {
+        method: 'DELETE',
+        headers: {
+            'Authorization': `Bearer ${localStorage.getItem('hostToken')}`,
+        },
+    });
+
+    if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to delete parking spot');
+    }
+}
+
 // ============ Components ============
 
 function StatusBadge({ status }: { status: ParkingSpot['status'] }) {
@@ -60,7 +74,7 @@ function StatusBadge({ status }: { status: ParkingSpot['status'] }) {
     );
 }
 
-function SpotCard({ spot, onEdit }: { spot: ParkingSpot; onEdit: (id: string) => void }) {
+function SpotCard({ spot, onEdit, onDelete }: { spot: ParkingSpot; onEdit: (id: string) => void; onDelete: (id: string, name: string) => void }) {
     const navigate = useNavigate();
     const t = useTranslations();
 
@@ -98,6 +112,12 @@ function SpotCard({ spot, onEdit }: { spot: ParkingSpot; onEdit: (id: string) =>
                         className="px-4 py-2 bg-emerald-600 text-white rounded-lg font-medium hover:bg-emerald-700 transition-colors"
                     >
                         {t.viewBookings}
+                    </button>
+                    <button
+                        onClick={() => onDelete(spot._id, spot.name)}
+                        className="px-4 py-2 bg-red-600 text-white rounded-lg font-medium hover:bg-red-700 transition-colors"
+                    >
+                        {t.deleteSpot}
                     </button>
                 </div>
             </div>
@@ -166,6 +186,76 @@ function EmptyState() {
     );
 }
 
+// Delete Confirmation Modal
+function DeleteConfirmModal({
+    isOpen,
+    spotName,
+    onConfirm,
+    onCancel,
+    isDeleting
+}: {
+    isOpen: boolean;
+    spotName: string;
+    onConfirm: () => void;
+    onCancel: () => void;
+    isDeleting: boolean;
+}) {
+    const t = useTranslations();
+
+    if (!isOpen) return null;
+
+    return (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
+            <div className="bg-white rounded-xl shadow-xl max-w-md w-full p-6">
+                <div className="flex items-center gap-3 mb-4">
+                    <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center flex-shrink-0">
+                        <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                        </svg>
+                    </div>
+                    <div>
+                        <h3 className="text-lg font-semibold text-gray-900">{t.deleteSpotConfirmTitle}</h3>
+                    </div>
+                </div>
+
+                <p className="text-gray-600 mb-2">
+                    {t.deleteSpotConfirmMessage}
+                </p>
+                <p className="text-sm text-gray-500 mb-6">
+                    <strong>{spotName}</strong>
+                </p>
+
+                <div className="flex gap-3">
+                    <button
+                        onClick={onCancel}
+                        disabled={isDeleting}
+                        className="flex-1 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors font-medium disabled:opacity-50"
+                    >
+                        {t.cancel}
+                    </button>
+                    <button
+                        onClick={onConfirm}
+                        disabled={isDeleting}
+                        className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium disabled:opacity-50 flex items-center justify-center gap-2"
+                    >
+                        {isDeleting ? (
+                            <>
+                                <svg className="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
+                                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                </svg>
+                                {t.loading}
+                            </>
+                        ) : (
+                            t.delete
+                        )}
+                    </button>
+                </div>
+            </div>
+        </div>
+    );
+}
+
 // ============ Main Page Component ============
 export default function HostSpotsPage() {
     const navigate = useNavigate();
@@ -173,6 +263,14 @@ export default function HostSpotsPage() {
     const [spots, setSpots] = useState<ParkingSpot[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+
+    // Delete modal state
+    const [deleteModal, setDeleteModal] = useState<{ isOpen: boolean; spotId: string; spotName: string }>({
+        isOpen: false,
+        spotId: '',
+        spotName: ''
+    });
+    const [isDeleting, setIsDeleting] = useState(false);
 
     useEffect(() => {
         loadSpots();
@@ -193,6 +291,35 @@ export default function HostSpotsPage() {
 
     const handleEdit = (id: string) => {
         navigate(`/host/spots/${id}/edit`);
+    };
+
+    const handleDeleteClick = (spotId: string, spotName: string) => {
+        setDeleteModal({ isOpen: true, spotId, spotName });
+    };
+
+    const handleDeleteConfirm = async () => {
+        try {
+            setIsDeleting(true);
+            await deleteSpotAPI(deleteModal.spotId);
+
+            // Remove spot from list
+            setSpots(spots.filter(spot => spot._id !== deleteModal.spotId));
+
+            // Close modal
+            setDeleteModal({ isOpen: false, spotId: '', spotName: '' });
+
+            // Show success message (you could use a toast notification here)
+            alert(t.deleteSpotSuccess);
+        } catch (err: any) {
+            console.error('Error deleting spot:', err);
+            alert(err.message || t.deleteSpotError);
+        } finally {
+            setIsDeleting(false);
+        }
+    };
+
+    const handleDeleteCancel = () => {
+        setDeleteModal({ isOpen: false, spotId: '', spotName: '' });
     };
 
     return (
@@ -243,10 +370,24 @@ export default function HostSpotsPage() {
             ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {spots.map((spot) => (
-                        <SpotCard key={spot._id} spot={spot} onEdit={handleEdit} />
+                        <SpotCard
+                            key={spot._id}
+                            spot={spot}
+                            onEdit={handleEdit}
+                            onDelete={handleDeleteClick}
+                        />
                     ))}
                 </div>
             )}
+
+            {/* Delete Confirmation Modal */}
+            <DeleteConfirmModal
+                isOpen={deleteModal.isOpen}
+                spotName={deleteModal.spotName}
+                onConfirm={handleDeleteConfirm}
+                onCancel={handleDeleteCancel}
+                isDeleting={isDeleting}
+            />
         </div>
     );
 }

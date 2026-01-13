@@ -42,25 +42,36 @@ async function initializeBookingConfigPage(spotId, arrivalParam, leavingParam) {
     const guestFullnameInput = document.getElementById('guest-fullname-input');
     const guestEmailInput = document.getElementById('guest-email-input');
 
-    // --- LOGIN DETECTION & LAYOUT CONTROL ---
+    // --- LOGIN DETECTION ---
     const userToken = localStorage.getItem('userToken');
     const isLoggedIn = !!userToken;
 
-    // Apply CSS class to body for conditional layout
-    if (isLoggedIn) {
-        document.body.classList.add('logged-in-layout');
-        document.body.classList.remove('guest-layout');
-    } else {
-        document.body.classList.add('guest-layout');
-        document.body.classList.remove('logged-in-layout');
-    }
-
-    console.log(`Booking Config - User ${isLoggedIn ? 'logged in' : 'not logged in (guest)'}, layout class applied.`);
+    console.log(`Booking Config - User ${isLoggedIn ? 'logged in' : 'not logged in (guest)'}.`);
 
     // --- AUTO-FILL USER DATA FOR LOGGED-IN USERS ---
     if (isLoggedIn) {
         try {
             const userData = JSON.parse(localStorage.getItem('userData') || '{}');
+
+            // Auto-fill Full Name and make it read-only
+            if (userData.fullName && guestFullnameInput) {
+                guestFullnameInput.value = userData.fullName;
+                guestFullnameInput.readOnly = true;
+                guestFullnameInput.style.backgroundColor = '#f5f5f5';
+                guestFullnameInput.style.cursor = 'not-allowed';
+                console.log('Auto-filled full name from user data.');
+            }
+
+            // Auto-fill Email and make it read-only
+            if (userData.email && guestEmailInput) {
+                guestEmailInput.value = userData.email;
+                guestEmailInput.readOnly = true;
+                guestEmailInput.style.backgroundColor = '#f5f5f5';
+                guestEmailInput.style.cursor = 'not-allowed';
+                console.log('Auto-filled email from user data.');
+            }
+
+            // Auto-fill Phone Number (keep editable)
             if (userData.phone && phoneNumberInput) {
                 phoneNumberInput.value = userData.phone;
                 console.log('Auto-filled phone number from user data.');
@@ -113,10 +124,27 @@ async function initializeBookingConfigPage(spotId, arrivalParam, leavingParam) {
 
         const totalHours = Math.ceil(Math.abs(endTime - startTime) / 36e5);
 
+        // Calculate exact duration for "Duration" field
+        const diffMinutes = Math.floor(Math.abs(endTime - startTime) / 60000);
+        const exactHours = Math.floor(diffMinutes / 60);
+        const exactMinutes = diffMinutes % 60;
+
+        let exactDurationText = '';
+        if (exactHours > 0) exactDurationText += `${exactHours} hour${exactHours > 1 ? 's' : ''}`;
+        if (exactMinutes > 0) exactDurationText += ` ${exactMinutes} minute${exactMinutes > 1 ? 's' : ''}`;
+        if (exactDurationText === '') exactDurationText = '0 minutes';
+
         summaryUnitPrice.textContent = `${currentSpotData.hourlyRate.toLocaleString('vi-VN')} VND / hour`;
         summaryDuration.textContent = `${totalHours} hour${totalHours > 1 ? 's' : ''}`;
-        // Use the same billable hours on the left side for consistency
-        bookingDuration.textContent = `${totalHours} hour${totalHours > 1 ? 's' : ''}`;
+
+        // Show exact duration (not rounded)
+        bookingDuration.textContent = exactDurationText.trim();
+
+        // Update "Billed as" field with rounded billable hours
+        const billedHoursElement = document.getElementById('booking-billed-hours');
+        if (billedHoursElement) {
+            billedHoursElement.textContent = `${totalHours} hour${totalHours > 1 ? 's' : ''}`;
+        }
 
         try {
             const response = await fetch(`${API_URL}/bookings/estimate-price`, {
@@ -605,9 +633,33 @@ async function initializeBookingConfigPage(spotId, arrivalParam, leavingParam) {
         }
 
         // Logged-in user flow
+        const fullName = (guestFullnameInput?.value || '').trim();
+        const email = (guestEmailInput?.value || '').trim();
         const phoneNumber = phoneNumberInput.value.trim();
+        const vehicleReg = (vehicleRegInput?.value || '').trim();
+
+        // Validate all required fields
+        if (!fullName) {
+            alert('Please enter your full name.');
+            guestFullnameInput?.focus();
+            return;
+        }
+
+        if (!email) {
+            alert('Please enter your email address.');
+            guestEmailInput?.focus();
+            return;
+        }
+
         if (!phoneNumber) {
             alert('Please enter your phone number.');
+            phoneNumberInput?.focus();
+            return;
+        }
+
+        if (!vehicleReg) {
+            alert('Please enter your vehicle registration.');
+            vehicleRegInput?.focus();
             return;
         }
 
@@ -616,6 +668,7 @@ async function initializeBookingConfigPage(spotId, arrivalParam, leavingParam) {
                 payload: {
                     ...basePayload,
                     phoneNumber,
+                    vehicleRegistration: vehicleReg,
                 },
                 token,
                 triggerButton: payAndReserveBtn,
@@ -635,6 +688,7 @@ async function initializeBookingConfigPage(spotId, arrivalParam, leavingParam) {
                     body: JSON.stringify({
                         ...basePayload,
                         phoneNumber,
+                        vehicleRegistration: vehicleReg,
                     }),
                 });
 

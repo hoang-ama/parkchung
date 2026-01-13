@@ -75,6 +75,10 @@ export interface Translations {
     editDetails: string;
     viewBookings: string;
     deleteSpot: string;
+    deleteSpotConfirmTitle: string;
+    deleteSpotConfirmMessage: string;
+    deleteSpotSuccess: string;
+    deleteSpotError: string;
     spotStatus: string;
     statusApproved: string;
     statusPending: string;
@@ -301,7 +305,11 @@ export const translations: Record<Language, Translations> = {
         createFirstSpot: 'Create your first parking spot',
         editDetails: 'Edit Details',
         viewBookings: 'View Bookings',
-        deleteSpot: 'Delete Spot',
+        deleteSpot: 'Delete',
+        deleteSpotConfirmTitle: 'Delete Parking Spot?',
+        deleteSpotConfirmMessage: 'Are you sure you want to delete this parking spot? This action cannot be undone.',
+        deleteSpotSuccess: 'Parking spot deleted successfully',
+        deleteSpotError: 'Failed to delete parking spot',
         spotStatus: 'Status',
         statusApproved: 'Approved',
         statusPending: 'Pending',
@@ -526,7 +534,11 @@ export const translations: Record<Language, Translations> = {
         createFirstSpot: 'Tạo bãi đỗ đầu tiên',
         editDetails: 'Chỉnh sửa',
         viewBookings: 'Xem đặt chỗ',
-        deleteSpot: 'Xóa bãi',
+        deleteSpot: 'Xóa',
+        deleteSpotConfirmTitle: 'Xóa bãi đỗ xe?',
+        deleteSpotConfirmMessage: 'Bạn có chắc chắn muốn xóa bãi đỗ này? Hành động này không thể hoàn tác.',
+        deleteSpotSuccess: 'Xóa bãi đỗ thành công',
+        deleteSpotError: 'Không thể xóa bãi đỗ',
         spotStatus: 'Trạng thái',
         statusApproved: 'Đã duyệt',
         statusPending: 'Đang chờ',

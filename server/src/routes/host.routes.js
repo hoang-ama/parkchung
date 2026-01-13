@@ -10,6 +10,7 @@ const {
     getSpotById,
     createSpot,
     updateSpot,
+    deleteSpot,
     updateHostProfile
 } = require('../controllers/host.controller');
 
@@ -40,6 +41,7 @@ router.get('/spots', getMySpots);
 router.post('/spots', upload.array('images', 5), createSpot);
 router.get('/spots/:id', getSpotById);
 router.put('/spots/:id', upload.array('images', 5), updateSpot);
+router.delete('/spots/:id', deleteSpot);
 
 // ============ Host Bookings Routes ============
 router.get('/bookings', getHostBookings);

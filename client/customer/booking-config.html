@@ -83,6 +83,13 @@
                                 <span id="booking-duration" class="highlight-text">--</span>
                             </div>
                         </div>
+                        <div class="booking-info-item">
+                            <span class="icon">💳</span>
+                            <span class="label" data-i18n="billed_as">Billed as</span>
+                            <div class="value-wrapper">
+                                <span id="booking-billed-hours" class="highlight-text">-- hours</span>
+                            </div>
+                        </div>
                     </div>
 
                     <!-- Contact Information -->
@@ -91,16 +98,16 @@
                         <p class="help-text" data-i18n="contact_hint">We'll use this to contact you about your booking
                         </p>
 
-                        <!-- Full Name (Guest Users Only) -->
-                        <div class="form-group guest-only-field">
+                        <!-- Full Name (All Users) -->
+                        <div class="form-group">
                             <label for="guest-fullname-input" class="form-label" data-i18n="contact_fullname_label">Full
                                 Name</label>
                             <input type="text" id="guest-fullname-input" placeholder="Enter your full name"
                                 data-i18n-placeholder="ph_fullname" class="text-input">
                         </div>
 
-                        <!-- Email (Guest Users Only) -->
-                        <div class="form-group guest-only-field">
+                        <!-- Email (All Users) -->
+                        <div class="form-group">
                             <label for="guest-email-input" class="form-label" data-i18n="contact_email_label">Email
                                 Address</label>
                             <input type="email" id="guest-email-input" placeholder="Enter your email address"
@@ -146,6 +153,9 @@
                                 <span id="summary-final-price" class="price-value">0 VND</span>
                             </div>
                         </div>
+
+                        <p class="billing-info-text" data-i18n="billing_info">Bookings are charged in 1-hour blocks
+                            (minimum 1 hour).</p>
 
                         <p class="rechecked-info" data-i18n="rechecked">Availability rechecked in <span
                                 id="rechecked-time">--:--</span></p>
