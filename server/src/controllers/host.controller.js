@@ -498,3 +498,43 @@ exports.deleteSpot = async (req, res) => {
         res.status(500).json({ message: 'Server error', error: error.message });
     }
 };
+
+/**
+ * @desc    Toggle spot active/inactive status
+ * @route   PATCH /api/host/spots/:id/toggle-active
+ * @access  Private (Host only)
+ */
+exports.toggleSpotActive = async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        // Find the spot
+        const spot = await ParkingSpot.findById(id);
+
+        if (!spot) {
+            return res.status(404).json({ message: 'Parking spot not found' });
+        }
+
+        // Verify ownership
+        if (spot.owner.toString() !== req.user._id.toString()) {
+            return res.status(403).json({ message: 'Not authorized to modify this spot' });
+        }
+
+        // Toggle isActive status
+        spot.isActive = !spot.isActive;
+        await spot.save();
+
+        res.json({
+            message: `Spot ${spot.isActive ? 'activated' : 'deactivated'} successfully`,
+            spot: {
+                _id: spot._id,
+                name: spot.name,
+                isActive: spot.isActive
+            }
+        });
+
+    } catch (error) {
+        console.error('Toggle spot active error:', error);
+        res.status(500).json({ message: 'Server error', error: error.message });
+    }
+};

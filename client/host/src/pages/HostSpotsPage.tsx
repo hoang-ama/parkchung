@@ -11,6 +11,7 @@ interface ParkingSpot {
     monthlyRate?: number;
     numberOfSlots: number;
     status: 'pending' | 'approved' | 'rejected' | 'archived';
+    isActive: boolean;
     images: string[];
     hasRoof: boolean;
     vehicleTypes: string[];
@@ -49,6 +50,22 @@ async function deleteSpotAPI(spotId: string): Promise<void> {
     }
 }
 
+async function toggleSpotActiveAPI(spotId: string): Promise<{ spot: { isActive: boolean } }> {
+    const response = await fetch(`${API_BASE_URL}/host/spots/${spotId}/toggle-active`, {
+        method: 'PATCH',
+        headers: {
+            'Authorization': `Bearer ${localStorage.getItem('hostToken')}`,
+        },
+    });
+
+    if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to toggle spot status');
+    }
+
+    return response.json();
+}
+
 // ============ Components ============
 
 function StatusBadge({ status }: { status: ParkingSpot['status'] }) {
@@ -74,7 +91,17 @@ function StatusBadge({ status }: { status: ParkingSpot['status'] }) {
     );
 }
 
-function SpotCard({ spot, onEdit, onDelete }: { spot: ParkingSpot; onEdit: (id: string) => void; onDelete: (id: string, name: string) => void }) {
+function SpotCard({
+    spot,
+    onEdit,
+    onDelete,
+    onToggleActive
+}: {
+    spot: ParkingSpot;
+    onEdit: (id: string) => void;
+    onDelete: (id: string, name: string) => void;
+    onToggleActive: (id: string, currentStatus: boolean) => void;
+}) {
     const navigate = useNavigate();
     const t = useTranslations();
 
@@ -95,30 +122,49 @@ function SpotCard({ spot, onEdit, onDelete }: { spot: ParkingSpot; onEdit: (id: 
                         (e.target as HTMLImageElement).src = '/uploads/default-parking.jpg';
                     }}
                 />
+                {/* Status Badges */}
                 <div className="absolute top-3 right-3">
                     <StatusBadge status={spot.status} />
                 </div>
+                {!spot.isActive && (
+                    <div className="absolute top-3 left-3">
+                        <span className="px-2.5 py-0.5 rounded-full text-xs font-medium bg-orange-100 text-orange-800 border border-orange-200">
+                            {t.inactive}
+                        </span>
+                    </div>
+                )}
 
-                {/* Overlay Actions */}
-                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
-                    <button
-                        onClick={() => onEdit(spot._id)}
-                        className="px-4 py-2 bg-white text-gray-900 rounded-lg font-medium hover:bg-gray-50 transition-colors"
-                    >
-                        {t.editDetails}
-                    </button>
-                    <button
-                        onClick={() => navigate(`/host/bookings?spotId=${spot._id}`)}
-                        className="px-4 py-2 bg-emerald-600 text-white rounded-lg font-medium hover:bg-emerald-700 transition-colors"
-                    >
-                        {t.viewBookings}
-                    </button>
-                    <button
-                        onClick={() => onDelete(spot._id, spot.name)}
-                        className="px-4 py-2 bg-red-600 text-white rounded-lg font-medium hover:bg-red-700 transition-colors"
-                    >
-                        {t.deleteSpot}
-                    </button>
+                {/* Overlay Actions - Vertical Stack on Left */}
+                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-start p-3">
+                    <div className="flex flex-col gap-1.5 w-28">
+                        <button
+                            onClick={() => onEdit(spot._id)}
+                            className="w-full px-2 py-1.5 bg-white text-gray-900 rounded-md font-medium hover:bg-gray-50 transition-colors text-xs"
+                        >
+                            {t.editDetails}
+                        </button>
+                        <button
+                            onClick={() => navigate(`/host/bookings?spotId=${spot._id}`)}
+                            className="w-full px-2 py-1.5 bg-emerald-600 text-white rounded-md font-medium hover:bg-emerald-700 transition-colors text-xs"
+                        >
+                            {t.viewBookings}
+                        </button>
+                        <button
+                            onClick={() => onToggleActive(spot._id, spot.isActive)}
+                            className={`w-full px-2 py-1.5 rounded-md font-medium transition-colors text-xs ${spot.isActive
+                                ? 'bg-orange-600 text-white hover:bg-orange-700'
+                                : 'bg-blue-600 text-white hover:bg-blue-700'
+                                }`}
+                        >
+                            {spot.isActive ? t.deactivate : t.activate}
+                        </button>
+                        <button
+                            onClick={() => onDelete(spot._id, spot.name)}
+                            className="w-full px-2 py-1.5 bg-red-600 text-white rounded-md font-medium hover:bg-red-700 transition-colors text-xs"
+                        >
+                            {t.deleteSpot}
+                        </button>
+                    </div>
                 </div>
             </div>
 
@@ -308,7 +354,7 @@ export default function HostSpotsPage() {
             // Close modal
             setDeleteModal({ isOpen: false, spotId: '', spotName: '' });
 
-            // Show success message (you could use a toast notification here)
+            // Show success message
             alert(t.deleteSpotSuccess);
         } catch (err: any) {
             console.error('Error deleting spot:', err);
@@ -320,6 +366,26 @@ export default function HostSpotsPage() {
 
     const handleDeleteCancel = () => {
         setDeleteModal({ isOpen: false, spotId: '', spotName: '' });
+    };
+
+    const handleToggleActive = async (spotId: string, currentStatus: boolean) => {
+        try {
+            const result = await toggleSpotActiveAPI(spotId);
+
+            // Update spot in list
+            setSpots(spots.map(spot =>
+                spot._id === spotId
+                    ? { ...spot, isActive: result.spot.isActive }
+                    : spot
+            ));
+
+            // Show success message
+            const message = result.spot.isActive ? t.activateSuccess : t.deactivateSuccess;
+            alert(message);
+        } catch (err: any) {
+            console.error('Error toggling spot status:', err);
+            alert(err.message || t.toggleActiveError);
+        }
     };
 
     return (
@@ -375,6 +441,7 @@ export default function HostSpotsPage() {
                             spot={spot}
                             onEdit={handleEdit}
                             onDelete={handleDeleteClick}
+                            onToggleActive={handleToggleActive}
                         />
                     ))}
                 </div>

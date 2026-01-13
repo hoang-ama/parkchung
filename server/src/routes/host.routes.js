@@ -11,6 +11,7 @@ const {
     createSpot,
     updateSpot,
     deleteSpot,
+    toggleSpotActive,
     updateHostProfile
 } = require('../controllers/host.controller');
 
@@ -42,6 +43,7 @@ router.post('/spots', upload.array('images', 5), createSpot);
 router.get('/spots/:id', getSpotById);
 router.put('/spots/:id', upload.array('images', 5), updateSpot);
 router.delete('/spots/:id', deleteSpot);
+router.patch('/spots/:id/toggle-active', toggleSpotActive);
 
 // ============ Host Bookings Routes ============
 router.get('/bookings', getHostBookings);

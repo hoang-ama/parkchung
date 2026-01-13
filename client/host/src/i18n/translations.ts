@@ -79,6 +79,12 @@ export interface Translations {
     deleteSpotConfirmMessage: string;
     deleteSpotSuccess: string;
     deleteSpotError: string;
+    activate: string;
+    deactivate: string;
+    inactive: string;
+    activateSuccess: string;
+    deactivateSuccess: string;
+    toggleActiveError: string;
     spotStatus: string;
     statusApproved: string;
     statusPending: string;
@@ -310,6 +316,12 @@ export const translations: Record<Language, Translations> = {
         deleteSpotConfirmMessage: 'Are you sure you want to delete this parking spot? This action cannot be undone.',
         deleteSpotSuccess: 'Parking spot deleted successfully',
         deleteSpotError: 'Failed to delete parking spot',
+        activate: 'Activate',
+        deactivate: 'Deactivate',
+        inactive: 'Inactive',
+        activateSuccess: 'Spot activated successfully',
+        deactivateSuccess: 'Spot deactivated successfully',
+        toggleActiveError: 'Failed to toggle spot status',
         spotStatus: 'Status',
         statusApproved: 'Approved',
         statusPending: 'Pending',
@@ -539,6 +551,12 @@ export const translations: Record<Language, Translations> = {
         deleteSpotConfirmMessage: 'Bạn có chắc chắn muốn xóa bãi đỗ này? Hành động này không thể hoàn tác.',
         deleteSpotSuccess: 'Xóa bãi đỗ thành công',
         deleteSpotError: 'Không thể xóa bãi đỗ',
+        activate: 'Kích hoạt',
+        deactivate: 'Vô hiệu hóa',
+        inactive: 'Không hoạt động',
+        activateSuccess: 'Kích hoạt bãi đỗ thành công',
+        deactivateSuccess: 'Vô hiệu hóa bãi đỗ thành công',
+        toggleActiveError: 'Không thể thay đổi trạng thái bãi đỗ',
         spotStatus: 'Trạng thái',
         statusApproved: 'Đã duyệt',
         statusPending: 'Đang chờ',

@@ -85,10 +85,16 @@ const parkingSpotSchema = new mongoose.Schema({
         default: 0
         // Google rating for the parking spot (0-5 stars, can be decimal like 4.9)
     },
+    isActive: {
+        type: Boolean,
+        default: true
+        // Host-controlled: false = temporarily deactivated (maintenance, full, etc.)
+    },
     status: {
         type: String,
         enum: ['pending', 'approved', 'rejected', 'archived'],
         default: 'pending'
+        // Admin-controlled approval status
     }
 }, { timestamps: true });
 

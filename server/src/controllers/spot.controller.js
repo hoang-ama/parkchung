@@ -31,7 +31,8 @@ exports.searchSpots = async (req, res) => {
                         $maxDistance: parseInt(radius) || 10000
                     }
                 },
-                status: 'approved'
+                status: 'approved',
+                isActive: true  // Only show active spots
             };
 
             if (q) {
@@ -55,7 +56,8 @@ exports.searchSpots = async (req, res) => {
 
         const filter = {
             address: { $regex: q ? q.trim() : '', $options: 'i' },
-            status: 'approved'
+            status: 'approved',
+            isActive: true  // Only show active spots
         };
 
         const spots = await ParkingSpot.find(filter);
@@ -131,8 +133,8 @@ exports.createSpot = async (req, res) => {
 exports.getSpotById = async (req, res) => {
     try {
         const spot = await ParkingSpot.findById(req.params.id).populate('owner', 'fullName email phone');
-        // Only return approved spots to customers (rejected/pending spots are not bookable)
-        if (spot && spot.status === 'approved') {
+        // Only return approved and active spots to customers
+        if (spot && spot.status === 'approved' && spot.isActive) {
             res.json(spot);
         } else {
             res.status(404).json({ message: 'Parking spot not found' });
@@ -158,7 +160,8 @@ exports.getAutocompleteSuggestions = async (req, res) => {
         const spots = await ParkingSpot.find(
             {
                 address: { $regex: q.trim(), $options: 'i' },
-                status: 'approved'  // Only show approved spots in autocomplete
+                status: 'approved',  // Only show approved spots in autocomplete
+                isActive: true  // Only show active spots
             },
             { address: 1, _id: 1 }  // Include _id in the projection
         ).limit(10);
