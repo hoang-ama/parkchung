@@ -100,7 +100,7 @@ function SpotCard({
     spot: ParkingSpot;
     onEdit: (id: string) => void;
     onDelete: (id: string, name: string) => void;
-    onToggleActive: (id: string, currentStatus: boolean) => void;
+    onToggleActive: (id: string) => void;
 }) {
     const navigate = useNavigate();
     const t = useTranslations();
@@ -150,7 +150,7 @@ function SpotCard({
                             {t.viewBookings}
                         </button>
                         <button
-                            onClick={() => onToggleActive(spot._id, spot.isActive)}
+                            onClick={() => onToggleActive(spot._id)}
                             className={`w-full px-2 py-1.5 rounded-md font-medium transition-colors text-xs ${spot.isActive
                                 ? 'bg-orange-600 text-white hover:bg-orange-700'
                                 : 'bg-blue-600 text-white hover:bg-blue-700'
@@ -368,7 +368,7 @@ export default function HostSpotsPage() {
         setDeleteModal({ isOpen: false, spotId: '', spotName: '' });
     };
 
-    const handleToggleActive = async (spotId: string, currentStatus: boolean) => {
+    const handleToggleActive = async (spotId: string) => {
         try {
             const result = await toggleSpotActiveAPI(spotId);
 
