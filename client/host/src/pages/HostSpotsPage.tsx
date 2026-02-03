@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslations } from '../i18n';
+import defaultParkingImg from '../../../assets/image/parking-area.jpg';
 
 // ============ Types ============
 interface ParkingSpot {
@@ -108,7 +109,7 @@ function SpotCard({
     // Use first image or placeholder
     const imageUrl = spot.images && spot.images.length > 0
         ? (spot.images[0].startsWith('http') ? spot.images[0] : `${API_BASE_URL.replace('/api', '')}${spot.images[0]}`)
-        : '/uploads/default-parking.jpg';
+        : defaultParkingImg;
 
     return (
         <div className="bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-md transition-shadow">
@@ -119,7 +120,7 @@ function SpotCard({
                     alt={spot.name}
                     className="w-full h-full object-cover"
                     onError={(e) => {
-                        (e.target as HTMLImageElement).src = '/uploads/default-parking.jpg';
+                        (e.target as HTMLImageElement).src = defaultParkingImg;
                     }}
                 />
                 {/* Status Badges */}
