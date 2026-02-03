@@ -148,3 +148,154 @@ exports.registerHost = async (req, res) => {
         });
     }
 };
+
+// ==================== PROFILE ENDPOINTS ====================
+
+/**
+ * @desc    Get current user profile
+ * @route   GET /api/auth/profile
+ * @access  Private
+ */
+exports.getProfile = async (req, res) => {
+    try {
+        const user = await User.findById(req.user.id).select('-password');
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        res.json({
+            _id: user._id,
+            fullName: user.fullName,
+            email: user.email,
+            phone: user.phone || '',
+            vehicleLicensePlate: user.vehicleLicensePlate || '',
+            role: user.role,
+            createdAt: user.createdAt,
+            updatedAt: user.updatedAt
+        });
+    } catch (error) {
+        console.error('Get profile error:', error);
+        res.status(500).json({ message: 'Server error', error: error.message });
+    }
+};
+
+/**
+ * @desc    Update user profile (phone, vehicleLicensePlate)
+ * @route   PUT /api/auth/profile
+ * @access  Private
+ */
+exports.updateProfile = async (req, res) => {
+    try {
+        const { phone, vehicleLicensePlate } = req.body;
+
+        const updatedUser = await User.findByIdAndUpdate(
+            req.user.id,
+            {
+                $set: {
+                    phone: phone !== undefined ? phone : undefined,
+                    vehicleLicensePlate: vehicleLicensePlate !== undefined ? vehicleLicensePlate : undefined
+                }
+            },
+            { new: true, runValidators: true }
+        ).select('-password');
+
+        if (!updatedUser) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        res.json({
+            message: 'Profile updated successfully',
+            user: {
+                _id: updatedUser._id,
+                fullName: updatedUser.fullName,
+                email: updatedUser.email,
+                phone: updatedUser.phone || '',
+                vehicleLicensePlate: updatedUser.vehicleLicensePlate || '',
+                role: updatedUser.role
+            }
+        });
+    } catch (error) {
+        console.error('Update profile error:', error);
+        res.status(500).json({ message: 'Server error', error: error.message });
+    }
+};
+
+/**
+ * @desc    Change user password
+ * @route   PUT /api/auth/change-password
+ * @access  Private
+ */
+exports.changePassword = async (req, res) => {
+    try {
+        const { currentPassword, newPassword } = req.body;
+
+        if (!currentPassword || !newPassword) {
+            return res.status(400).json({ message: 'Current password and new password are required' });
+        }
+
+        if (newPassword.length < 6) {
+            return res.status(400).json({ message: 'New password must be at least 6 characters' });
+        }
+
+        const user = await User.findById(req.user.id);
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        // Verify current password
+        const isMatch = await user.comparePassword(currentPassword);
+        if (!isMatch) {
+            return res.status(401).json({ message: 'Current password is incorrect' });
+        }
+
+        // Update password (the pre-save hook will hash it)
+        user.password = newPassword;
+        await user.save();
+
+        res.json({ message: 'Password changed successfully' });
+    } catch (error) {
+        console.error('Change password error:', error);
+        res.status(500).json({ message: 'Server error', error: error.message });
+    }
+};
+
+/**
+ * @desc    Delete user account
+ * @route   DELETE /api/auth/account
+ * @access  Private
+ */
+exports.deleteAccount = async (req, res) => {
+    try {
+        const { password } = req.body;
+
+        if (!password) {
+            return res.status(400).json({ message: 'Password confirmation is required' });
+        }
+
+        const user = await User.findById(req.user.id);
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        // Verify password
+        const isMatch = await user.comparePassword(password);
+        if (!isMatch) {
+            return res.status(401).json({ message: 'Password is incorrect' });
+        }
+
+        // Delete associated bookings
+        const Booking = require('../models/booking.model');
+        await Booking.deleteMany({ user: req.user.id });
+
+        // Delete HostProfile if exists
+        await HostProfile.deleteMany({ user: req.user.id });
+
+        // Delete the user
+        await User.findByIdAndDelete(req.user.id);
+
+        res.json({ message: 'Account deleted successfully' });
+    } catch (error) {
+        console.error('Delete account error:', error);
+        res.status(500).json({ message: 'Server error', error: error.message });
+    }
+};

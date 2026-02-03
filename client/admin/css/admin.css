@@ -211,12 +211,7 @@ tbody tr:nth-child(even) {
   font-weight: bold;
 }
 
-color: #fff;
-padding: 6px 14px;
-border: none;
-border-radius: 6px;
-cursor: pointer;
-}
+/* (removed orphan btn-edit properties - duplicated in .action-btn) */
 
 .btn-edit:hover {
   background-color: var(--primary-dark);
@@ -327,4 +322,266 @@ select.editable-input {
   object-fit: cover;
   border-radius: 6px;
   border: 1px solid var(--border);
+}
+
+/* ========== EXPANDABLE SPOT DETAILS ========== */
+.spot-details-row {
+  display: none;
+}
+
+.spot-details-row.expanded {
+  display: table-row;
+}
+
+.spot-details-row td {
+  padding: 0;
+  background-color: #f8fafa;
+  border-top: none;
+}
+
+.spot-details-content {
+  padding: 20px 24px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px;
+  border-top: 2px dashed var(--border);
+}
+
+.detail-section {
+  background: var(--card-bg);
+  padding: 16px;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px var(--shadow);
+}
+
+.detail-section-title {
+  font-weight: 700;
+  color: var(--primary);
+  margin-bottom: 12px;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 8px;
+}
+
+.detail-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 6px 0;
+  border-bottom: 1px dotted var(--border);
+}
+
+.detail-item:last-child {
+  border-bottom: none;
+}
+
+.detail-label {
+  font-weight: 600;
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.detail-value {
+  font-weight: 500;
+  color: var(--text);
+  text-align: right;
+  max-width: 60%;
+}
+
+/* Badges for categories */
+.badge-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  justify-content: flex-end;
+}
+
+.badge {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.badge-vehicle {
+  background-color: #e8f4fd;
+  color: #1976d2;
+}
+
+.badge-booking {
+  background-color: #e8f5e9;
+  color: #388e3c;
+}
+
+.badge-payment {
+  background-color: #fff3e0;
+  color: #f57c00;
+}
+
+.badge-addon {
+  background-color: #f3e5f5;
+  color: #7b1fa2;
+}
+
+.badge-yes {
+  background-color: #c8e6c9;
+  color: #2e7d32;
+}
+
+.badge-no {
+  background-color: #ffcdd2;
+  color: #c62828;
+}
+
+.badge-active {
+  background-color: #c8e6c9;
+  color: #2e7d32;
+}
+
+.badge-inactive {
+  background-color: #ffcdd2;
+  color: #c62828;
+}
+
+/* Description field */
+.detail-description {
+  grid-column: 1 / -1;
+  background: var(--card-bg);
+  padding: 16px;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px var(--shadow);
+}
+
+.detail-description .detail-section-title {
+  margin-bottom: 8px;
+}
+
+.detail-description-text {
+  color: var(--text);
+  line-height: 1.6;
+  font-size: 0.9rem;
+  white-space: pre-wrap;
+}
+
+/* Expand button */
+.btn-expand {
+  background-color: #9b59b6;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.btn-expand:hover {
+  background-color: #8e44ad;
+}
+
+.btn-expand .expand-icon {
+  transition: transform 0.2s ease;
+  display: inline-block;
+}
+
+.btn-expand.expanded .expand-icon {
+  transform: rotate(180deg);
+}
+
+/* Rating stars */
+.rating-stars {
+  color: #f1c40f;
+  font-size: 0.9rem;
+}
+
+.rating-value {
+  color: var(--text);
+  font-weight: 600;
+  margin-left: 4px;
+}
+
+/* Edit mode indicator */
+.btn-edit {
+  background-color: var(--primary);
+}
+
+/* ========== BULK ACTIONS ========== */
+.bulk-actions-container {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  border-radius: 8px;
+  margin: 12px 0;
+  border: 1px solid var(--border);
+  flex-wrap: wrap;
+}
+
+.bulk-count {
+  font-weight: 600;
+  color: var(--primary);
+  padding: 6px 12px;
+  background: white;
+  border-radius: 4px;
+  border: 1px solid var(--primary);
+}
+
+.bulk-action-btn {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.85rem;
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: transform 0.1s, box-shadow 0.2s;
+}
+
+.bulk-action-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.bulk-action-btn.bulk-approve {
+  background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
+}
+
+.bulk-action-btn.bulk-reject {
+  background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
+}
+
+.bulk-action-btn.bulk-delete {
+  background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+}
+
+/* Bulk delete button for bookings (existing) */
+.bulk-delete-btn {
+  padding: 10px 20px;
+  background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  margin: 12px 0;
+}
+
+/* ========== ACTIVATE/DEACTIVATE BUTTONS ========== */
+.btn-activate {
+  background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
+}
+
+.btn-activate:hover {
+  background: linear-gradient(135deg, #219a52 0%, #27ae60 100%);
+}
+
+.btn-deactivate {
+  background: linear-gradient(135deg, #95a5a6 0%, #7f8c8d 100%);
+}
+
+.btn-deactivate:hover {
+  background: linear-gradient(135deg, #7f8c8d 0%, #6c7a7b 100%);
 }

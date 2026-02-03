@@ -10,10 +10,14 @@ const {
     deleteSpot,
     updateSpot,
     updateSpotImage,
+    toggleSpotActive,
     createAdminBooking,
     updateAdminBooking,
     deleteAdminBooking,
-    bulkDeleteBookings
+    bulkDeleteBookings,
+    bulkApproveSpots,
+    bulkRejectSpots,
+    bulkDeleteSpots
 } = require('../controllers/admin.controller');
 const { protect } = require('../middlewares/auth.middleware');
 const { isAdmin } = require('../middlewares/admin.middleware');
@@ -26,9 +30,14 @@ router.get('/users', getAllUsers);
 router.get('/spots', getAllSpots);
 router.put('/spots/:id/approve', approveSpot);
 router.put('/spots/:id/reject', rejectSpot);
+router.patch('/spots/:id/toggle-active', toggleSpotActive);
 router.delete('/spots/:id', deleteSpot);
 router.put('/spots/:id', updateSpot);
 router.post('/spots/:id/image', upload.single('spotImage'), updateSpotImage);
+// Bulk spot operations
+router.post('/spots/bulk-approve', bulkApproveSpots);
+router.post('/spots/bulk-reject', bulkRejectSpots);
+router.post('/spots/bulk-delete', bulkDeleteSpots);
 router.get('/bookings', getAllBookings);
 router.post('/bookings', createAdminBooking);
 router.put('/bookings/:id', updateAdminBooking);

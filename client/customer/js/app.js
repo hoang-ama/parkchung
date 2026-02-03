@@ -377,6 +377,7 @@ document.addEventListener('DOMContentLoaded', () => {
             nav.innerHTML = `
             <a href="${window.HOST_URL}/login" style="text-decoration: none; color: #13b47e; font-weight: 500;">${dict.becomeHost}</a>
             <a href="my-bookings.html" style="text-decoration: none; color: #13b47e; font-weight: 500; margin-left: 15px;">${dict.myBookings}</a>
+            <a href="my-profile.html" style="text-decoration: none; color: #13b47e; font-weight: 500; margin-left: 15px;">My Profile</a>
             <span style="margin: 0 15px;">|</span>
             <span>${dict.welcome}, ${userData.fullName}!</span>
             <a href="#" id="logout-btn" style="margin-left: 15px; text-decoration: none; color: #e74c3c; font-weight: 500;">${dict.logout}</a>

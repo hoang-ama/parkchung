@@ -764,20 +764,20 @@ export default function HostCreateSpotPage() {
                     <div className="p-6 border-b border-gray-100">
                         <h2 className="text-lg font-semibold text-gray-800 mb-2">Open Time</h2>
                         <p className="text-sm text-gray-500 mb-4">
-                            Specify the operating hours for this parking spot
+                            Specify the operating hours for this parking spot (you can enter multiple lines for each day)
                         </p>
-                        <input
-                            type="text"
+                        <textarea
                             id="openTime"
                             name="openTime"
                             value={formValues.openTime}
                             onChange={handleChange}
                             onBlur={handleBlur}
-                            placeholder="e.g. 08:00-22:00 or 24/7"
-                            className="w-full sm:w-1/2 px-4 py-3 border border-gray-300 rounded-lg text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-200 focus:border-emerald-500 transition-colors"
+                            placeholder="e.g.&#10;Monday-Friday: 08:00-22:00&#10;Saturday: 09:00-20:00&#10;Sunday: Closed&#10;Or simply: 24/7"
+                            rows={5}
+                            className="w-full px-4 py-3 border border-gray-300 rounded-lg text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-200 focus:border-emerald-500 transition-colors resize-none"
                         />
                         <p className="mt-1 text-xs text-gray-500">
-                            Enter operating hours (e.g., "08:00-22:00") or "24/7" if open all day
+                            Enter operating hours for each day (e.g., "Monday-Friday: 08:00-22:00"). Press Enter to add multiple lines.
                         </p>
                     </div>
 

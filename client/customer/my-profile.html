@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Profile | Parkchung</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Reset & Base */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: "Montserrat", sans-serif;
+            background: linear-gradient(135deg, #13b47e 0%, #1f6f35 100%);
+            min-height: 100vh;
+            color: #333;
+            line-height: 1.5;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        /* Layout Utilities */
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header */
+        header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            padding: 15px 0;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1140px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .logo-area {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .logo-text {
+            font-size: 24px;
+            font-weight: 700;
+            color: #13b47e;
+            letter-spacing: 1px;
+        }
+
+        .logo-slogan {
+            font-size: 12px;
+            color: #777;
+            margin-top: 2px;
+        }
+
+        .nav-menu {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .nav-item {
+            font-size: 14px;
+            font-weight: 500;
+            color: #555;
+            padding: 8px 14px;
+            border-radius: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .nav-item:hover {
+            color: #13b47e;
+            background: rgba(19, 180, 126, 0.1);
+        }
+
+        .nav-item.active {
+            color: #ffffff;
+            background: linear-gradient(135deg, #13b47e 0%, #1f6f35 100%);
+            font-weight: 700;
+        }
+
+        /* Page Title */
+        .page-title-section {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            padding: 30px 0;
+            margin-bottom: 40px;
+        }
+
+        .page-title-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1140px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .page-title {
+            font-size: 32px;
+            font-weight: 700;
+            color: #ffffff;
+        }
+
+        .back-link {
+            color: #ffffff;
+            font-size: 15px;
+            font-weight: 600;
+            padding: 10px 24px;
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50px;
+            transition: all 0.3s ease;
+        }
+
+        .back-link:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        /* Profile Card */
+        .profile-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+            padding: 40px;
+            margin-bottom: 30px;
+        }
+
+        .profile-section {
+            margin-bottom: 30px;
+        }
+
+        .profile-section:last-child {
+            margin-bottom: 0;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #13b47e;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e0f5ed;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-title span {
+            font-size: 22px;
+        }
+
+        .profile-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .profile-row:last-child {
+            border-bottom: none;
+        }
+
+        .profile-label {
+            font-weight: 600;
+            color: #555;
+            font-size: 14px;
+        }
+
+        .profile-value {
+            font-weight: 500;
+            color: #333;
+            font-size: 15px;
+        }
+
+        .profile-value.editable {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .profile-input {
+            padding: 10px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: inherit;
+            width: 200px;
+            transition: border-color 0.3s;
+        }
+
+        .profile-input:focus {
+            outline: none;
+            border-color: #13b47e;
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: inherit;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #13b47e 0%, #1f6f35 100%);
+            color: #fff;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(19, 180, 126, 0.3);
+        }
+
+        .btn-secondary {
+            background: #f0f0f0;
+            color: #555;
+        }
+
+        .btn-secondary:hover {
+            background: #e0e0e0;
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+            color: #fff;
+        }
+
+        .btn-danger:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(231, 76, 60, 0.3);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 2px solid #13b47e;
+            color: #13b47e;
+        }
+
+        .btn-outline:hover {
+            background: #13b47e;
+            color: #fff;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal {
+            background: #fff;
+            border-radius: 16px;
+            padding: 30px;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .modal-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .modal-input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: inherit;
+            margin-bottom: 15px;
+        }
+
+        .modal-input:focus {
+            outline: none;
+            border-color: #13b47e;
+        }
+
+        .password-input-wrapper {
+            position: relative;
+            margin-bottom: 15px;
+        }
+
+        .password-input-wrapper .modal-input {
+            margin-bottom: 0;
+            padding-right: 45px;
+        }
+
+        .password-toggle-icon {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: #999;
+            width: 20px;
+            height: 20px;
+            user-select: none;
+            transition: color 0.3s;
+        }
+
+        .password-toggle-icon:hover {
+            color: #13b47e;
+        }
+
+        /* Hide browser's built-in password reveal icon */
+        .modal-input::-ms-reveal,
+        .modal-input::-ms-clear {
+            display: none;
+        }
+
+        .modal-input::-webkit-credentials-auto-fill-button {
+            display: none !important;
+        }
+
+        input[type="password"]::-ms-reveal,
+        input[type="password"]::-ms-clear {
+            display: none;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-top: 20px;
+        }
+
+        /* Loading */
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #777;
+        }
+
+        /* Messages */
+        .message {
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-weight: 500;
+        }
+
+        .message.success {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .message.error {
+            background: #ffebee;
+            color: #c62828;
+        }
+
+        /* Member since badge */
+        .member-badge {
+            display: inline-block;
+            padding: 6px 14px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .nav-menu {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .profile-card {
+                padding: 25px;
+            }
+
+            .profile-row {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+
+            .profile-input {
+                width: 100%;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Header -->
+    <header>
+        <div class="header-content">
+            <div class="logo-area">
+                <a href="index.html" class="logo-text">PARKCHUNG</a>
+                <span class="logo-slogan">Seamless Smart Parking, Safe & Easy</span>
+            </div>
+            <nav class="nav-menu">
+                <a href="#" class="nav-item" id="host-link" data-i18n="becomeHost">Host</a>
+                <a href="my-bookings.html" class="nav-item" data-i18n="my_bookings">My Bookings</a>
+                <a href="my-profile.html" class="nav-item active" data-i18n="my_profile">My Profile</a>
+                <a href="index.html" class="nav-item" id="user-welcome">Welcome</a>
+                <a href="login.html" class="nav-item" id="logout-link" data-i18n="logout">Logout</a>
+                <span style="margin: 0 10px; color: #ccc;">|</span>
+                <button id="lang-en" class="lang-btn"
+                    style="background:none;border:none;cursor:pointer;font-weight:500;padding:5px 8px;">EN</button>
+                <span style="color:#aaa;">/</span>
+                <button id="lang-vi" class="lang-btn"
+                    style="background:none;border:none;cursor:pointer;font-weight:500;padding:5px 8px;">VI</button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Page Title -->
+    <div class="page-title-section">
+        <div class="page-title-content">
+            <h1 class="page-title">My Profile</h1>
+            <a href="index.html" class="back-link">← Back to Home</a>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container">
+        <div id="message-container"></div>
+
+        <div id="profile-content">
+            <p class="loading">Loading profile...</p>
+        </div>
+    </div>
+
+    <!-- Change Password Modal -->
+    <div class="modal-overlay" id="password-modal">
+        <div class="modal">
+            <h3 class="modal-title">🔐 Change Password</h3>
+
+            <div class="password-input-wrapper">
+                <input type="password" class="modal-input" id="current-password" placeholder="Current Password">
+                <svg class="password-toggle-icon" onclick="togglePasswordVisibility('current-password')"
+                    xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                    <circle cx="12" cy="12" r="3"></circle>
+                </svg>
+            </div>
+
+            <div class="password-input-wrapper">
+                <input type="password" class="modal-input" id="new-password" placeholder="New Password (min 6 chars)">
+                <svg class="password-toggle-icon" onclick="togglePasswordVisibility('new-password')"
+                    xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                    <circle cx="12" cy="12" r="3"></circle>
+                </svg>
+            </div>
+
+            <div class="password-input-wrapper">
+                <input type="password" class="modal-input" id="confirm-password" placeholder="Confirm New Password">
+                <svg class="password-toggle-icon" onclick="togglePasswordVisibility('confirm-password')"
+                    xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                    <circle cx="12" cy="12" r="3"></circle>
+                </svg>
+            </div>
+
+            <div class="modal-buttons">
+                <button class="btn btn-secondary" onclick="closePasswordModal()">Cancel</button>
+                <button class="btn btn-primary" onclick="submitPasswordChange()">Change Password</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Account Modal -->
+    <div class="modal-overlay" id="delete-modal">
+        <div class="modal">
+            <h3 class="modal-title">⚠️ Delete Account</h3>
+            <p style="margin-bottom: 15px; color: #666;">This action is <strong>permanent</strong> and cannot be undone.
+                All your bookings will be deleted.</p>
+            <input type="password" class="modal-input" id="delete-password"
+                placeholder="Enter your password to confirm">
+            <div class="modal-buttons">
+                <button class="btn btn-secondary" onclick="closeDeleteModal()">Cancel</button>
+                <button class="btn btn-danger" onclick="submitDeleteAccount()">Delete My Account</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/config.js"></script>
+    <script src="js/my-profile.js"></script>
+</body>
+
+</html>

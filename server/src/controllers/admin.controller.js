@@ -35,30 +35,38 @@ exports.getAllSpots = async (req, res) => {
 
 exports.approveSpot = async (req, res) => {
     try {
-        const spot = await ParkingSpot.findById(req.params.id);
-        if (spot) {
-            spot.status = 'approved';
-            const updatedSpot = await spot.save();
-            res.json(updatedSpot);
-        } else {
-            res.status(404).json({ message: 'Spot not found' });
+        const updatedSpot = await ParkingSpot.findByIdAndUpdate(
+            req.params.id,
+            { $set: { status: 'approved' } },
+            { new: true, runValidators: false }
+        ).populate('owner', 'email');
+
+        if (!updatedSpot) {
+            return res.status(404).json({ message: 'Spot not found' });
         }
+
+        res.json(updatedSpot);
     } catch (error) {
+        console.error('Error approving spot:', error);
         res.status(500).json({ message: 'Server error', error: error.message });
     }
 };
 
 exports.rejectSpot = async (req, res) => {
     try {
-        const spot = await ParkingSpot.findById(req.params.id);
-        if (spot) {
-            spot.status = 'rejected';
-            const updatedSpot = await spot.save();
-            res.json(updatedSpot);
-        } else {
-            res.status(404).json({ message: 'Spot not found' });
+        const updatedSpot = await ParkingSpot.findByIdAndUpdate(
+            req.params.id,
+            { $set: { status: 'rejected' } },
+            { new: true, runValidators: false }
+        ).populate('owner', 'email');
+
+        if (!updatedSpot) {
+            return res.status(404).json({ message: 'Spot not found' });
         }
+
+        res.json(updatedSpot);
     } catch (error) {
+        console.error('Error rejecting spot:', error);
         res.status(500).json({ message: 'Server error', error: error.message });
     }
 };
@@ -89,6 +97,39 @@ exports.updateSpot = async (req, res) => {
             res.status(404).json({ message: 'Spot not found' });
         }
     } catch (error) {
+        res.status(500).json({ message: 'Server error', error: error.message });
+    }
+};
+
+/**
+ * @desc    Toggle spot active/inactive status (Admin)
+ * @route   PATCH /api/admin/spots/:id/toggle-active
+ * @access  Private/Admin
+ */
+exports.toggleSpotActive = async (req, res) => {
+    try {
+        const spot = await ParkingSpot.findById(req.params.id);
+        if (!spot) {
+            return res.status(404).json({ message: 'Spot not found' });
+        }
+
+        // Handle undefined/null isActive - treat as true (default)
+        const currentStatus = spot.isActive !== false;
+        const newStatus = !currentStatus;
+
+        // Use findByIdAndUpdate for atomic operation to avoid validation issues
+        const updatedSpot = await ParkingSpot.findByIdAndUpdate(
+            req.params.id,
+            { $set: { isActive: newStatus } },
+            { new: true, runValidators: false }
+        );
+
+        res.json({
+            message: `Spot ${newStatus ? 'activated' : 'deactivated'} successfully`,
+            spot: updatedSpot
+        });
+    } catch (error) {
+        console.error('Error toggling spot active status:', error);
         res.status(500).json({ message: 'Server error', error: error.message });
     }
 };
@@ -349,5 +390,101 @@ exports.bulkDeleteBookings = async (req, res) => {
         });
     } catch (error) {
         res.status(500).json({ message: 'Server error deleting bookings', error: error.message });
+    }
+};
+
+/**
+ * @desc    Bulk approve parking spots (Admin)
+ * @route   POST /api/admin/spots/bulk-approve
+ * @access  Private/Admin
+ */
+exports.bulkApproveSpots = async (req, res) => {
+    try {
+        const { spotIds } = req.body;
+
+        if (!spotIds || !Array.isArray(spotIds) || spotIds.length === 0) {
+            return res.status(400).json({ message: 'Please provide an array of spot IDs' });
+        }
+
+        const result = await ParkingSpot.updateMany(
+            { _id: { $in: spotIds } },
+            { $set: { status: 'approved' } }
+        );
+
+        if (result.matchedCount === 0) {
+            return res.status(404).json({ message: 'No spots found with provided IDs' });
+        }
+
+        res.json({
+            message: `Successfully approved ${result.modifiedCount} spot(s)`,
+            modifiedCount: result.modifiedCount,
+            requestedCount: spotIds.length
+        });
+    } catch (error) {
+        res.status(500).json({ message: 'Server error approving spots', error: error.message });
+    }
+};
+
+/**
+ * @desc    Bulk reject parking spots (Admin)
+ * @route   POST /api/admin/spots/bulk-reject
+ * @access  Private/Admin
+ */
+exports.bulkRejectSpots = async (req, res) => {
+    try {
+        const { spotIds } = req.body;
+
+        if (!spotIds || !Array.isArray(spotIds) || spotIds.length === 0) {
+            return res.status(400).json({ message: 'Please provide an array of spot IDs' });
+        }
+
+        const result = await ParkingSpot.updateMany(
+            { _id: { $in: spotIds } },
+            { $set: { status: 'rejected' } }
+        );
+
+        if (result.matchedCount === 0) {
+            return res.status(404).json({ message: 'No spots found with provided IDs' });
+        }
+
+        res.json({
+            message: `Successfully rejected ${result.modifiedCount} spot(s)`,
+            modifiedCount: result.modifiedCount,
+            requestedCount: spotIds.length
+        });
+    } catch (error) {
+        res.status(500).json({ message: 'Server error rejecting spots', error: error.message });
+    }
+};
+
+/**
+ * @desc    Bulk delete parking spots (Admin)
+ * @route   POST /api/admin/spots/bulk-delete
+ * @access  Private/Admin
+ */
+exports.bulkDeleteSpots = async (req, res) => {
+    try {
+        const { spotIds } = req.body;
+
+        if (!spotIds || !Array.isArray(spotIds) || spotIds.length === 0) {
+            return res.status(400).json({ message: 'Please provide an array of spot IDs' });
+        }
+
+        // Also delete any bookings associated with these spots
+        await Booking.deleteMany({ spot: { $in: spotIds } });
+
+        const result = await ParkingSpot.deleteMany({ _id: { $in: spotIds } });
+
+        if (result.deletedCount === 0) {
+            return res.status(404).json({ message: 'No spots found with provided IDs' });
+        }
+
+        res.json({
+            message: `Successfully deleted ${result.deletedCount} spot(s)`,
+            deletedCount: result.deletedCount,
+            requestedCount: spotIds.length
+        });
+    } catch (error) {
+        res.status(500).json({ message: 'Server error deleting spots', error: error.message });
     }
 };

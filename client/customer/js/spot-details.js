@@ -76,6 +76,23 @@ async function initializeSpotBookingPage(spotId) {
         const spotDescEl = document.getElementById('spot-description');
         if (spotDescEl) spotDescEl.textContent = spot.description || 'No description available for this parking spot.';
 
+        // Operating Hours (openTime field - supports multiple lines)
+        const spotOpenTimeEl = document.getElementById('spot-open-time');
+        if (spotOpenTimeEl) {
+            if (spot.openTime && spot.openTime.trim()) {
+                // Convert newlines to styled paragraphs for proper display
+                const formattedHours = spot.openTime
+                    .split('\n')
+                    .map(line => line.trim())
+                    .filter(line => line.length > 0)
+                    .map(line => `<p class="hours-line">${line}</p>`)
+                    .join('');
+                spotOpenTimeEl.innerHTML = formattedHours || '<p>No operating hours specified.</p>';
+            } else {
+                spotOpenTimeEl.innerHTML = '<p>No operating hours specified.</p>';
+            }
+        }
+
         // Rating (dynamic from API data)
         const ratingValueEl = document.getElementById('spot-rating-value');
         const ratingStarsEl = document.getElementById('spot-rating-stars');

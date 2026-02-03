@@ -98,6 +98,15 @@ const parkingSpotSchema = new mongoose.Schema({
     }
 }, { timestamps: true });
 
+// Pre-save hook: Ensure isActive is always defined
+// This prevents future documents from being created without the isActive field
+parkingSpotSchema.pre('save', function (next) {
+    if (this.isActive === undefined || this.isActive === null) {
+        this.isActive = true;
+    }
+    next();
+});
+
 // Create 2dsphere index for geo-queries
 parkingSpotSchema.index({ location: '2dsphere' });
 

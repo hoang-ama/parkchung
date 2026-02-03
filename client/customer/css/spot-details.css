@@ -2576,6 +2576,7 @@ input:focus {
     height: 80px;
   }
 }
+
 /* Billing info text (smaller font below Total Price) */
 .billing-info-text {
   font-size: 12px;
@@ -2586,4 +2587,40 @@ input:focus {
   border-radius: 6px;
   line-height: 1.5;
   text-align: center;
+}
+
+/* ================= OPERATING HOURS SECTION ================= */
+.spot-hours-card {
+  background: var(--white);
+}
+
+.open-time-text {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.open-time-text .hours-line {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  background: linear-gradient(135deg, var(--gray-50) 0%, var(--white) 100%);
+  border-radius: var(--radius);
+  border-left: 3px solid var(--primary);
+  color: var(--text);
+  font-size: 15px;
+  font-weight: 500;
+  margin: 0;
+  transition: var(--transition);
+}
+
+.open-time-text .hours-line:hover {
+  background: var(--primary-lighter);
+  transform: translateX(4px);
+}
+
+.open-time-text p:not(.hours-line) {
+  color: var(--text-muted);
+  font-style: italic;
 }

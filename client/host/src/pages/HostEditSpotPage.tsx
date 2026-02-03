@@ -574,14 +574,15 @@ export default function HostEditSpotPage() {
                         {/* Open Time */}
                         <div className="mt-4">
                             <label className="block text-sm font-medium text-gray-700 mb-1">{t.operatingHours}</label>
-                            <input
-                                type="text"
+                            <textarea
                                 name="openTime"
                                 value={formValues.openTime}
                                 onChange={handleChange}
-                                placeholder="e.g. 08:00-22:00 or 24/7"
-                                className="w-full sm:w-1/2 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-200"
+                                placeholder="e.g.&#10;Monday-Friday: 08:00-22:00&#10;Saturday: 09:00-20:00&#10;Sunday: Closed"
+                                rows={4}
+                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-200 resize-none"
                             />
+                            <p className="mt-1 text-xs text-gray-500">Enter operating hours for each day. Press Enter to add multiple lines.</p>
                         </div>
 
                         {/* Has Roof */}
