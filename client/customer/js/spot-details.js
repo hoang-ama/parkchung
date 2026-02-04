@@ -35,12 +35,12 @@ async function initializeSpotBookingPage(spotId) {
     function updateSpotImageDisplay() {
         if (currentSpotData && currentSpotData.images && currentSpotData.images.length > 0) {
             spotMainImage.src = currentSpotData.images[currentImageIndex];
-            spotMainImage.onerror = function () { this.onerror = null; this.src = '../assets/image/parking-area.jpg'; };
+            spotMainImage.onerror = function () { this.onerror = null; this.src = '../assets/image/Spot Image Coming Soon.png'; };
             imageCounter.textContent = `${currentImageIndex + 1}/${currentSpotData.images.length}`;
             prevImageBtn.disabled = currentImageIndex === 0;
             nextImageBtn.disabled = currentImageIndex === currentSpotData.images.length - 1;
         } else {
-            spotMainImage.src = '../assets/image/parking-area.jpg'; // Ảnh mặc định
+            spotMainImage.src = '../assets/image/Spot Image Coming Soon.png'; // Ảnh mặc định
             imageCounter.textContent = '1/1';
             prevImageBtn.disabled = true;
             nextImageBtn.disabled = true;

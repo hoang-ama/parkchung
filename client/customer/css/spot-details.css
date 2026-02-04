@@ -367,13 +367,13 @@ p {
 
 .spot-image-nav {
   position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
+  bottom: 20px;
   left: 0;
   right: 0;
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
+  gap: 20px;
   padding: 0 20px;
   pointer-events: none;
 }

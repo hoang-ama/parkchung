@@ -184,7 +184,7 @@ document.addEventListener('DOMContentLoaded', () => {
             badge_flexible: 'Flexible'
         },
         vi: {
-            becomeHost: 'Đăng bãi',
+            becomeHost: 'Trở thành chủ bãi đậu xe',
             registerText: 'Đăng ký',
             myBookings: 'Đặt chỗ của tôi',
             welcome: 'Xin chào',

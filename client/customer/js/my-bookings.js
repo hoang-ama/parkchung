@@ -440,7 +440,7 @@ function createBookingCard(booking) {
                     </button>
                 </div>
                 ` : ''}
-                ${booking.paymentStatus.toLowerCase() === 'pending' ? `
+                ${booking.paymentStatus.toLowerCase() === 'pending' && booking.status.toLowerCase() !== 'cancelled' ? `
                 <div class="detail-row" style="margin-top: 15px; border-top: 2px solid rgba(0,0,0,0.1); padding-top: 15px;">
                     <button class="pay-now-btn" data-booking-id="${booking._id}" style="
                         width: 100%;

@@ -1,12 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - ParkChung</title>
     <link rel="icon" type="image/png" href="/assets/logo/favicon.png" />
     <link rel="stylesheet" href="css/styles.css" />
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap"
+        rel="stylesheet" />
     <style>
         .auth-container {
             display: flex;
@@ -14,27 +16,32 @@
             align-items: center;
             padding: 50px 20px;
         }
+
         .auth-form {
             background: white;
             padding: 40px;
             border-radius: 8px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
             width: 100%;
             max-width: 450px;
         }
+
         .auth-form h2 {
             text-align: center;
             color: #13b47e;
             margin-bottom: 20px;
         }
+
         .form-group {
             margin-bottom: 15px;
         }
+
         .form-group label {
             display: block;
             margin-bottom: 5px;
             font-weight: 500;
         }
+
         .form-group input {
             width: 100%;
             padding: 10px;
@@ -42,6 +49,7 @@
             border-radius: 4px;
             box-sizing: border-box;
         }
+
         .auth-form button {
             width: 100%;
             padding: 12px;
@@ -53,19 +61,47 @@
             cursor: pointer;
             transition: background-color 0.3s;
         }
+
         .auth-form button:hover {
             background-color: #1f6f35;
         }
+
         .form-link {
             text-align: center;
             margin-top: 15px;
         }
+
         .form-link a {
             color: #13b47e;
             text-decoration: none;
         }
+
+        .success-banner {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            padding: 14px 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-weight: 600;
+            display: none;
+            animation: slideDown 0.4s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
     </style>
 </head>
+
 <body>
     <header>
         <div class="logo">
@@ -78,11 +114,14 @@
             </a>
         </div>
         <nav>
-             </nav>
+        </nav>
     </header>
 
     <main class="auth-container">
         <form id="login-form" class="auth-form">
+            <div id="register-success" class="success-banner">
+                ✓ Account created successfully! Please login with your new account.
+            </div>
             <h2 data-i18n="login_title">Login to Your Account</h2>
             <div class="form-group">
                 <label for="email" data-i18n="email">Email</label>
@@ -93,11 +132,23 @@
                 <input type="password" id="password" name="password" required>
             </div>
             <button type="submit" data-i18n="login">Login</button>
-            <p class="form-link"><span data-i18n="no_account">Don't have an account?</span> <a href="register.html" data-i18n="register_here">Register here</a></p>
+            <p class="form-link"><span data-i18n="no_account">Don't have an account?</span> <a href="register.html"
+                    data-i18n="register_here">Register here</a></p>
         </form>
     </main>
-    <script src="js/config.js"></script> 
+    <script src="/customer/js/custom-modal.js"></script>
+    <script src="js/config.js"></script>
     <script type="module" src="js/app.js"></script>
     <script type="module" src="js/auth.js"></script>
+    <script>
+        // Show success banner if redirected from registration
+        const params = new URLSearchParams(window.location.search);
+        if (params.get('registered') === 'true') {
+            document.getElementById('register-success').style.display = 'block';
+            // Clean URL without reload
+            window.history.replaceState({}, '', 'login.html');
+        }
+    </script>
 </body>
+
 </html>

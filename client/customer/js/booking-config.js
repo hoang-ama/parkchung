@@ -363,7 +363,7 @@ async function initializeBookingConfigPage(spotId, arrivalParam, leavingParam) {
 
             // Handle spot thumbnail image
             if (spotThumbnail) {
-                let imageUrl = '/assets/image/parking-area.jpg'; // Default fallback
+                let imageUrl = '/assets/image/Spot Image Coming Soon.png'; // Default fallback
 
                 if (currentSpotData.images && currentSpotData.images.length > 0) {
                     const firstImage = currentSpotData.images[0];
@@ -380,7 +380,7 @@ async function initializeBookingConfigPage(spotId, arrivalParam, leavingParam) {
 
                 // Add error handler to show fallback if image fails to load
                 spotThumbnail.onerror = function () {
-                    this.src = '/assets/image/parking-area.jpg';
+                    this.src = '/assets/image/Spot Image Coming Soon.png';
                 };
             }
 

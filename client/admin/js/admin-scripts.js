@@ -1,7 +1,7 @@
 // File: client/admin/js/admin-scripts.js
 
 // --- CONSTANTS ---
-const FALLBACK_IMAGE = '/assets/image/parking-area.jpg';
+const FALLBACK_IMAGE = '/assets/image/Spot Image Coming Soon.png';
 
 /**
  * Validate and get a proper image URL, returning fallback for invalid URLs.

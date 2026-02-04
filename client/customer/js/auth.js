@@ -13,7 +13,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             try {
                 await api.register(fullName, email, password, phone);
-                alert('Registration successful! Please log in.');
+                await window.customModal.success('Your account has been created successfully! Please login with your new account.', 'Registration Successful');
                 window.location.href = 'login.html';
             } catch (error) {
                 alert(`Registration failed: ${error.message}`);
@@ -32,7 +32,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const data = await api.login(email, password);
                 localStorage.setItem('userToken', data.token);
                 localStorage.setItem('userData', JSON.stringify({ fullName: data.fullName, email: data.email, phone: data.phone }));
-                alert('Login successful!');
+                await window.customModal.success(`Welcome back, ${data.fullName}! You have successfully logged in to ParkChung.`, 'Login Successful');
                 window.location.href = 'index.html';
             } catch (error) {
                 alert(`Login failed: ${error.message}`);

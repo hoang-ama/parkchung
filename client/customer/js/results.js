@@ -207,10 +207,10 @@ function displaySpots(params) {
 
         const imageUrl = spot.images && spot.images.length > 0
             ? spot.images[0]
-            : '/assets/image/parking-area.jpg';
+            : '/assets/image/Spot Image Coming Soon.png';
 
         spotCard.innerHTML = `
-            <img src="${imageUrl}" alt="${spot.address}" class="spot-card__image" onerror="this.onerror=null; this.src='/assets/image/parking-area.jpg';">
+            <img src="${imageUrl}" alt="${spot.address}" class="spot-card__image" onerror="this.onerror=null; this.src='/assets/image/Spot Image Coming Soon.png';">
             <div class="spot-card__content">
                 <h3>${spot.address}</h3>
                 <div class="spot-card__info">
@@ -288,30 +288,31 @@ function createPaginationControls(totalPages, params) {
         align-items: center;
     `;
 
-    for (let i = 1; i <= totalPages; i++) {
+    // Helper function to create page button
+    const createPageButton = (pageNum) => {
         const pageButton = document.createElement('button');
-        pageButton.textContent = i;
+        pageButton.textContent = pageNum;
         pageButton.style.cssText = `
             width: 40px;
             height: 40px;
             padding: 8px;
-            background: ${i === currentPage ? 'var(--primary)' : '#f0f0f0'};
-            color: ${i === currentPage ? 'white' : '#333'};
-            border: 2px solid ${i === currentPage ? 'var(--primary)' : '#ddd'};
+            background: ${pageNum === currentPage ? 'var(--primary)' : '#f0f0f0'};
+            color: ${pageNum === currentPage ? 'white' : '#333'};
+            border: 2px solid ${pageNum === currentPage ? 'var(--primary)' : '#ddd'};
             border-radius: 50%;
-            font-weight: ${i === currentPage ? '700' : '600'};
+            font-weight: ${pageNum === currentPage ? '700' : '600'};
             font-size: 14px;
             cursor: pointer;
             transition: all 0.3s ease;
             font-family: 'Montserrat', sans-serif;
-            box-shadow: ${i === currentPage ? '0 4px 15px rgba(19, 180, 126, 0.3)' : 'none'};
+            box-shadow: ${pageNum === currentPage ? '0 4px 15px rgba(19, 180, 126, 0.3)' : 'none'};
         `;
         pageButton.addEventListener('click', () => {
-            currentPage = i;
+            currentPage = pageNum;
             displaySpots(params);
             window.scrollTo({ top: 0, behavior: 'smooth' });
         });
-        if (i !== currentPage) {
+        if (pageNum !== currentPage) {
             pageButton.addEventListener('mouseenter', (e) => {
                 e.target.style.background = '#e0e0e0';
                 e.target.style.transform = 'scale(1.1)';
@@ -321,8 +322,50 @@ function createPaginationControls(totalPages, params) {
                 e.target.style.transform = 'scale(1)';
             });
         }
-        pageNumbersDiv.appendChild(pageButton);
+        return pageButton;
+    };
+
+    // Helper function to create ellipsis
+    const createEllipsis = () => {
+        const ellipsis = document.createElement('span');
+        ellipsis.textContent = '...';
+        ellipsis.style.cssText = `
+            padding: 0 8px;
+            color: #666;
+            font-weight: 600;
+            font-size: 14px;
+        `;
+        return ellipsis;
+    };
+
+    // Truncated pagination logic
+    const showPages = new Set();
+
+    // Always show first 3 pages
+    for (let i = 1; i <= Math.min(3, totalPages); i++) {
+        showPages.add(i);
     }
+
+    // Always show last 3 pages
+    for (let i = Math.max(1, totalPages - 2); i <= totalPages; i++) {
+        showPages.add(i);
+    }
+
+    // Show current page and neighbors (current - 1, current, current + 1)
+    for (let i = Math.max(1, currentPage - 1); i <= Math.min(totalPages, currentPage + 1); i++) {
+        showPages.add(i);
+    }
+
+    // Convert to sorted array and render with ellipsis
+    const sortedPages = Array.from(showPages).sort((a, b) => a - b);
+
+    sortedPages.forEach((pageNum, index) => {
+        // Add ellipsis if there's a gap
+        if (index > 0 && pageNum - sortedPages[index - 1] > 1) {
+            pageNumbersDiv.appendChild(createEllipsis());
+        }
+        pageNumbersDiv.appendChild(createPageButton(pageNum));
+    });
 
     // Next button
     const nextButton = document.createElement('button');
