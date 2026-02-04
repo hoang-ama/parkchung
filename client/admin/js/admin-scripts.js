@@ -867,7 +867,7 @@ function handleDashboardPage(API_URL, token) {
                 const spots = await fetchAdminData('spots');
                 const headers = [
                     '<input type="checkbox" id="select-all-spots" onchange="toggleSelectAllSpots()" title="Select All">',
-                    'Image', 'Address', 'Hourly Rate', 'Status', 'Actions'
+                    'Spot ID', 'Image', 'Address', 'Hourly Rate', 'Status', 'Actions'
                 ];
                 const rowsHtml = spots.map(s => {
                     // Expand button comes first
@@ -908,6 +908,7 @@ function handleDashboardPage(API_URL, token) {
                     return `
                         <tr id="spot-${s._id}">
                             <td><input type="checkbox" class="spot-checkbox" value="${s._id}" onchange="updateSpotBulkActions()"></td>
+                            <td class="spot-code-column">${s.spotCode ? `<span class="spot-code-badge">${s.spotCode}</span>` : '<span class="spot-code-na">N/A</span>'}</td>
                             <td class="spot-image-column"><img src="${imageUrl}" alt="Spot image" class="spot-thumbnail" onerror="this.onerror=null; this.src='${FALLBACK_IMAGE}';"></td>
                             <td class="editable-address">${s.address}</td>
                             <td class="editable-rate">${s.hourlyRate ? s.hourlyRate.toLocaleString('vi-VN') + ' VND' : 'N/A'}</td>

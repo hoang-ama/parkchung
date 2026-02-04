@@ -3,6 +3,7 @@ const User = require('../models/user.model');
 const HostProfile = require('../models/hostProfile.model');
 const ParkingSpot = require('../models/parkingSpot.model');
 const Booking = require('../models/booking.model');
+const { generateSpotCode, getProvinceCode } = require('../utils/provinceCode.util');
 
 /**
  * @desc    Get current host's profile and user info
@@ -177,6 +178,9 @@ exports.createSpot = async (req, res) => {
             return [val];
         };
 
+        // Generate spotCode based on address province
+        const spotCode = await generateSpotCode(address.trim());
+
         // Create the parking spot
         const spot = await ParkingSpot.create({
             owner: req.user._id,
@@ -197,6 +201,7 @@ exports.createSpot = async (req, res) => {
                 return methods.length > 0 ? methods : ['cash'];
             })(),
             images: imageUrls,
+            spotCode: spotCode,
             status: 'pending' // New spots are pending admin approval
         });
 
@@ -301,6 +306,17 @@ exports.updateSpot = async (req, res) => {
         // Validate numberOfSlots if being updated
         if (updates.numberOfSlots !== undefined && updates.numberOfSlots <= 0) {
             return res.status(400).json({ message: 'numberOfSlots must be greater than 0' });
+        }
+
+        // Check if address changed to a different province - regenerate spotCode
+        if (updates.address) {
+            const oldProvinceCode = getProvinceCode(spot.address);
+            const newProvinceCode = getProvinceCode(updates.address);
+
+            if (oldProvinceCode !== newProvinceCode) {
+                // Province changed, generate new spotCode
+                updates.spotCode = await generateSpotCode(updates.address);
+            }
         }
 
         // Apply updates

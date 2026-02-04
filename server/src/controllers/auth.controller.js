@@ -3,6 +3,7 @@ const User = require('../models/user.model');
 const HostProfile = require('../models/hostProfile.model');
 const jwt = require('jsonwebtoken');
 const config = require('../config');
+const brevoService = require('../services/brevo.service');
 
 // JWT token generator
 const generateToken = (id, role) => {
@@ -25,6 +26,15 @@ exports.registerUser = async (req, res) => {
         const user = await User.create({ fullName, email: email.toLowerCase(), password, phone });
 
         if (user) {
+            // Send registration confirmation email (non-blocking)
+            brevoService.sendRegistrationEmail({
+                fullName: user.fullName,
+                email: user.email,
+                phone: user.phone
+            }, 'userregisemail').catch(err => {
+                console.error('Failed to send user registration email:', err);
+            });
+
             res.status(201).json({
                 _id: user._id,
                 fullName: user.fullName,
@@ -120,6 +130,15 @@ exports.registerHost = async (req, res) => {
 
         // Generate JWT token
         const token = generateToken(user._id, user.role);
+
+        // Send registration confirmation email to partner (non-blocking)
+        brevoService.sendRegistrationEmail({
+            fullName: user.fullName,
+            email: user.email,
+            phone: user.phone
+        }, 'partnerregisemail').catch(err => {
+            console.error('Failed to send partner registration email:', err);
+        });
 
         // Return success response
         res.status(201).json({

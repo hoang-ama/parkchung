@@ -190,8 +190,44 @@ const sendReviewEmail = async (bookingData) => {
     }
 };
 
+/**
+ * Send registration confirmation email to User or Partner
+ * @param {Object} userData - User details containing fullName, email
+ * @param {string} templateName - Template key: 'userregisemail' for customer, 'partnerregisemail' for partner
+ */
+const sendRegistrationEmail = async (userData, templateName) => {
+    try {
+        const templateId = templates[templateName];
+        if (!templateId) {
+            throw new Error(`Template '${templateName}' not found in configuration.`);
+        }
+
+        const sendSmtpEmail = new SibApiV3Sdk.SendSmtpEmail();
+        sendSmtpEmail.templateId = templateId;
+        sendSmtpEmail.to = [{ email: userData.email, name: userData.fullName }];
+        sendSmtpEmail.params = {
+            // User information
+            userName: userData.fullName,
+            userEmail: userData.email,
+            userPhone: userData.phone || '',
+            // Registration date
+            registerDate: new Date().toLocaleDateString('vi-VN'),
+            registerTime: new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })
+        };
+
+        console.log(`Sending '${templateName}' registration email to ${userData.email}...`);
+        const data = await apiInstance.sendTransacEmail(sendSmtpEmail);
+        console.log(`Registration email '${templateName}' sent successfully. Message ID: ${data.messageId}`);
+        return data;
+    } catch (error) {
+        console.error(`Error sending '${templateName}' registration email:`, error);
+        // Don't throw - registration should succeed even if email fails
+    }
+};
+
 module.exports = {
     sendBookingEmail,
     sendEmailPartner,
-    sendReviewEmail
+    sendReviewEmail,
+    sendRegistrationEmail
 };

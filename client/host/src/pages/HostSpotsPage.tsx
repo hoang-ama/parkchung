@@ -16,6 +16,7 @@ interface ParkingSpot {
     images: string[];
     hasRoof: boolean;
     vehicleTypes: string[];
+    spotCode?: string; // Province-based management ID (e.g., "29-001" for Hanoi)
     createdAt: string;
 }
 
@@ -172,9 +173,16 @@ function SpotCard({
             {/* Content */}
             <div className="p-5">
                 <div className="flex justify-between items-start mb-2">
-                    <h3 className="font-semibold text-lg text-gray-900 line-clamp-1" title={spot.name}>
-                        {spot.name}
-                    </h3>
+                    <div>
+                        <h3 className="font-semibold text-lg text-gray-900 line-clamp-1" title={spot.name}>
+                            {spot.name}
+                        </h3>
+                        {spot.spotCode && (
+                            <span className="inline-block mt-1 px-2 py-0.5 bg-blue-100 text-blue-800 text-xs font-mono rounded">
+                                ID: {spot.spotCode}
+                            </span>
+                        )}
+                    </div>
                 </div>
 
                 <p className="text-gray-500 text-sm mb-4 line-clamp-1" title={spot.address}>

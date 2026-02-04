@@ -324,6 +324,34 @@ select.editable-input {
   border: 1px solid var(--border);
 }
 
+/* ========== SPOT CODE BADGE ========== */
+.spot-code-column {
+  width: 80px;
+  text-align: center;
+}
+
+.spot-code-badge {
+  display: inline-block;
+  padding: 4px 10px;
+  background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.85rem;
+  font-family: 'Courier New', monospace;
+  border-radius: 6px;
+  letter-spacing: 0.5px;
+}
+
+.spot-code-na {
+  display: inline-block;
+  padding: 4px 10px;
+  background: #ecf0f1;
+  color: #95a5a6;
+  font-weight: 600;
+  font-size: 0.8rem;
+  border-radius: 6px;
+}
+
 /* ========== EXPANDABLE SPOT DETAILS ========== */
 .spot-details-row {
   display: none;

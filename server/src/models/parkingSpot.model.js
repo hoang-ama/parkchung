@@ -85,6 +85,14 @@ const parkingSpotSchema = new mongoose.Schema({
         default: 0
         // Google rating for the parking spot (0-5 stars, can be decimal like 4.9)
     },
+    spotCode: {
+        type: String,
+        unique: true,
+        sparse: true, // Allow null for existing spots before migration
+        trim: true
+        // Format: "XX-YYY" (XX = province code, YYY = sequential number)
+        // Example: "29-001" for Hanoi, "22-001" for Tuyen Quang
+    },
     isActive: {
         type: Boolean,
         default: true
