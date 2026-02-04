@@ -210,7 +210,7 @@ function displaySpots(params) {
             : '/assets/image/parking-area.jpg';
 
         spotCard.innerHTML = `
-            <img src="${imageUrl}" alt="${spot.address}" class="spot-card__image">
+            <img src="${imageUrl}" alt="${spot.address}" class="spot-card__image" onerror="this.onerror=null; this.src='/assets/image/parking-area.jpg';">
             <div class="spot-card__content">
                 <h3>${spot.address}</h3>
                 <div class="spot-card__info">
