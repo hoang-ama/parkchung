@@ -183,11 +183,15 @@ export default function HostRegisterPage() {
                 phone: formValues.phone,
             });
 
-            setSuccessMessage('Account created successfully! Redirecting...');
+            // Clear any stale session data from previous logins
+            localStorage.removeItem('hostToken');
+            localStorage.removeItem('hostUser');
 
-            // Redirect to dashboard after a short delay
+            setSuccessMessage('Account created successfully! Redirecting to login...');
+
+            // Redirect to login page so user authenticates with their new account
             setTimeout(() => {
-                navigate('/host/dashboard');
+                navigate('/host/login');
             }, 1500);
         } catch (error) {
             const apiErr = error as ApiError;

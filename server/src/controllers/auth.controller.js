@@ -20,6 +20,9 @@ exports.registerUser = async (req, res) => {
     try {
         const userExists = await User.findOne({ email: email.toLowerCase() });
         if (userExists) {
+            if (userExists.role === 'host' || userExists.role === 'admin') {
+                return res.status(400).json({ message: 'This email is already registered as a Host/Partner. You can login to Customer Portal with the same account.' });
+            }
             return res.status(400).json({ message: 'User with this email already exists' });
         }
 
@@ -108,9 +111,57 @@ exports.registerHost = async (req, res) => {
         }
 
         // Check if email already exists
-        const userExists = await User.findOne({ email: email.toLowerCase() });
-        if (userExists) {
-            return res.status(400).json({ message: 'Email already in use' });
+        const existingUser = await User.findOne({ email: email.toLowerCase() });
+
+        if (existingUser) {
+            // If already a host or admin, reject
+            if (existingUser.role === 'host' || existingUser.role === 'admin') {
+                return res.status(400).json({ message: 'Email already in use' });
+            }
+
+            // If existing user is a customer, upgrade to host
+            existingUser.role = 'host';
+            existingUser.fullName = fullName;
+            if (phone) existingUser.phone = phone;
+            await existingUser.save();
+
+            // Create HostProfile if not exists
+            let hostProfile = await HostProfile.findOne({ user: existingUser._id });
+            if (!hostProfile) {
+                hostProfile = await HostProfile.create({
+                    user: existingUser._id,
+                    kycStatus: 'pending'
+                });
+            }
+
+            const token = generateToken(existingUser._id, existingUser.role);
+
+            // Send registration email (non-blocking)
+            brevoService.sendRegistrationEmail({
+                fullName: existingUser.fullName,
+                email: existingUser.email,
+                phone: existingUser.phone
+            }, 'partnerregisemail').catch(err => {
+                console.error('Failed to send partner registration email:', err);
+            });
+
+            return res.status(201).json({
+                message: 'Account upgraded to Host successfully',
+                user: {
+                    id: existingUser._id,
+                    fullName: existingUser.fullName,
+                    email: existingUser.email,
+                    phone: existingUser.phone,
+                    role: existingUser.role
+                },
+                hostProfile: {
+                    id: hostProfile._id,
+                    kycStatus: hostProfile.kycStatus,
+                    companyName: hostProfile.companyName,
+                    address: hostProfile.address
+                },
+                token
+            });
         }
 
         // Create new user with 'host' role
