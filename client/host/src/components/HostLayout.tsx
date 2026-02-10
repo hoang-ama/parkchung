@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Outlet, NavLink, useNavigate, useLocation } from 'react-router-dom';
+import { Outlet, NavLink, Navigate, useNavigate, useLocation } from 'react-router-dom';
 import { useTranslations } from '../i18n';
 import LanguageSwitcher from './LanguageSwitcher';
 
@@ -9,6 +9,12 @@ export default function HostLayout() {
     const t = useTranslations();
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [hostName, setHostName] = useState('Host');
+
+    // Auth guard: redirect to login if no token
+    const token = localStorage.getItem('hostToken');
+    if (!token) {
+        return <Navigate to="/host/login" replace />;
+    }
 
     // Determine the Home URL based on environment
     const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
