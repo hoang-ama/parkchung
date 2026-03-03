@@ -864,63 +864,157 @@ function handleDashboardPage(API_URL, token) {
                 const rowsHtml = users.map(u => `<tr><td>${u._id}</td><td>${u.fullName}</td><td>${u.email}</td><td>${u.role}</td></tr>`).join('');
                 tableHtml = renderTable(headers, rowsHtml);
             } else if (sectionName === 'spots') {
-                const spots = await fetchAdminData('spots');
-                const headers = [
-                    '<input type="checkbox" id="select-all-spots" onchange="toggleSelectAllSpots()" title="Select All">',
-                    'Spot ID', 'Image', 'Address', 'Hourly Rate', 'Status', 'Actions'
-                ];
-                const rowsHtml = spots.map(s => {
-                    // Expand button comes first
-                    let actionsHtml = `<button class="action-btn btn-expand" onclick="toggleSpotDetails('${s._id}')"><span class="expand-icon">▼</span> Details</button>`;
+                const allSpots = await fetchAdminData('spots');
+                const SPOTS_PER_PAGE = 10;
+                let filteredSpots = allSpots;
 
-                    actionsHtml += `<button class="action-btn btn-edit" onclick="toggleEditMode('${s._id}', true)">Edit</button>`;
+                // Header with search bar aligned
+                title = `
+                    <div class="spots-header">
+                        <h2>Spots Management</h2>
+                        <div class="spots-search-box">
+                            <span class="search-icon">🔍</span>
+                            <input
+                                type="text"
+                                id="spots-search-input"
+                                class="spots-search-input"
+                                placeholder="Search by address or spot ID..."
+                                oninput="window.__spotsSearch(this.value)"
+                                autocomplete="off"
+                            >
+                        </div>
+                    </div>
+                `;
 
-                    if (s.status === 'pending') {
-                        actionsHtml += `
-                            <button class="action-btn btn-approve" onclick="handleSpotAction('${s._id}', 'approve')">Approve</button>
-                            <button class="action-btn btn-reject" onclick="handleSpotAction('${s._id}', 'reject')">Reject</button>
-                        `;
+                function renderSpotsPage(page) {
+                    const totalPages = Math.max(1, Math.ceil(filteredSpots.length / SPOTS_PER_PAGE));
+                    page = Math.min(page, totalPages);
+                    const start = (page - 1) * SPOTS_PER_PAGE;
+                    const end = start + SPOTS_PER_PAGE;
+                    const pageSpots = filteredSpots.slice(start, end);
+
+                    const headers = [
+                        '<input type="checkbox" id="select-all-spots" onchange="toggleSelectAllSpots()" title="Select All">',
+                        'Spot ID', 'Image', 'Address', 'Hourly Rate', 'Status', 'Actions'
+                    ];
+
+                    let rowsHtml;
+                    if (pageSpots.length === 0) {
+                        rowsHtml = '<tr><td colspan="7" style="text-align:center;padding:32px;color:var(--muted);">No spots found matching your search.</td></tr>';
+                    } else {
+                        rowsHtml = pageSpots.map(s => {
+                            let actionsHtml = `<button class="action-btn btn-expand" onclick="toggleSpotDetails('${s._id}')"><span class="expand-icon">▼</span> Details</button>`;
+                            actionsHtml += `<button class="action-btn btn-edit" onclick="toggleEditMode('${s._id}', true)">Edit</button>`;
+
+                            if (s.status === 'pending') {
+                                actionsHtml += `
+                                    <button class="action-btn btn-approve" onclick="handleSpotAction('${s._id}', 'approve')">Approve</button>
+                                    <button class="action-btn btn-reject" onclick="handleSpotAction('${s._id}', 'reject')">Reject</button>
+                                `;
+                            }
+
+                            actionsHtml += `
+                                <button class="action-btn btn-image" onclick="triggerImageUpload('${s._id}')">Change Image</button>
+                                <input 
+                                    type="file" 
+                                    id="image-upload-${s._id}" 
+                                    style="display: none;" 
+                                    accept="image/*"
+                                    onchange="handleImageUpdate('${s._id}')"
+                                >
+                            `;
+
+                            const isActive = s.isActive !== false;
+                            const toggleBtnClass = isActive ? 'btn-deactivate' : 'btn-activate';
+                            const toggleBtnText = isActive ? '⏸ Deactivate' : '▶ Activate';
+                            actionsHtml += `<button class="action-btn ${toggleBtnClass}" onclick="toggleSpotActiveStatus('${s._id}', ${isActive})">${toggleBtnText}</button>`;
+                            actionsHtml += `<button class="action-btn btn-delete" onclick="handleSpotAction('${s._id}', 'delete')">Delete</button>`;
+
+                            const imageUrl = getValidImageUrl(s.images);
+
+                            return `
+                                <tr id="spot-${s._id}">
+                                    <td><input type="checkbox" class="spot-checkbox" value="${s._id}" onchange="updateSpotBulkActions()"></td>
+                                    <td class="spot-code-column">${s.spotCode ? `<span class="spot-code-badge">${s.spotCode}</span>` : '<span class="spot-code-na">N/A</span>'}</td>
+                                    <td class="spot-image-column"><img src="${imageUrl}" alt="Spot image" class="spot-thumbnail" onerror="this.onerror=null; this.src='${FALLBACK_IMAGE}';"></td>
+                                    <td class="editable-address">${s.address}</td>
+                                    <td class="editable-rate">${s.hourlyRate ? s.hourlyRate.toLocaleString('vi-VN') + ' VND' : 'N/A'}</td>
+                                    <td><span class="status-${s.status}">${s.status}</span></td>
+                                    <td><div class="action-buttons">${actionsHtml}</div></td>
+                                </tr>
+                                <tr id="spot-details-${s._id}" class="spot-details-row">
+                                    ${renderSpotDetailsHtml(s)}
+                                </tr>
+                            `;
+                        }).join('');
                     }
 
-                    actionsHtml += `
-                        <button class="action-btn btn-image" onclick="triggerImageUpload('${s._id}')">Change Image</button>
-                        <input 
-                            type="file" 
-                            id="image-upload-${s._id}" 
-                            style="display: none;" 
-                            accept="image/*"
-                            onchange="handleImageUpdate('${s._id}')"
-                        >
-                    `;
+                    const tableHtml = renderTable(headers, rowsHtml);
 
-                    // Activate/Deactivate toggle button
-                    const isActive = s.isActive !== false; // Default to true if undefined
-                    const toggleBtnClass = isActive ? 'btn-deactivate' : 'btn-activate';
-                    const toggleBtnText = isActive ? '⏸ Deactivate' : '▶ Activate';
-                    actionsHtml += `<button class="action-btn ${toggleBtnClass}" onclick="toggleSpotActiveStatus('${s._id}', ${isActive})">${toggleBtnText}</button>`;
+                    // Pagination controls
+                    const totalLabel = filteredSpots.length < allSpots.length
+                        ? `${filteredSpots.length} result${filteredSpots.length !== 1 ? 's' : ''} (filtered from ${allSpots.length})`
+                        : `${allSpots.length} spots`;
 
-                    actionsHtml += `<button class="action-btn btn-delete" onclick="handleSpotAction('${s._id}', 'delete')">Delete</button>`;
+                    let paginationHtml = '<div class="pagination-controls">';
+                    paginationHtml += `<span class="pagination-info">Showing ${filteredSpots.length === 0 ? 0 : start + 1}–${Math.min(end, filteredSpots.length)} of ${totalLabel}</span>`;
+                    paginationHtml += '<div class="pagination-buttons">';
+                    paginationHtml += `<button class="pagination-btn" onclick="window.__spotsGoToPage(${page - 1})" ${page <= 1 ? 'disabled' : ''}>← Previous</button>`;
 
-                    // Use validated image URL with onerror fallback
-                    const imageUrl = getValidImageUrl(s.images);
+                    // Page number buttons (smart truncation with ellipsis)
+                    const WINDOW = 2;
+                    const pageSet = new Set();
+                    pageSet.add(1);
+                    pageSet.add(totalPages);
+                    for (let p = Math.max(1, page - WINDOW); p <= Math.min(totalPages, page + WINDOW); p++) {
+                        pageSet.add(p);
+                    }
+                    const sortedPages = [...pageSet].sort((a, b) => a - b);
+                    let lastP = 0;
+                    sortedPages.forEach(p => {
+                        if (p - lastP > 1) {
+                            paginationHtml += `<span class="pagination-ellipsis">...</span>`;
+                        }
+                        paginationHtml += `<button class="pagination-btn ${p === page ? 'pagination-active' : ''}" onclick="window.__spotsGoToPage(${p})">${p}</button>`;
+                        lastP = p;
+                    });
 
-                    // Main row + expandable details row
-                    return `
-                        <tr id="spot-${s._id}">
-                            <td><input type="checkbox" class="spot-checkbox" value="${s._id}" onchange="updateSpotBulkActions()"></td>
-                            <td class="spot-code-column">${s.spotCode ? `<span class="spot-code-badge">${s.spotCode}</span>` : '<span class="spot-code-na">N/A</span>'}</td>
-                            <td class="spot-image-column"><img src="${imageUrl}" alt="Spot image" class="spot-thumbnail" onerror="this.onerror=null; this.src='${FALLBACK_IMAGE}';"></td>
-                            <td class="editable-address">${s.address}</td>
-                            <td class="editable-rate">${s.hourlyRate ? s.hourlyRate.toLocaleString('vi-VN') + ' VND' : 'N/A'}</td>
-                            <td><span class="status-${s.status}">${s.status}</span></td>
-                            <td><div class="action-buttons">${actionsHtml}</div></td>
-                        </tr>
-                        <tr id="spot-details-${s._id}" class="spot-details-row">
-                            ${renderSpotDetailsHtml(s)}
-                        </tr>
-                    `;
-                }).join('');
-                tableHtml = renderTable(headers, rowsHtml);
+                    paginationHtml += `<button class="pagination-btn" onclick="window.__spotsGoToPage(${page + 1})" ${page >= totalPages ? 'disabled' : ''}>Next →</button>`;
+                    paginationHtml += '</div></div>';
+
+                    // Preserve search input value across re-renders
+                    const currentQuery = document.getElementById('spots-search-input')?.value || '';
+                    contentArea.innerHTML = title + tableHtml + paginationHtml;
+                    const input = document.getElementById('spots-search-input');
+                    if (input) {
+                        input.value = currentQuery;
+                        input.focus();
+                        // Move cursor to end
+                        input.setSelectionRange(input.value.length, input.value.length);
+                    }
+                }
+
+                // Global: go to page
+                window.__spotsGoToPage = function (page) {
+                    const totalPages = Math.max(1, Math.ceil(filteredSpots.length / SPOTS_PER_PAGE));
+                    if (page < 1 || page > totalPages) return;
+                    renderSpotsPage(page);
+                };
+
+                // Global: handle search input
+                window.__spotsSearch = function (query) {
+                    const q = query.trim().toLowerCase();
+                    filteredSpots = q
+                        ? allSpots.filter(s =>
+                            (s.address && s.address.toLowerCase().includes(q)) ||
+                            (s.spotCode && s.spotCode.toLowerCase().includes(q))
+                        )
+                        : allSpots;
+                    renderSpotsPage(1);
+                };
+
+                renderSpotsPage(1);
+                return;
             } else if (sectionName === 'bookings') {
                 const bookings = await fetchAdminData('bookings');
                 const headers = [

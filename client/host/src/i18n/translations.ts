@@ -113,6 +113,25 @@ export interface Translations {
     pricingCapacity: string;
     numberOfSlots: string;
     operatingHours: string;
+    monday: string;
+    tuesday: string;
+    wednesday: string;
+    thursday: string;
+    friday: string;
+    saturday: string;
+    sunday: string;
+    open: string;
+    closed: string;
+    copyToAll: string;
+    scheduleNotes: string;
+    notesPlaceholder: string;
+    presetWeekdays: string;
+    presetEveryday: string;
+    preset247: string;
+    presetCustom: string;
+    addTimeSlot: string;
+    removeSlot: string;
+    maxSlotsReached: string;
     hasRoof: string;
     vehicleTypes: string;
     bookingMethods: string;
@@ -350,6 +369,25 @@ export const translations: Record<Language, Translations> = {
         pricingCapacity: 'Pricing & Capacity',
         numberOfSlots: 'Number of Slots',
         operatingHours: 'Operating Hours',
+        monday: 'Monday',
+        tuesday: 'Tuesday',
+        wednesday: 'Wednesday',
+        thursday: 'Thursday',
+        friday: 'Friday',
+        saturday: 'Saturday',
+        sunday: 'Sunday',
+        open: 'Open',
+        closed: 'Closed',
+        copyToAll: 'Copy Mon → All',
+        scheduleNotes: 'Notes',
+        notesPlaceholder: 'e.g. Closed on public holidays, gate code: 1234...',
+        presetWeekdays: 'Weekdays 8–22',
+        presetEveryday: 'Everyday 8–22',
+        preset247: '24/7',
+        presetCustom: 'Custom',
+        addTimeSlot: '+ Add time slot',
+        removeSlot: 'Remove',
+        maxSlotsReached: 'Max 3 slots per day',
         hasRoof: 'This spot has a roof (covered parking)',
         vehicleTypes: 'Vehicle Types',
         bookingMethods: 'Booking Methods',
@@ -585,6 +623,25 @@ export const translations: Record<Language, Translations> = {
         pricingCapacity: 'Giá & Sức chứa',
         numberOfSlots: 'Số chỗ',
         operatingHours: 'Giờ hoạt động',
+        monday: 'Thứ Hai',
+        tuesday: 'Thứ Ba',
+        wednesday: 'Thứ Tư',
+        thursday: 'Thứ Năm',
+        friday: 'Thứ Sáu',
+        saturday: 'Thứ Bảy',
+        sunday: 'Chủ Nhật',
+        open: 'Mở cửa',
+        closed: 'Đóng cửa',
+        copyToAll: 'Áp dụng T2 → Tất cả',
+        scheduleNotes: 'Ghi chú',
+        notesPlaceholder: 'VD: Đóng cửa ngày lễ, mã cổng: 1234...',
+        presetWeekdays: 'Ngày thường 8–22',
+        presetEveryday: 'Hàng ngày 8–22',
+        preset247: '24/7',
+        presetCustom: 'Tùy chỉnh',
+        addTimeSlot: '+ Thêm khung giờ',
+        removeSlot: 'Xóa',
+        maxSlotsReached: 'Tối đa 3 khung giờ/ngày',
         hasRoof: 'Bãi đỗ có mái che',
         vehicleTypes: 'Loại phương tiện',
         bookingMethods: 'Phương thức đặt chỗ',

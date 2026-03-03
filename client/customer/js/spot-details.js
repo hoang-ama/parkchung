@@ -77,11 +77,65 @@ async function initializeSpotBookingPage(spotId) {
         const spotDescEl = document.getElementById('spot-description');
         if (spotDescEl) spotDescEl.textContent = spot.description || 'No description available for this parking spot.';
 
-        // Operating Hours (openTime field - supports multiple lines)
+        // Operating Hours (structured operatingHours or legacy openTime fallback)
         const spotOpenTimeEl = document.getElementById('spot-open-time');
+        const statusBadgeEl = document.getElementById('spot-status-badge');
         if (spotOpenTimeEl) {
-            if (spot.openTime && spot.openTime.trim()) {
-                // Convert newlines to styled paragraphs for proper display
+            if (spot.operatingHours && spot.operatingHours.schedule && spot.operatingHours.schedule.length > 0) {
+                // Render structured schedule (multi-slot compatible)
+                const dayLabels = {
+                    monday: 'Monday', tuesday: 'Tuesday', wednesday: 'Wednesday',
+                    thursday: 'Thursday', friday: 'Friday', saturday: 'Saturday', sunday: 'Sunday'
+                };
+                const jsDayMap = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+
+                let html = '<div class="schedule-list">';
+                spot.operatingHours.schedule.forEach(item => {
+                    const label = dayLabels[item.day] || item.day;
+                    if (item.isOpen) {
+                        // Multi-slot: item.slots is an array, or fallback to legacy openAt/closeAt
+                        let timeStr = '';
+                        if (item.slots && Array.isArray(item.slots) && item.slots.length > 0) {
+                            timeStr = item.slots.map(s => `${s.openAt} – ${s.closeAt}`).join(', ');
+                        } else if (item.openAt && item.closeAt) {
+                            timeStr = `${item.openAt} – ${item.closeAt}`;
+                        }
+                        html += `<div class="schedule-row"><span class="schedule-day">${label}</span><span class="schedule-time">${timeStr}</span></div>`;
+                    } else {
+                        html += `<div class="schedule-row schedule-closed"><span class="schedule-day">${label}</span><span class="schedule-time closed-label">Closed</span></div>`;
+                    }
+                });
+                html += '</div>';
+                if (spot.operatingHours.notes && spot.operatingHours.notes.trim()) {
+                    html += `<div class="schedule-notes"><strong>📝 Notes:</strong> ${spot.operatingHours.notes}</div>`;
+                }
+                spotOpenTimeEl.innerHTML = html;
+
+                // Open Now / Closed Now badge
+                if (statusBadgeEl) {
+                    const now = new Date();
+                    const todayKey = jsDayMap[now.getDay()];
+                    const todaySchedule = spot.operatingHours.schedule.find(s => s.day === todayKey);
+                    let isOpenNow = false;
+
+                    if (todaySchedule && todaySchedule.isOpen) {
+                        const currentMinutes = now.getHours() * 60 + now.getMinutes();
+                        const slots = (todaySchedule.slots && Array.isArray(todaySchedule.slots))
+                            ? todaySchedule.slots
+                            : [{ openAt: todaySchedule.openAt, closeAt: todaySchedule.closeAt }];
+
+                        isOpenNow = slots.some(slot => {
+                            const [oh, om] = (slot.openAt || '00:00').split(':').map(Number);
+                            const [ch, cm] = (slot.closeAt || '23:59').split(':').map(Number);
+                            return currentMinutes >= (oh * 60 + om) && currentMinutes <= (ch * 60 + cm);
+                        });
+                    }
+
+                    statusBadgeEl.textContent = isOpenNow ? '🟢 Open Now' : '🔴 Closed Now';
+                    statusBadgeEl.className = `schedule-status-badge ${isOpenNow ? 'status-open' : 'status-closed'}`;
+                }
+            } else if (spot.openTime && spot.openTime.trim()) {
+                // Legacy: plain text fallback
                 const formattedHours = spot.openTime
                     .split('\n')
                     .map(line => line.trim())
@@ -89,8 +143,10 @@ async function initializeSpotBookingPage(spotId) {
                     .map(line => `<p class="hours-line">${line}</p>`)
                     .join('');
                 spotOpenTimeEl.innerHTML = formattedHours || '<p>No operating hours specified.</p>';
+                if (statusBadgeEl) statusBadgeEl.style.display = 'none';
             } else {
                 spotOpenTimeEl.innerHTML = '<p>No operating hours specified.</p>';
+                if (statusBadgeEl) statusBadgeEl.style.display = 'none';
             }
         }
 

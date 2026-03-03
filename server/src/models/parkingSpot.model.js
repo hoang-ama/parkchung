@@ -40,7 +40,19 @@ const parkingSpotSchema = new mongoose.Schema({
     openTime: {
         type: String,
         trim: true
-        // Operating hours, e.g., "08:00-22:00" or "24/7"
+        // Legacy: Operating hours as plain text (kept for backward compatibility)
+    },
+    operatingHours: {
+        schedule: [{
+            day: { type: String, enum: ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'] },
+            isOpen: { type: Boolean, default: true },
+            // Multi-slot: allows multiple time ranges per day (e.g. morning + afternoon)
+            slots: [{
+                openAt: { type: String, default: '08:00' },  // HH:mm format
+                closeAt: { type: String, default: '22:00' }   // HH:mm format
+            }]
+        }],
+        notes: { type: String, trim: true }
     },
     bookingTypes: [{
         type: String,

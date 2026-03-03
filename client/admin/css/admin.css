@@ -613,3 +613,122 @@ select.editable-input {
 .btn-deactivate:hover {
   background: linear-gradient(135deg, #7f8c8d 0%, #6c7a7b 100%);
 }
+
+/* ========== PAGINATION CONTROLS ========== */
+.pagination-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  margin-top: 16px;
+  background: var(--card-bg);
+  border-radius: 8px;
+  box-shadow: 0 2px 6px var(--shadow);
+  border: 1px solid var(--border);
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.pagination-info {
+  font-size: 0.9rem;
+  color: var(--muted);
+  font-weight: 500;
+}
+
+.pagination-buttons {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.pagination-btn {
+  padding: 8px 14px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--card-bg);
+  color: var(--text);
+  font-weight: 600;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  width: auto;
+}
+
+.pagination-btn:hover:not(:disabled):not(.pagination-active) {
+  background: var(--hover);
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.pagination-btn.pagination-active {
+  background: var(--primary);
+  color: #fff;
+  border-color: var(--primary);
+}
+
+.pagination-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  background: var(--card-bg);
+}
+
+.pagination-ellipsis {
+  padding: 4px 8px;
+  color: var(--muted);
+  font-weight: 600;
+  user-select: none;
+}
+
+/* ========== SPOTS HEADER + SEARCH ========== */
+.spots-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 4px;
+}
+
+.spots-header h2 {
+  margin: 0;
+}
+
+.spots-search-box {
+  display: flex;
+  align-items: center;
+  background: var(--card-bg);
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  padding: 8px 14px;
+  gap: 8px;
+  box-shadow: 0 1px 4px var(--shadow);
+  transition: border-color 0.2s, box-shadow 0.2s;
+  min-width: 280px;
+}
+
+.spots-search-box:focus-within {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(19, 180, 126, 0.15);
+}
+
+.search-icon {
+  font-size: 1rem;
+  flex-shrink: 0;
+  opacity: 0.7;
+}
+
+.spots-search-input {
+  border: none;
+  outline: none;
+  background: transparent;
+  font-size: 0.9rem;
+  color: var(--text);
+  width: 100%;
+  font-family: 'Montserrat', sans-serif;
+  padding: 0;
+}
+
+.spots-search-input::placeholder {
+  color: var(--muted);
+}

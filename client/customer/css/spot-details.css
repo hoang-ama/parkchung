@@ -2624,3 +2624,101 @@ input:focus {
   color: var(--text-muted);
   font-style: italic;
 }
+
+/* Structured Schedule Display */
+.schedule-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.schedule-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  background: linear-gradient(135deg, var(--gray-50) 0%, var(--white) 100%);
+  border-radius: var(--radius);
+  border-left: 3px solid var(--primary);
+  transition: var(--transition);
+}
+
+.schedule-row:hover {
+  background: var(--primary-lighter);
+  transform: translateX(4px);
+}
+
+.schedule-day {
+  font-weight: 600;
+  color: var(--text);
+  font-size: 14px;
+  min-width: 100px;
+}
+
+.schedule-time {
+  color: var(--primary);
+  font-weight: 500;
+  font-size: 14px;
+}
+
+.schedule-row.schedule-closed {
+  border-left-color: var(--gray-300);
+  opacity: 0.6;
+}
+
+.schedule-row.schedule-closed:hover {
+  transform: none;
+  background: linear-gradient(135deg, var(--gray-50) 0%, var(--white) 100%);
+}
+
+.closed-label {
+  color: var(--text-muted);
+  font-style: italic;
+  font-weight: 400;
+}
+
+.schedule-notes {
+  margin-top: 12px;
+  padding: 12px 14px;
+  background: var(--gray-50);
+  border-radius: var(--radius);
+  font-size: 14px;
+  color: var(--text-muted);
+  line-height: 1.5;
+  white-space: pre-line;
+}
+
+/* Operating Hours header with status badge */
+.spot-hours-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.spot-hours-header .section-title {
+  margin-bottom: 0;
+}
+
+/* Open Now / Closed Now badge */
+.schedule-status-badge {
+  font-size: 13px;
+  font-weight: 600;
+  padding: 4px 12px;
+  border-radius: 20px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.schedule-status-badge.status-open {
+  background: #ecfdf5;
+  color: #059669;
+  border: 1px solid #a7f3d0;
+}
+
+.schedule-status-badge.status-closed {
+  background: #fef2f2;
+  color: #dc2626;
+  border: 1px solid #fecaca;
+}

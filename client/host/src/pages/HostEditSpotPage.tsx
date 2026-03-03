@@ -3,6 +3,22 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useTranslations } from '../i18n';
 
 // ============ Types ============
+interface TimeSlot {
+    openAt: string;
+    closeAt: string;
+}
+
+interface DaySchedule {
+    day: string;
+    isOpen: boolean;
+    slots: TimeSlot[];
+}
+
+interface OperatingHoursData {
+    schedule: DaySchedule[];
+    notes: string;
+}
+
 interface SpotFormValues {
     name: string;
     address: string;
@@ -16,7 +32,7 @@ interface SpotFormValues {
     vehicleTypes: string[];
     paymentMethods: string[];
     contactPhone: string;
-    openTime: string;
+    operatingHours: OperatingHoursData;
     bookingTypes: string[];
     addOnServices: string[];
 }
@@ -49,7 +65,7 @@ interface ParkingSpot {
     vehicleTypes: string[];
     paymentMethods: string[];
     contactPhone?: string;
-    openTime?: string;
+    operatingHours?: OperatingHoursData;
     bookingTypes?: string[];
     addOnServices?: string[];
     images: string[];
@@ -57,7 +73,46 @@ interface ParkingSpot {
 }
 
 const MAX_IMAGES = 5;
+const MAX_SLOTS_PER_DAY = 3;
 const API_BASE_URL = import.meta.env.VITE_API_URL || '/api';
+
+const DAYS_OF_WEEK = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'] as const;
+
+const DEFAULT_SCHEDULE: DaySchedule[] = DAYS_OF_WEEK.map(day => ({
+    day,
+    isOpen: day !== 'sunday',
+    slots: [{ openAt: '08:00', closeAt: '22:00' }],
+}));
+
+const PRESET_WEEKDAYS: DaySchedule[] = DAYS_OF_WEEK.map(day => ({
+    day,
+    isOpen: !['saturday', 'sunday'].includes(day),
+    slots: [{ openAt: '08:00', closeAt: '22:00' }],
+}));
+
+const PRESET_EVERYDAY: DaySchedule[] = DAYS_OF_WEEK.map(day => ({
+    day,
+    isOpen: true,
+    slots: [{ openAt: '08:00', closeAt: '22:00' }],
+}));
+
+const PRESET_247: DaySchedule[] = DAYS_OF_WEEK.map(day => ({
+    day,
+    isOpen: true,
+    slots: [{ openAt: '00:00', closeAt: '23:30' }],
+}));
+
+const DAY_LABELS: Record<string, string> = {
+    monday: 'Monday', tuesday: 'Tuesday', wednesday: 'Wednesday',
+    thursday: 'Thursday', friday: 'Friday', saturday: 'Saturday', sunday: 'Sunday',
+};
+
+const TIME_OPTIONS: string[] = [];
+for (let h = 0; h < 24; h++) {
+    for (let m = 0; m < 60; m += 30) {
+        TIME_OPTIONS.push(`${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`);
+    }
+}
 
 // ============ API Helpers ============
 async function fetchSpotById(id: string): Promise<ParkingSpot> {
@@ -179,7 +234,7 @@ export default function HostEditSpotPage() {
         vehicleTypes: [],
         paymentMethods: ['cash'],
         contactPhone: '',
-        openTime: '',
+        operatingHours: { schedule: [...DEFAULT_SCHEDULE], notes: '' },
         bookingTypes: ['online'],
         addOnServices: [],
     });
@@ -214,7 +269,24 @@ export default function HostEditSpotPage() {
                     vehicleTypes: spot.vehicleTypes || [],
                     paymentMethods: spot.paymentMethods || ['cash'],
                     contactPhone: spot.contactPhone || '',
-                    openTime: spot.openTime || '',
+                    operatingHours: (() => {
+                        if (spot.operatingHours && spot.operatingHours.schedule) {
+                            // Backward-compatible: convert old format (openAt/closeAt) to multi-slot
+                            const schedule = spot.operatingHours.schedule.map((item: any) => {
+                                if (item.slots && Array.isArray(item.slots)) {
+                                    return item; // Already multi-slot format
+                                }
+                                // Old format: convert single openAt/closeAt to slots array
+                                return {
+                                    day: item.day,
+                                    isOpen: item.isOpen !== undefined ? item.isOpen : true,
+                                    slots: [{ openAt: item.openAt || '08:00', closeAt: item.closeAt || '22:00' }]
+                                };
+                            });
+                            return { schedule, notes: spot.operatingHours.notes || '' };
+                        }
+                        return { schedule: [...DEFAULT_SCHEDULE], notes: '' };
+                    })(),
                     bookingTypes: spot.bookingTypes || ['online'],
                     addOnServices: spot.addOnServices || [],
                 });
@@ -295,7 +367,7 @@ export default function HostEditSpotPage() {
             formData.append('numberOfSlots', formValues.numberOfSlots);
             formData.append('hasRoof', String(formValues.hasRoof));
             formData.append('contactPhone', formValues.contactPhone);
-            formData.append('openTime', formValues.openTime);
+            formData.append('operatingHours', JSON.stringify(formValues.operatingHours));
 
             formValues.vehicleTypes.forEach((v) => formData.append('vehicleTypes[]', v));
             formValues.paymentMethods.forEach((v) => formData.append('paymentMethods[]', v));
@@ -571,18 +643,174 @@ export default function HostEditSpotPage() {
                             </div>
                         </div>
 
-                        {/* Open Time */}
+                        {/* Operating Hours */}
                         <div className="mt-4">
-                            <label className="block text-sm font-medium text-gray-700 mb-1">{t.operatingHours}</label>
-                            <textarea
-                                name="openTime"
-                                value={formValues.openTime}
-                                onChange={handleChange}
-                                placeholder="e.g.&#10;Monday-Friday: 08:00-22:00&#10;Saturday: 09:00-20:00&#10;Sunday: Closed"
-                                rows={4}
-                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-200 resize-none"
-                            />
-                            <p className="mt-1 text-xs text-gray-500">Enter operating hours for each day. Press Enter to add multiple lines.</p>
+                            <div className="flex items-center justify-between mb-3">
+                                <label className="block text-sm font-medium text-gray-700">🕐 {t.operatingHours}</label>
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        const monday = formValues.operatingHours.schedule[0];
+                                        setFormValues(prev => ({
+                                            ...prev,
+                                            operatingHours: {
+                                                ...prev.operatingHours,
+                                                schedule: prev.operatingHours.schedule.map(s => ({
+                                                    ...s, isOpen: monday.isOpen, slots: monday.slots.map(sl => ({ ...sl })),
+                                                })),
+                                            },
+                                        }));
+                                    }}
+                                    className="text-xs px-2 py-1 bg-emerald-50 text-emerald-700 rounded-lg hover:bg-emerald-100 transition-colors font-medium"
+                                >
+                                    📋 {t.copyToAll}
+                                </button>
+                            </div>
+
+                            {/* Preset Templates */}
+                            <div className="flex flex-wrap gap-2 mb-3">
+                                {[
+                                    { label: t.presetWeekdays, preset: PRESET_WEEKDAYS },
+                                    { label: t.presetEveryday, preset: PRESET_EVERYDAY },
+                                    { label: t.preset247, preset: PRESET_247 },
+                                ].map(({ label, preset }) => (
+                                    <button
+                                        key={label}
+                                        type="button"
+                                        onClick={() => setFormValues(prev => ({
+                                            ...prev,
+                                            operatingHours: { ...prev.operatingHours, schedule: preset.map(d => ({ ...d, slots: d.slots.map(s => ({ ...s })) })) },
+                                        }))}
+                                        className="px-3 py-1.5 text-xs font-medium border border-gray-300 rounded-lg hover:bg-gray-50 hover:border-gray-400 transition-colors text-gray-600"
+                                    >
+                                        {label}
+                                    </button>
+                                ))}
+                            </div>
+
+                            <div className="space-y-2">
+                                {formValues.operatingHours.schedule.map((dayItem, idx) => (
+                                    <div
+                                        key={dayItem.day}
+                                        className={`p-3 rounded-lg border transition-colors ${dayItem.isOpen ? 'bg-white border-gray-200' : 'bg-gray-50 border-gray-100'
+                                            }`}
+                                    >
+                                        <div className="flex items-center gap-3">
+                                            <button
+                                                type="button"
+                                                onClick={() => {
+                                                    setFormValues(prev => {
+                                                        const newSchedule = [...prev.operatingHours.schedule];
+                                                        newSchedule[idx] = { ...newSchedule[idx], isOpen: !newSchedule[idx].isOpen };
+                                                        return { ...prev, operatingHours: { ...prev.operatingHours, schedule: newSchedule } };
+                                                    });
+                                                }}
+                                                className={`relative w-10 h-5 rounded-full transition-colors flex-shrink-0 ${dayItem.isOpen ? 'bg-emerald-500' : 'bg-gray-300'
+                                                    }`}
+                                            >
+                                                <span className={`absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform ${dayItem.isOpen ? 'translate-x-5' : 'translate-x-0'
+                                                    }`} />
+                                            </button>
+                                            <span className={`w-24 text-sm font-medium flex-shrink-0 ${dayItem.isOpen ? 'text-gray-800' : 'text-gray-400'
+                                                }`}>
+                                                {DAY_LABELS[dayItem.day] || dayItem.day}
+                                            </span>
+                                            {!dayItem.isOpen && (
+                                                <span className="text-sm text-gray-400 italic">— {t.closed} —</span>
+                                            )}
+                                        </div>
+
+                                        {/* Multi-slot rows */}
+                                        {dayItem.isOpen && (
+                                            <div className="mt-2 ml-[76px] space-y-1.5">
+                                                {dayItem.slots.map((slot, slotIdx) => (
+                                                    <div key={slotIdx} className="flex items-center gap-2">
+                                                        <select
+                                                            value={slot.openAt}
+                                                            onChange={(e) => {
+                                                                setFormValues(prev => {
+                                                                    const newSchedule = [...prev.operatingHours.schedule];
+                                                                    const newSlots = [...newSchedule[idx].slots];
+                                                                    newSlots[slotIdx] = { ...newSlots[slotIdx], openAt: e.target.value };
+                                                                    newSchedule[idx] = { ...newSchedule[idx], slots: newSlots };
+                                                                    return { ...prev, operatingHours: { ...prev.operatingHours, schedule: newSchedule } };
+                                                                });
+                                                            }}
+                                                            className="px-2 py-1.5 border border-gray-300 rounded-lg text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-emerald-200 focus:border-emerald-500 bg-white"
+                                                        >
+                                                            {TIME_OPTIONS.map(ti => <option key={ti} value={ti}>{ti}</option>)}
+                                                        </select>
+                                                        <span className="text-gray-400">→</span>
+                                                        <select
+                                                            value={slot.closeAt}
+                                                            onChange={(e) => {
+                                                                setFormValues(prev => {
+                                                                    const newSchedule = [...prev.operatingHours.schedule];
+                                                                    const newSlots = [...newSchedule[idx].slots];
+                                                                    newSlots[slotIdx] = { ...newSlots[slotIdx], closeAt: e.target.value };
+                                                                    newSchedule[idx] = { ...newSchedule[idx], slots: newSlots };
+                                                                    return { ...prev, operatingHours: { ...prev.operatingHours, schedule: newSchedule } };
+                                                                });
+                                                            }}
+                                                            className="px-2 py-1.5 border border-gray-300 rounded-lg text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-emerald-200 focus:border-emerald-500 bg-white"
+                                                        >
+                                                            {TIME_OPTIONS.map(ti => <option key={ti} value={ti}>{ti}</option>)}
+                                                        </select>
+                                                        {dayItem.slots.length > 1 && (
+                                                            <button
+                                                                type="button"
+                                                                onClick={() => {
+                                                                    setFormValues(prev => {
+                                                                        const newSchedule = [...prev.operatingHours.schedule];
+                                                                        const newSlots = newSchedule[idx].slots.filter((_, si) => si !== slotIdx);
+                                                                        newSchedule[idx] = { ...newSchedule[idx], slots: newSlots };
+                                                                        return { ...prev, operatingHours: { ...prev.operatingHours, schedule: newSchedule } };
+                                                                    });
+                                                                }}
+                                                                className="text-xs text-red-500 hover:text-red-700 font-medium px-1"
+                                                            >
+                                                                ✕
+                                                            </button>
+                                                        )}
+                                                    </div>
+                                                ))}
+                                                {dayItem.slots.length < MAX_SLOTS_PER_DAY && (
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => {
+                                                            setFormValues(prev => {
+                                                                const newSchedule = [...prev.operatingHours.schedule];
+                                                                const lastSlot = newSchedule[idx].slots[newSchedule[idx].slots.length - 1];
+                                                                const newSlots = [...newSchedule[idx].slots, { openAt: lastSlot.closeAt, closeAt: '22:00' }];
+                                                                newSchedule[idx] = { ...newSchedule[idx], slots: newSlots };
+                                                                return { ...prev, operatingHours: { ...prev.operatingHours, schedule: newSchedule } };
+                                                            });
+                                                        }}
+                                                        className="text-xs text-emerald-600 hover:text-emerald-700 font-medium mt-1"
+                                                    >
+                                                        {t.addTimeSlot}
+                                                    </button>
+                                                )}
+                                            </div>
+                                        )}
+                                    </div>
+                                ))}
+                            </div>
+                            <div className="mt-3">
+                                <label className="block text-sm font-medium text-gray-700 mb-1">📝 {t.scheduleNotes}</label>
+                                <textarea
+                                    value={formValues.operatingHours.notes}
+                                    onChange={(e) => {
+                                        setFormValues(prev => ({
+                                            ...prev,
+                                            operatingHours: { ...prev.operatingHours, notes: e.target.value },
+                                        }));
+                                    }}
+                                    placeholder={t.notesPlaceholder}
+                                    rows={2}
+                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-200 focus:border-emerald-500 transition-colors resize-none text-sm"
+                                />
+                            </div>
                         </div>
 
                         {/* Has Roof */}

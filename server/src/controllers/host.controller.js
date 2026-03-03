@@ -121,7 +121,12 @@ exports.createSpot = async (req, res) => {
             hasRoof,
             vehicleTypes,
             numberOfSlots,
-            paymentMethods
+            paymentMethods,
+            contactPhone,
+            openTime,
+            bookingTypes,
+            addOnServices,
+            operatingHours
         } = req.body;
 
         // Process uploaded images (Cloudinary URLs from multer-storage-cloudinary)
@@ -201,6 +206,11 @@ exports.createSpot = async (req, res) => {
                 return methods.length > 0 ? methods : ['cash'];
             })(),
             images: imageUrls,
+            contactPhone: contactPhone ? contactPhone.trim() : undefined,
+            openTime: openTime ? openTime.trim() : undefined,
+            bookingTypes: toArray(bookingTypes),
+            addOnServices: toArray(addOnServices),
+            operatingHours: operatingHours ? (typeof operatingHours === 'string' ? JSON.parse(operatingHours) : operatingHours) : undefined,
             spotCode: spotCode,
             status: 'pending' // New spots are pending admin approval
         });
@@ -253,6 +263,7 @@ exports.updateSpot = async (req, res) => {
             'paymentMethods',
             'contactPhone',
             'openTime',
+            'operatingHours',
             'bookingTypes',
             'addOnServices'
         ];
@@ -261,6 +272,15 @@ exports.updateSpot = async (req, res) => {
         for (const field of allowedFields) {
             if (req.body[field] !== undefined) {
                 updates[field] = req.body[field];
+            }
+        }
+
+        // Parse operatingHours from JSON string if sent via FormData
+        if (updates.operatingHours && typeof updates.operatingHours === 'string') {
+            try {
+                updates.operatingHours = JSON.parse(updates.operatingHours);
+            } catch (e) {
+                return res.status(400).json({ message: 'Invalid operatingHours format' });
             }
         }
 
