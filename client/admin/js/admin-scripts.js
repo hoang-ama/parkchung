@@ -860,8 +860,8 @@ function handleDashboardPage(API_URL, token) {
                 return;
             } else if (sectionName === 'users') {
                 const users = await fetchAdminData('users');
-                const headers = ['ID', 'Full Name', 'Email', 'Role'];
-                const rowsHtml = users.map(u => `<tr><td>${u._id}</td><td>${u.fullName}</td><td>${u.email}</td><td>${u.role}</td></tr>`).join('');
+                const headers = ['ID', 'Full Name', 'Email', 'Phone', 'Role'];
+                const rowsHtml = users.map(u => `<tr><td>${u._id}</td><td>${u.fullName}</td><td>${u.email}</td><td>${u.phone || 'N/A'}</td><td>${u.role}</td></tr>`).join('');
                 tableHtml = renderTable(headers, rowsHtml);
             } else if (sectionName === 'spots') {
                 const allSpots = await fetchAdminData('spots');
