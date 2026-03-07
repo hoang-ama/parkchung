@@ -162,7 +162,22 @@ exports.updateSpotImage = async (req, res) => {
 
 exports.getAllBookings = async (req, res) => {
     try {
-        const bookings = await Booking.find({}).populate('user', 'fullName email').populate('spot', 'address');
+        const { days } = req.query;
+        let filter = {};
+
+        if (days && days !== 'all') {
+            const daysNum = parseInt(days, 10);
+            if (!isNaN(daysNum) && daysNum > 0) {
+                const since = new Date();
+                since.setDate(since.getDate() - daysNum);
+                filter.startTime = { $gte: since };
+            }
+        }
+
+        const bookings = await Booking.find(filter)
+            .populate('user', 'fullName email phone')
+            .populate('spot', 'address')
+            .sort({ startTime: -1 });
         res.json(bookings);
     } catch (error) {
         res.status(500).json({ message: 'Server error', error: error.message });

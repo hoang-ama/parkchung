@@ -44,7 +44,7 @@ const translations = {
     }
 };
 
-let currentLang = localStorage.getItem('lang') || 'en';
+let currentLang = localStorage.getItem('lang') || 'vi';
 
 function getTranslation(key) {
     return translations[currentLang]?.[key] || translations.en[key] || key;

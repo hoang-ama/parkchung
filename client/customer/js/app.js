@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
     const nav = document.querySelector('header nav');
     const userData = JSON.parse(localStorage.getItem('userData'));
-    let currentLang = localStorage.getItem('lang') || 'en';
+    let currentLang = localStorage.getItem('lang') || 'vi';
 
     const t = {
         en: {

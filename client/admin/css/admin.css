@@ -732,3 +732,144 @@ select.editable-input {
 .spots-search-input::placeholder {
   color: var(--muted);
 }
+
+/* ========== BOOKINGS TOOLBAR ========== */
+.bookings-toolbar {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 4px;
+}
+
+.bookings-toolbar h2 {
+  margin: 0;
+}
+
+.bookings-filters {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+/* Search box (mirrors spots pattern) */
+.bookings-search-box {
+  display: flex;
+  align-items: center;
+  background: var(--card-bg);
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  padding: 8px 14px;
+  gap: 8px;
+  box-shadow: 0 1px 4px var(--shadow);
+  transition: border-color 0.2s, box-shadow 0.2s;
+  min-width: 240px;
+}
+
+.bookings-search-box:focus-within {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(19, 180, 126, 0.15);
+}
+
+.bookings-search-input {
+  border: none;
+  outline: none;
+  background: transparent;
+  font-size: 0.9rem;
+  color: var(--text);
+  width: 100%;
+  font-family: 'Montserrat', sans-serif;
+  padding: 0;
+}
+
+.bookings-search-input::placeholder {
+  color: var(--muted);
+}
+
+/* Status Pills */
+.status-pills {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.status-pill {
+  padding: 6px 16px;
+  border: 1.5px solid var(--border);
+  border-radius: 20px;
+  background: var(--card-bg);
+  color: var(--text);
+  font-weight: 600;
+  font-size: 0.82rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  width: auto;
+}
+
+.status-pill:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+  background: var(--hover);
+}
+
+.status-pill.active {
+  background: var(--primary);
+  color: #fff;
+  border-color: var(--primary);
+}
+
+.status-pill.pill-pending.active {
+  background: #f39c12;
+  border-color: #f39c12;
+}
+
+.status-pill.pill-confirmed.active {
+  background: #2ecc71;
+  border-color: #2ecc71;
+}
+
+.status-pill.pill-completed.active {
+  background: #3498db;
+  border-color: #3498db;
+}
+
+.status-pill.pill-cancelled.active {
+  background: #e74c3c;
+  border-color: #e74c3c;
+}
+
+/* Filter Selects */
+.filter-select {
+  padding: 8px 14px;
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  background: var(--card-bg);
+  color: var(--text);
+  font-weight: 600;
+  font-size: 0.85rem;
+  font-family: 'Montserrat', sans-serif;
+  cursor: pointer;
+  transition: border-color 0.2s;
+  width: auto;
+  min-width: 140px;
+}
+
+.filter-select:focus {
+  border-color: var(--primary);
+  outline: none;
+}
+
+.filter-select:hover {
+  border-color: var(--primary);
+}
+
+/* Cancelled status color */
+.status-cancelled {
+  color: #e74c3c;
+  font-weight: bold;
+}
+
+.status-completed {
+  color: #3498db;
+  font-weight: bold;
+}

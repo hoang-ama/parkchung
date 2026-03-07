@@ -1016,40 +1016,217 @@ function handleDashboardPage(API_URL, token) {
                 renderSpotsPage(1);
                 return;
             } else if (sectionName === 'bookings') {
-                const bookings = await fetchAdminData('bookings');
-                const headers = [
-                    '<input type="checkbox" id="select-all-bookings" onchange="toggleSelectAll()" title="Select All">',
-                    'Spot Address',
-                    'User',
-                    'Start Time',
-                    'End Time',
-                    'Total Price',
-                    'Status',
-                    'Actions'
-                ];
-                const rowsHtml = bookings.map(b => {
-                    const options = { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' };
-                    const userDisplay = b.user ? b.user.email : (b.guestEmail || 'N/A');
+                let currentDays = 'all';
+                let allBookings = await fetchAdminData(`bookings?days=${currentDays}`);
+                const BOOKINGS_PER_PAGE = 10;
+                let filteredBookings = allBookings;
+                let currentStatus = 'all';
+                let currentSort = 'newest';
+                let currentSearchQuery = '';
 
-                    let actionsHtml = `
-                        <button class="action-btn btn-edit" onclick="toggleBookingEditMode('${b._id}', true)">Edit</button>
-                        <button class="action-btn btn-delete" onclick="handleBookingAction('${b._id}', 'delete')">Delete</button>
-                    `;
-
+                // Build toolbar header
+                function buildBookingsToolbar() {
                     return `
-                        <tr id="booking-${b._id}">
-                            <td><input type="checkbox" class="booking-checkbox" value="${b._id}" onchange="updateBulkDeleteButton()"></td>
-                            <td class="editable-spot">${b.spot ? b.spot.address : 'N/A'}</td>
-                            <td>${userDisplay}</td>
-                            <td class="editable-start">${new Date(b.startTime).toLocaleString('vi-VN', options)}</td>
-                            <td class="editable-end">${new Date(b.endTime).toLocaleString('vi-VN', options)}</td>
-                            <td class="editable-price">${b.totalPrice.toLocaleString('vi-VN')} VND</td>
-                            <td class="editable-status"><span class="status-${b.status}">${b.status}</span></td>
-                            <td><div class="action-buttons">${actionsHtml}</div></td>
-                        </tr>
+                        <div class="bookings-toolbar">
+                            <h2>Bookings Management</h2>
+                            <div class="bookings-filters">
+                                <div class="bookings-search-box">
+                                    <span class="search-icon">🔍</span>
+                                    <input
+                                        type="text"
+                                        id="bookings-search-input"
+                                        class="bookings-search-input"
+                                        placeholder="Search by email, phone, address..."
+                                        oninput="window.__bookingsSearch(this.value)"
+                                        autocomplete="off"
+                                    >
+                                </div>
+                                <div class="status-pills">
+                                    <button class="status-pill ${currentStatus === 'all' ? 'active' : ''}" onclick="window.__bookingsFilterStatus('all')">All</button>
+                                    <button class="status-pill pill-pending ${currentStatus === 'pending' ? 'active' : ''}" onclick="window.__bookingsFilterStatus('pending')">Pending</button>
+                                    <button class="status-pill pill-confirmed ${currentStatus === 'confirmed' ? 'active' : ''}" onclick="window.__bookingsFilterStatus('confirmed')">Confirmed</button>
+                                    <button class="status-pill pill-completed ${currentStatus === 'completed' ? 'active' : ''}" onclick="window.__bookingsFilterStatus('completed')">Completed</button>
+                                    <button class="status-pill pill-cancelled ${currentStatus === 'cancelled' ? 'active' : ''}" onclick="window.__bookingsFilterStatus('cancelled')">Cancelled</button>
+                                </div>
+                                <select id="bookings-sort" class="filter-select" onchange="window.__bookingsSort(this.value)">
+                                    <option value="newest" ${currentSort === 'newest' ? 'selected' : ''}>Newest First</option>
+                                    <option value="oldest" ${currentSort === 'oldest' ? 'selected' : ''}>Oldest First</option>
+                                    <option value="price-high" ${currentSort === 'price-high' ? 'selected' : ''}>Price: High → Low</option>
+                                    <option value="price-low" ${currentSort === 'price-low' ? 'selected' : ''}>Price: Low → High</option>
+                                </select>
+                                <select id="bookings-date-range" class="filter-select" onchange="window.__bookingsDateRange(this.value)">
+                                    <option value="all" ${currentDays === 'all' ? 'selected' : ''}>All Time</option>
+                                    <option value="7" ${currentDays === '7' ? 'selected' : ''}>Last 7 Days</option>
+                                    <option value="30" ${currentDays === '30' ? 'selected' : ''}>Last 30 Days</option>
+                                    <option value="90" ${currentDays === '90' ? 'selected' : ''}>Last 90 Days</option>
+                                </select>
+                            </div>
+                        </div>
                     `;
-                }).join('');
-                tableHtml = renderTable(headers, rowsHtml);
+                }
+
+                // Apply client-side filters + sort
+                function applyFilters() {
+                    let result = allBookings;
+
+                    // Status filter
+                    if (currentStatus !== 'all') {
+                        result = result.filter(b => b.status === currentStatus);
+                    }
+
+                    // Search filter
+                    if (currentSearchQuery) {
+                        const q = currentSearchQuery.toLowerCase();
+                        result = result.filter(b => {
+                            const email = b.user ? b.user.email : (b.guestEmail || '');
+                            const phone = b.phoneNumber || b.guestPhoneNumber || (b.user && b.user.phone) || '';
+                            const address = b.spot ? b.spot.address : '';
+                            const fullName = b.user ? b.user.fullName : (b.guestFullName || '');
+                            return email.toLowerCase().includes(q) ||
+                                phone.toLowerCase().includes(q) ||
+                                address.toLowerCase().includes(q) ||
+                                fullName.toLowerCase().includes(q);
+                        });
+                    }
+
+                    // Sort
+                    result = [...result].sort((a, b) => {
+                        switch (currentSort) {
+                            case 'oldest': return new Date(a.startTime) - new Date(b.startTime);
+                            case 'price-high': return b.totalPrice - a.totalPrice;
+                            case 'price-low': return a.totalPrice - b.totalPrice;
+                            default: return new Date(b.startTime) - new Date(a.startTime);
+                        }
+                    });
+
+                    filteredBookings = result;
+                }
+
+                function renderBookingsPage(page) {
+                    applyFilters();
+                    const totalPages = Math.max(1, Math.ceil(filteredBookings.length / BOOKINGS_PER_PAGE));
+                    page = Math.min(page, totalPages);
+                    const start = (page - 1) * BOOKINGS_PER_PAGE;
+                    const end = start + BOOKINGS_PER_PAGE;
+                    const pageBookings = filteredBookings.slice(start, end);
+
+                    const headers = [
+                        '<input type="checkbox" id="select-all-bookings" onchange="toggleSelectAll()" title="Select All">',
+                        'Spot Address',
+                        'User',
+                        'Phone',
+                        'Start Time',
+                        'End Time',
+                        'Total Price',
+                        'Status',
+                        'Actions'
+                    ];
+
+                    let rowsHtml;
+                    if (pageBookings.length === 0) {
+                        rowsHtml = '<tr><td colspan="9" style="text-align:center;padding:32px;color:var(--muted);">No bookings found matching your filters.</td></tr>';
+                    } else {
+                        const options = { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' };
+                        rowsHtml = pageBookings.map(b => {
+                            const userDisplay = b.user ? b.user.email : (b.guestEmail || 'N/A');
+                            const phoneDisplay = b.phoneNumber || b.guestPhoneNumber || (b.user && b.user.phone) || 'N/A';
+
+                            let actionsHtml = `
+                                <button class="action-btn btn-edit" onclick="toggleBookingEditMode('${b._id}', true)">Edit</button>
+                                <button class="action-btn btn-delete" onclick="handleBookingAction('${b._id}', 'delete')">Delete</button>
+                            `;
+
+                            return `
+                                <tr id="booking-${b._id}">
+                                    <td><input type="checkbox" class="booking-checkbox" value="${b._id}" onchange="updateBulkDeleteButton()"></td>
+                                    <td class="editable-spot">${b.spot ? b.spot.address : 'N/A'}</td>
+                                    <td>${userDisplay}</td>
+                                    <td>${phoneDisplay}</td>
+                                    <td class="editable-start">${new Date(b.startTime).toLocaleString('vi-VN', options)}</td>
+                                    <td class="editable-end">${new Date(b.endTime).toLocaleString('vi-VN', options)}</td>
+                                    <td class="editable-price">${b.totalPrice.toLocaleString('vi-VN')} VND</td>
+                                    <td class="editable-status"><span class="status-${b.status}">${b.status}</span></td>
+                                    <td><div class="action-buttons">${actionsHtml}</div></td>
+                                </tr>
+                            `;
+                        }).join('');
+                    }
+
+                    const tableHtml = renderTable(headers, rowsHtml);
+
+                    // Pagination
+                    const totalLabel = filteredBookings.length < allBookings.length
+                        ? `${filteredBookings.length} result${filteredBookings.length !== 1 ? 's' : ''} (filtered from ${allBookings.length})`
+                        : `${allBookings.length} booking${allBookings.length !== 1 ? 's' : ''}`;
+
+                    let paginationHtml = '<div class="pagination-controls">';
+                    paginationHtml += `<span class="pagination-info">Showing ${filteredBookings.length === 0 ? 0 : start + 1}–${Math.min(end, filteredBookings.length)} of ${totalLabel}</span>`;
+                    paginationHtml += '<div class="pagination-buttons">';
+                    paginationHtml += `<button class="pagination-btn" onclick="window.__bookingsGoToPage(${page - 1})" ${page <= 1 ? 'disabled' : ''}>← Previous</button>`;
+
+                    const WINDOW = 2;
+                    const pageSet = new Set();
+                    pageSet.add(1);
+                    pageSet.add(totalPages);
+                    for (let p = Math.max(1, page - WINDOW); p <= Math.min(totalPages, page + WINDOW); p++) {
+                        pageSet.add(p);
+                    }
+                    const sortedPages = [...pageSet].sort((a, b) => a - b);
+                    let lastP = 0;
+                    sortedPages.forEach(p => {
+                        if (p - lastP > 1) {
+                            paginationHtml += `<span class="pagination-ellipsis">...</span>`;
+                        }
+                        paginationHtml += `<button class="pagination-btn ${p === page ? 'pagination-active' : ''}" onclick="window.__bookingsGoToPage(${p})">${p}</button>`;
+                        lastP = p;
+                    });
+
+                    paginationHtml += `<button class="pagination-btn" onclick="window.__bookingsGoToPage(${page + 1})" ${page >= totalPages ? 'disabled' : ''}>Next →</button>`;
+                    paginationHtml += '</div></div>';
+
+                    // Preserve search & dropdown values on re-render
+                    const savedSearch = document.getElementById('bookings-search-input')?.value || currentSearchQuery;
+                    contentArea.innerHTML = buildBookingsToolbar() + tableHtml + paginationHtml;
+                    const searchInput = document.getElementById('bookings-search-input');
+                    if (searchInput) {
+                        searchInput.value = savedSearch;
+                    }
+                }
+
+                // Global handlers
+                window.__bookingsGoToPage = function (page) {
+                    const totalPages = Math.max(1, Math.ceil(filteredBookings.length / BOOKINGS_PER_PAGE));
+                    if (page < 1 || page > totalPages) return;
+                    renderBookingsPage(page);
+                };
+
+                window.__bookingsSearch = function (query) {
+                    currentSearchQuery = query.trim();
+                    renderBookingsPage(1);
+                };
+
+                window.__bookingsFilterStatus = function (status) {
+                    currentStatus = status;
+                    renderBookingsPage(1);
+                };
+
+                window.__bookingsSort = function (sortKey) {
+                    currentSort = sortKey;
+                    renderBookingsPage(1);
+                };
+
+                window.__bookingsDateRange = async function (days) {
+                    currentDays = days;
+                    try {
+                        allBookings = await fetchAdminData(`bookings?days=${days}`);
+                        renderBookingsPage(1);
+                    } catch (error) {
+                        alert(`Error loading bookings: ${error.message}`);
+                    }
+                };
+
+                renderBookingsPage(1);
+                return;
             }
 
             contentArea.innerHTML = title + tableHtml;

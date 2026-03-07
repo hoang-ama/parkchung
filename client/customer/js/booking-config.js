@@ -193,7 +193,7 @@ async function initializeBookingConfigPage(spotId, arrivalParam, leavingParam) {
         const endTime = leavingFlatpickr?.selectedDates[0];
 
         // Get current language for translations
-        const currentLang = localStorage.getItem('lang') || 'en';
+        const currentLang = localStorage.getItem('lang') || 'vi';
         const translations = {
             en: {
                 payNow: 'Pay now and reserve',

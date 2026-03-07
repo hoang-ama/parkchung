@@ -15,7 +15,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
     const [language, setLanguageState] = useState<Language>(() => {
         // Sync with customer portal's language preference
         const stored = localStorage.getItem('lang');
-        return (stored === 'vi' || stored === 'en') ? stored : 'en';
+        return (stored === 'vi' || stored === 'en') ? stored : 'vi';
     });
 
     const setLanguage = (lang: Language) => {
