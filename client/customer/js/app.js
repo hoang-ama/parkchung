@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
     const nav = document.querySelector('header nav');
-    const userData = JSON.parse(localStorage.getItem('userData'));
+    const userData = JSON.parse(localStorage.getItem('userData') || 'null');
     let currentLang = localStorage.getItem('lang') || 'vi';
 
     const t = {
@@ -364,6 +364,62 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
+    Object.assign(t.en, {
+        my_profile: 'My Profile',
+        billed_as: 'Billed as',
+        billing_info: 'Bookings are charged in 1-hour blocks (minimum 1 hour).',
+        footer_about: 'About Us',
+        pol_terms_service: 'Terms of Service',
+        pol_insurance: 'Insurance & Liability Policy',
+        pol_dispute: 'Dispute Resolution Policy',
+        pol_security: 'Security Policy',
+        pol_driver: 'Driver Terms & Booking Policies',
+        pol_supplier: 'Supplier Terms & Policies',
+        terms_prefix: 'Clicking below indicates that you have read and accept the',
+        terms_link: 'Terms & Conditions',
+        about_page_title: 'About Us',
+        about_intro_para1: 'Parkchung is a pioneering startup developing an online platform for self-driving car and motorbike rental and sharing in Vietnam.',
+        about_intro_para2: 'Parkchung connects customers needing to rent self-driving vehicles (cars, motorbikes) with rental units and individuals with idle vehicles nationwide via its website or mobile app, allowing easy and quick searching, comparing, and renting.',
+        about_intro_para3: 'Parkchung\'s mission is to provide a modern technology platform for fast, safe, and economical vehicle rental and sharing, aiming for a civilized and environmentally friendly community for vehicle sharing.',
+        about_why_title: 'Why do we do it?',
+        about_why_item1: 'Currently, in Vietnam, there is no online platform for renting and sharing motorbikes, self-driving cars.',
+        about_why_item2: 'Car renters face many difficulties in renting a self-driving car as desired, while individuals with idle cars or self-driving car rental units do not have good enough technology to manage and optimize their assets.',
+        about_why_item3: 'With the explosion of the 4.0 technology trend, the conveniences of booking transportation services via online/mobile channels as well as car-sharing technology are increasingly developing and becoming popular.',
+        about_why_item4: 'Vehicle sharing is gradually becoming the main trend in the world, replacing vehicle ownership.',
+        about_how_title: 'How do we do it?',
+        about_how_para1: 'Even the most complex problems have a suitable solution. Parkchung doesn\'t just rent cars; it creates innovative products within the existing ecosystem.',
+        about_how_para2: 'We leverage technology to provide a comprehensive travel solution by connecting customers with self-drive car rental service providers. Parkchung\'s mission is to offer a platform where customers can easily rent their desired car, while car owners can attract customers and conduct business conveniently.',
+        about_how_para3: 'The company focuses on simplifying the car rental process, offering transaction support tools from price comparison to online payment, car rental insurance, reduced procedures, and many other utilities for both customers and car-providing partners.'
+    });
+
+    Object.assign(t.vi, {
+        my_profile: 'Hồ sơ của tôi',
+        billed_as: 'Tính phí theo',
+        billing_info: 'Đặt chỗ được tính theo block 1 giờ (tối thiểu 1 giờ).',
+        footer_about: 'Về chúng tôi',
+        pol_terms_service: 'Điều khoản dịch vụ',
+        pol_insurance: 'Chính sách bảo hiểm và trách nhiệm',
+        pol_dispute: 'Chính sách giải quyết tranh chấp',
+        pol_security: 'Chính sách an ninh',
+        pol_driver: 'Điều khoản tài xế và chính sách đặt chỗ',
+        pol_supplier: 'Điều khoản và chính sách nhà cung cấp',
+        terms_prefix: 'Nhấn nút bên dưới đồng nghĩa bạn đã đọc và đồng ý với',
+        terms_link: 'Điều khoản & Điều kiện',
+        about_page_title: 'Về chúng tôi',
+        about_intro_para1: 'Parkchung là startup tiên phong phát triển nền tảng trực tuyến cho thuê và chia sẻ ô tô, xe máy tự lái tại Việt Nam.',
+        about_intro_para2: 'Parkchung kết nối khách hàng có nhu cầu thuê xe tự lái (ô tô, xe máy) với các đơn vị cho thuê và cá nhân có phương tiện nhàn rỗi trên toàn quốc thông qua website hoặc ứng dụng di động, giúp việc tìm kiếm, so sánh và thuê xe trở nên dễ dàng, nhanh chóng.',
+        about_intro_para3: 'Sứ mệnh của Parkchung là cung cấp nền tảng công nghệ hiện đại cho hoạt động thuê và chia sẻ phương tiện nhanh chóng, an toàn, tiết kiệm, hướng tới một cộng đồng văn minh và thân thiện với môi trường.',
+        about_why_title: 'Vì sao chúng tôi làm điều này?',
+        about_why_item1: 'Hiện tại tại Việt Nam chưa có nền tảng trực tuyến chuyên cho thuê và chia sẻ xe máy, ô tô tự lái.',
+        about_why_item2: 'Người thuê xe gặp nhiều khó khăn khi tìm xe tự lái đúng nhu cầu, trong khi cá nhân có xe nhàn rỗi hoặc đơn vị cho thuê lại chưa có công nghệ đủ tốt để quản lý và tối ưu tài sản.',
+        about_why_item3: 'Cùng với làn sóng công nghệ 4.0, việc đặt dịch vụ vận chuyển qua kênh online/mobile và công nghệ chia sẻ xe ngày càng phát triển, phổ biến hơn.',
+        about_why_item4: 'Chia sẻ phương tiện đang dần trở thành xu hướng chủ đạo trên thế giới, thay thế cho việc sở hữu phương tiện.',
+        about_how_title: 'Chúng tôi thực hiện như thế nào?',
+        about_how_para1: 'Ngay cả những bài toán phức tạp nhất cũng có lời giải phù hợp. Parkchung không chỉ cho thuê xe mà còn tạo ra những sản phẩm đổi mới trong hệ sinh thái sẵn có.',
+        about_how_para2: 'Chúng tôi tận dụng công nghệ để cung cấp giải pháp di chuyển toàn diện bằng cách kết nối khách hàng với các đơn vị cung cấp dịch vụ cho thuê xe tự lái. Parkchung hướng tới một nền tảng nơi khách hàng dễ dàng thuê đúng chiếc xe mong muốn, còn chủ xe có thể tiếp cận khách hàng và kinh doanh thuận tiện.',
+        about_how_para3: 'Công ty tập trung đơn giản hóa quy trình thuê xe, cung cấp các công cụ hỗ trợ giao dịch từ so sánh giá, thanh toán trực tuyến, bảo hiểm thuê xe, tinh gọn thủ tục đến nhiều tiện ích khác cho cả khách hàng lẫn đối tác cung cấp xe.'
+    });
+
     function renderNav() {
         const dict = t[currentLang] || t.en;
         const langSwitcher = `
@@ -377,7 +433,7 @@ document.addEventListener('DOMContentLoaded', () => {
             nav.innerHTML = `
             <a href="${window.HOST_URL}/login" style="text-decoration: none; color: #13b47e; font-weight: 500;">${dict.becomeHost}</a>
             <a href="my-bookings.html" style="text-decoration: none; color: #13b47e; font-weight: 500; margin-left: 15px;">${dict.myBookings}</a>
-            <a href="my-profile.html" style="text-decoration: none; color: #13b47e; font-weight: 500; margin-left: 15px;">My Profile</a>
+            <a href="my-profile.html" style="text-decoration: none; color: #13b47e; font-weight: 500; margin-left: 15px;">${dict.my_profile}</a>
             <span style="margin: 0 15px;">|</span>
             <span>${dict.welcome}, ${userData.fullName}!</span>
             <a href="#" id="logout-btn" style="margin-left: 15px; text-decoration: none; color: #e74c3c; font-weight: 500;">${dict.logout}</a>

@@ -172,9 +172,6 @@
                             </div>
                         </div>
 
-                        <button id="pay-and-reserve-btn" class="btn btn-action" disabled data-i18n="btn_pay_reserve">Pay
-                            now and reserve</button>
-
                         <!-- Payment Method Selection Card -->
                         <div class="payment-method-selection-card">
                             <h3 class="payment-selection-title" data-i18n="payment_method_title">Payment Method</h3>
@@ -224,8 +221,10 @@
                             </div>
                         </div>
 
-                        <p class="terms-text" data-i18n="terms">Clicking below indicates that you have read and accept
-                            the <a href="#">Terms & Conditions</a></p>
+                        <p class="terms-text">
+                            <span data-i18n="terms_prefix">Clicking below indicates that you have read and accept the</span>
+                            <a href="#" data-i18n="terms_link">Terms & Conditions</a>
+                        </p>
                         <div class="trust-item">
                             <span class="icon">💰</span> <span data-i18n="trust_transparent_pricing">Transparent pricing
                                 shown before you confirm</span>
@@ -250,6 +249,8 @@
                             <span id="trustpilot-rating-value">0</span> <span id="trustpilot-rating-stars"
                                 class="stars">★★★★★</span>
                         </div>
+                        <button id="pay-and-reserve-btn" class="btn btn-action" disabled data-i18n="btn_pay_reserve">Pay
+                            now and reserve</button>
                     </div>
                 </div>
             </div>

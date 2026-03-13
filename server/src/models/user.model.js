@@ -1,13 +1,37 @@
 // File: server/src/models/user.model.js
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
+const {
+    normalizePhoneNumber,
+    isValidEmail,
+    isValidVietnamPhoneNumber,
+} = require('../utils/validation');
 
 const userSchema = new mongoose.Schema({
     fullName: { type: String, required: true, trim: true },
-    email: { type: String, required: true, unique: true, lowercase: true, trim: true },
+    email: {
+        type: String,
+        required: [true, 'Email is required.'],
+        unique: true,
+        lowercase: true,
+        trim: true,
+        validate: {
+            validator: isValidEmail,
+            message: 'Please provide a valid email address.',
+        },
+    },
     password: { type: String, required: true },
     role: { type: String, enum: ['user', 'host', 'admin'], default: 'user' },
-    phone: { type: String, required: false, trim: true },
+    phone: {
+        type: String,
+        required: false,
+        trim: true,
+        set: normalizePhoneNumber,
+        validate: {
+            validator: (value) => !value || isValidVietnamPhoneNumber(value),
+            message: 'Phone number must be a valid Vietnamese number (0xxxxxxxxx or +84xxxxxxxxx).',
+        },
+    },
     vehicleLicensePlate: { type: String, required: false, trim: true },
 }, { timestamps: true });
 

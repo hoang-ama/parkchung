@@ -4,10 +4,37 @@ const HostProfile = require('../models/hostProfile.model');
 const jwt = require('jsonwebtoken');
 const config = require('../config');
 const brevoService = require('../services/brevo.service');
+const {
+    normalizePhoneNumber,
+    isValidEmail,
+    isValidVietnamPhoneNumber,
+} = require('../utils/validation');
 
 // JWT token generator
 const generateToken = (id, role) => {
     return jwt.sign({ id, role }, config.jwtSecret, { expiresIn: '30d' });
+};
+
+const getValidationErrorMessage = (error) => {
+    if (error?.name !== 'ValidationError') {
+        return '';
+    }
+
+    return Object.values(error.errors)
+        .map(({ message }) => message)
+        .join(' ');
+};
+
+const validateContactFields = ({ email, phone }) => {
+    if (!isValidEmail(email)) {
+        return 'Please provide a valid email address.';
+    }
+
+    if (phone && !isValidVietnamPhoneNumber(phone)) {
+        return 'Phone number must be a valid Vietnamese number (0xxxxxxxxx or +84xxxxxxxxx).';
+    }
+
+    return '';
 };
 
 /**
@@ -18,7 +45,22 @@ const generateToken = (id, role) => {
 exports.registerUser = async (req, res) => {
     const { fullName, email, password, phone } = req.body;
     try {
-        const userExists = await User.findOne({ email: email.toLowerCase() });
+        if (!fullName || !email || !password) {
+            return res.status(400).json({ message: 'Full name, email, and password are required.' });
+        }
+
+        const normalizedEmail = email.trim().toLowerCase();
+        const normalizedPhone = phone ? normalizePhoneNumber(phone) : undefined;
+        const contactValidationMessage = validateContactFields({
+            email: normalizedEmail,
+            phone: normalizedPhone,
+        });
+
+        if (contactValidationMessage) {
+            return res.status(400).json({ message: contactValidationMessage });
+        }
+
+        const userExists = await User.findOne({ email: normalizedEmail });
         if (userExists) {
             if (userExists.role === 'host' || userExists.role === 'admin') {
                 return res.status(400).json({ message: 'This email is already registered as a Host/Partner. You can login to Customer Portal with the same account.' });
@@ -26,7 +68,12 @@ exports.registerUser = async (req, res) => {
             return res.status(400).json({ message: 'User with this email already exists' });
         }
 
-        const user = await User.create({ fullName, email: email.toLowerCase(), password, phone });
+        const user = await User.create({
+            fullName: fullName.trim(),
+            email: normalizedEmail,
+            password,
+            phone: normalizedPhone,
+        });
 
         if (user) {
             // Send registration confirmation email (non-blocking)
@@ -50,6 +97,11 @@ exports.registerUser = async (req, res) => {
             res.status(400).json({ message: 'Invalid user data' });
         }
     } catch (error) {
+        const validationErrorMessage = getValidationErrorMessage(error);
+        if (validationErrorMessage) {
+            return res.status(400).json({ message: validationErrorMessage });
+        }
+
         console.error('Registration error:', error);
         res.status(500).json({ message: 'Server error during registration', error: error.message });
     }
@@ -110,8 +162,19 @@ exports.registerHost = async (req, res) => {
             });
         }
 
+        const normalizedEmail = email.trim().toLowerCase();
+        const normalizedPhone = phone ? normalizePhoneNumber(phone) : undefined;
+        const contactValidationMessage = validateContactFields({
+            email: normalizedEmail,
+            phone: normalizedPhone,
+        });
+
+        if (contactValidationMessage) {
+            return res.status(400).json({ message: contactValidationMessage });
+        }
+
         // Check if email already exists
-        const existingUser = await User.findOne({ email: email.toLowerCase() });
+        const existingUser = await User.findOne({ email: normalizedEmail });
 
         if (existingUser) {
             // If already a host or admin, reject
@@ -121,8 +184,8 @@ exports.registerHost = async (req, res) => {
 
             // If existing user is a customer, upgrade to host
             existingUser.role = 'host';
-            existingUser.fullName = fullName;
-            if (phone) existingUser.phone = phone;
+            existingUser.fullName = fullName.trim();
+            if (normalizedPhone) existingUser.phone = normalizedPhone;
             await existingUser.save();
 
             // Create HostProfile if not exists
@@ -166,10 +229,10 @@ exports.registerHost = async (req, res) => {
 
         // Create new user with 'host' role
         const user = await User.create({
-            fullName,
-            email: email.toLowerCase(),
+            fullName: fullName.trim(),
+            email: normalizedEmail,
             password,
-            phone,
+            phone: normalizedPhone,
             role: 'host'
         });
 
@@ -211,6 +274,11 @@ exports.registerHost = async (req, res) => {
         });
 
     } catch (error) {
+        const validationErrorMessage = getValidationErrorMessage(error);
+        if (validationErrorMessage) {
+            return res.status(400).json({ message: validationErrorMessage });
+        }
+
         console.error('Host registration error:', error);
         res.status(500).json({
             message: 'Server error during host registration',
@@ -257,12 +325,19 @@ exports.getProfile = async (req, res) => {
 exports.updateProfile = async (req, res) => {
     try {
         const { phone, vehicleLicensePlate } = req.body;
+        const normalizedPhone = phone !== undefined ? normalizePhoneNumber(phone) : undefined;
+
+        if (normalizedPhone && !isValidVietnamPhoneNumber(normalizedPhone)) {
+            return res.status(400).json({
+                message: 'Phone number must be a valid Vietnamese number (0xxxxxxxxx or +84xxxxxxxxx).'
+            });
+        }
 
         const updatedUser = await User.findByIdAndUpdate(
             req.user.id,
             {
                 $set: {
-                    phone: phone !== undefined ? phone : undefined,
+                    phone: phone !== undefined ? normalizedPhone : undefined,
                     vehicleLicensePlate: vehicleLicensePlate !== undefined ? vehicleLicensePlate : undefined
                 }
             },
@@ -285,6 +360,11 @@ exports.updateProfile = async (req, res) => {
             }
         });
     } catch (error) {
+        const validationErrorMessage = getValidationErrorMessage(error);
+        if (validationErrorMessage) {
+            return res.status(400).json({ message: validationErrorMessage });
+        }
+
         console.error('Update profile error:', error);
         res.status(500).json({ message: 'Server error', error: error.message });
     }
