@@ -2,9 +2,44 @@ import { api } from './apiService.js';
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[A-Za-z]{2,}$/;
 const VIETNAM_PHONE_REGEX = /^(?:0\d{9}|\+84\d{9})$/;
+const AUTH_TEXT = {
+    en: {
+        invalidEmail: 'Email must include a valid domain, for example name@example.com.',
+        invalidPhone: 'Phone must be a valid Vietnamese number like 0912345678 or +84912345678.',
+        registerSuccessMessage: 'Your account has been created successfully! Please login with your new account.',
+        registerSuccessTitle: 'Registration Successful',
+        registerFailedPrefix: 'Registration failed',
+        loginSuccessTitle: 'Login Successful',
+        loginSuccessMessage: 'Welcome back, {fullName}! You have successfully logged in to ParkChung.',
+        loginFailedPrefix: 'Login failed',
+    },
+    vi: {
+        invalidEmail: 'Email phải có tên miền hợp lệ, ví dụ name@example.com.',
+        invalidPhone: 'Số điện thoại phải đúng định dạng Việt Nam như 0912345678 hoặc +84912345678.',
+        registerSuccessMessage: 'Tạo tài khoản thành công! Vui lòng đăng nhập bằng tài khoản mới của bạn.',
+        registerSuccessTitle: 'Đăng ký thành công',
+        registerFailedPrefix: 'Đăng ký thất bại',
+        loginSuccessTitle: 'Đăng nhập thành công',
+        loginSuccessMessage: 'Chào mừng quay lại, {fullName}! Bạn đã đăng nhập thành công vào ParkChung.',
+        loginFailedPrefix: 'Đăng nhập thất bại',
+    },
+};
 
 function normalizePhoneNumber(phoneNumber) {
     return phoneNumber.replace(/[\s().-]/g, '').trim();
+}
+
+function getCurrentAuthLang() {
+    return localStorage.getItem('lang') || 'vi';
+}
+
+function getAuthText(key, replacements = {}) {
+    const lang = getCurrentAuthLang();
+    const template = AUTH_TEXT[lang]?.[key] || AUTH_TEXT.en[key] || key;
+    return Object.entries(replacements).reduce(
+        (message, [placeholder, value]) => message.replaceAll(`{${placeholder}}`, value),
+        template,
+    );
 }
 
 function setFieldError(input, errorElement, message) {
@@ -22,7 +57,7 @@ function validateRegisterEmail(emailInput, errorElement) {
     }
 
     if (!EMAIL_REGEX.test(email)) {
-        setFieldError(emailInput, errorElement, 'Email must include a valid domain, for example name@example.com.');
+        setFieldError(emailInput, errorElement, getAuthText('invalidEmail'));
         return { isValid: false, value: email };
     }
 
@@ -39,7 +74,7 @@ function validateRegisterPhone(phoneInput, errorElement) {
 
     const normalizedPhoneNumber = normalizePhoneNumber(rawPhoneNumber);
     if (!VIETNAM_PHONE_REGEX.test(normalizedPhoneNumber)) {
-        setFieldError(phoneInput, errorElement, 'Phone must be a valid Vietnamese number like 0912345678 or +84912345678.');
+        setFieldError(phoneInput, errorElement, getAuthText('invalidPhone'));
         return { isValid: false, value: normalizedPhoneNumber };
     }
 
@@ -88,11 +123,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
             try {
                 await api.register(fullName, emailState.value, password, phoneState.value || undefined);
-                await window.customModal.success('Your account has been created successfully! Please login with your new account.', 'Registration Successful');
+                await window.customModal.success(
+                    getAuthText('registerSuccessMessage'),
+                    getAuthText('registerSuccessTitle'),
+                );
                 window.location.href = 'login.html';
             } catch (error) {
                 if (formError) {
-                    formError.textContent = `Registration failed: ${error.message}`;
+                    formError.textContent = `${getAuthText('registerFailedPrefix')}: ${error.message}`;
                 }
             }
         });
@@ -109,10 +147,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 const data = await api.login(email, password);
                 localStorage.setItem('userToken', data.token);
                 localStorage.setItem('userData', JSON.stringify({ fullName: data.fullName, email: data.email, phone: data.phone }));
-                await window.customModal.success(`Welcome back, ${data.fullName}! You have successfully logged in to ParkChung.`, 'Login Successful');
+                await window.customModal.success(
+                    getAuthText('loginSuccessMessage', { fullName: data.fullName }),
+                    getAuthText('loginSuccessTitle'),
+                );
                 window.location.href = 'index.html';
             } catch (error) {
-                alert(`Login failed: ${error.message}`);
+                alert(`${getAuthText('loginFailedPrefix')}: ${error.message}`);
             }
         });
     }

@@ -127,6 +127,8 @@ function getUserDisplayName() {
 }
 
 function applyTranslations() {
+    document.title = `${getTranslation('my_bookings')} | Parkchung`;
+
     document.querySelectorAll('[data-i18n]').forEach((element) => {
         const key = element.getAttribute('data-i18n');
         element.textContent = getTranslation(key);
