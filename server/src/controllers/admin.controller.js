@@ -2,6 +2,7 @@
 const User = require('../models/user.model');
 const ParkingSpot = require('../models/parkingSpot.model');
 const Booking = require('../models/booking.model');
+const { isValidVNPhone, VN_PHONE_ERROR_MSG } = require('../utils/validation.util');
 
 exports.getDashboardStats = async (req, res) => {
     try {
@@ -193,6 +194,13 @@ exports.createAdminBooking = async (req, res) => {
     const { spot, startTime, endTime, userId, guestFullName, guestEmail, guestPhoneNumber, phoneNumber, status } = req.body;
 
     try {
+        if (phoneNumber && !isValidVNPhone(phoneNumber)) {
+            return res.status(400).json({ message: VN_PHONE_ERROR_MSG });
+        }
+        if (guestPhoneNumber && !isValidVNPhone(guestPhoneNumber)) {
+            return res.status(400).json({ message: VN_PHONE_ERROR_MSG });
+        }
+
         const parkingSpot = await ParkingSpot.findById(spot);
         if (!parkingSpot) {
             return res.status(404).json({ message: 'Parking spot not found.' });
@@ -269,6 +277,10 @@ exports.updateAdminBooking = async (req, res) => {
     const { spot, startTime, endTime, status, phoneNumber, totalPrice } = req.body;
 
     try {
+        if (phoneNumber && !isValidVNPhone(phoneNumber)) {
+            return res.status(400).json({ message: VN_PHONE_ERROR_MSG });
+        }
+
         const booking = await Booking.findById(req.params.id);
         if (!booking) {
             return res.status(404).json({ message: 'Booking not found' });

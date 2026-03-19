@@ -4,6 +4,7 @@ const HostProfile = require('../models/hostProfile.model');
 const jwt = require('jsonwebtoken');
 const config = require('../config');
 const brevoService = require('../services/brevo.service');
+const { isValidVNPhone, VN_PHONE_ERROR_MSG } = require('../utils/validation.util');
 
 // JWT token generator
 const generateToken = (id, role) => {
@@ -18,6 +19,10 @@ const generateToken = (id, role) => {
 exports.registerUser = async (req, res) => {
     const { fullName, email, password, phone } = req.body;
     try {
+        if (phone && !isValidVNPhone(phone)) {
+            return res.status(400).json({ message: VN_PHONE_ERROR_MSG });
+        }
+
         const userExists = await User.findOne({ email: email.toLowerCase() });
         if (userExists) {
             if (userExists.role === 'host' || userExists.role === 'admin') {
@@ -108,6 +113,10 @@ exports.registerHost = async (req, res) => {
             return res.status(400).json({
                 message: 'Missing required fields: fullName, email, and password are required'
             });
+        }
+
+        if (phone && !isValidVNPhone(phone)) {
+            return res.status(400).json({ message: VN_PHONE_ERROR_MSG });
         }
 
         // Check if email already exists
@@ -257,6 +266,10 @@ exports.getProfile = async (req, res) => {
 exports.updateProfile = async (req, res) => {
     try {
         const { phone, vehicleLicensePlate } = req.body;
+
+        if (phone && !isValidVNPhone(phone)) {
+            return res.status(400).json({ message: VN_PHONE_ERROR_MSG });
+        }
 
         const updatedUser = await User.findByIdAndUpdate(
             req.user.id,

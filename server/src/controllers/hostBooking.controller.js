@@ -91,7 +91,7 @@ exports.getHostBookings = async (req, res) => {
         const [bookings, total] = await Promise.all([
             Booking.find(filter)
                 .populate('spot', 'name address')
-                .populate('user', 'fullName email')
+                .populate('user', 'fullName email phone')
                 .sort({ startTime: -1 })
                 .skip(skip)
                 .limit(limitNum)
@@ -107,6 +107,7 @@ exports.getHostBookings = async (req, res) => {
             spotAddress: booking.spot?.address,
             customerName: booking.user?.fullName || booking.guestFullName || 'Guest',
             customerEmail: booking.user?.email || booking.guestEmail,
+            customerPhone: booking.user?.phone || booking.guestPhoneNumber || booking.phoneNumber,
             startTime: booking.startTime,
             endTime: booking.endTime,
             totalPrice: booking.totalPrice,
@@ -252,3 +253,48 @@ exports.getHostBookingById = async (req, res) => {
         res.status(500).json({ message: 'Server error', error: error.message });
     }
 };
+
+/**
+ * @desc    Mark a cash booking as paid
+ * @route   PUT /api/host/bookings/:id/mark-paid
+ * @access  Private (Host only)
+ */
+exports.markBookingAsPaid = async (req, res) => {
+    try {
+        const { id: bookingId } = req.params;
+        const hostId = req.user._id;
+
+        const booking = await Booking.findById(bookingId).populate('spot', 'owner');
+        if (!booking) {
+            return res.status(404).json({ message: 'Booking not found' });
+        }
+
+        // Check ownership
+        if (!booking.spot || booking.spot.owner.toString() !== hostId.toString()) {
+            return res.status(403).json({ message: 'You are not allowed to modify this booking' });
+        }
+
+        // Validate conditions for marking as paid
+        if (String(booking.paymentMethod).toUpperCase() !== 'CASH') {
+            return res.status(400).json({ message: 'Only cash bookings can be manually marked as paid' });
+        }
+        if (String(booking.paymentStatus).toUpperCase() === 'PAID') {
+            return res.status(400).json({ message: 'Booking is already paid' });
+        }
+        if (String(booking.status).toUpperCase() === 'CANCELLED') {
+            return res.status(400).json({ message: 'Cannot update payment status of a cancelled booking' });
+        }
+
+        booking.paymentStatus = 'PAID';
+        await booking.save();
+
+        res.json({
+            message: 'Booking marked as paid successfully',
+            paymentStatus: booking.paymentStatus,
+        });
+    } catch (error) {
+        console.error('Mark booking as paid error:', error);
+        res.status(500).json({ message: 'Server error', error: error.message });
+    }
+};
+
