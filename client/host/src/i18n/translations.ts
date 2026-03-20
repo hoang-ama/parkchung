@@ -216,6 +216,9 @@ export interface Translations {
     showing: string;
     to: string;
     results: string;
+    via: string;
+    markPaid: string;
+    confirmMarkPaid: string;
 
     // Earnings
     earningsTitle: string;
@@ -434,7 +437,7 @@ export const translations: Record<Language, Translations> = {
         dateTime: 'Date & Time',
         duration: 'Duration',
         amount: 'Amount',
-        status: 'Status',
+        status: 'Booking Status',
         confirmed: 'Confirmed',
         pending: 'Pending',
         cancelled: 'Cancelled',
@@ -472,6 +475,9 @@ export const translations: Record<Language, Translations> = {
         showing: 'Showing',
         to: 'to',
         results: 'results',
+        via: 'via',
+        markPaid: 'Mark Paid',
+        confirmMarkPaid: 'Are you sure you want to mark this booking as paid?',
 
         // Earnings
         earningsTitle: 'Payouts & Earnings',
@@ -688,7 +694,7 @@ export const translations: Record<Language, Translations> = {
         dateTime: 'Ngày & Giờ',
         duration: 'Thời lượng',
         amount: 'Số tiền',
-        status: 'Trạng thái',
+        status: 'Trạng thái đặt chỗ',
         confirmed: 'Đã xác nhận',
         pending: 'Đang chờ',
         cancelled: 'Đã hủy',
@@ -726,6 +732,9 @@ export const translations: Record<Language, Translations> = {
         showing: 'Hiển thị',
         to: 'đến',
         results: 'kết quả',
+        via: 'qua',
+        markPaid: 'Đã thanh toán',
+        confirmMarkPaid: 'Bạn có chắc chắn muốn xác nhận đã thu tiền đơn này?',
 
         // Earnings
         earningsTitle: 'Thu nhập & Thanh toán',

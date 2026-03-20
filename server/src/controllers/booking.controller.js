@@ -8,6 +8,7 @@ const {
 } = require('../constants/payment');
 const { calculatePrice } = require('../utils/pricing');
 const brevoService = require('../services/brevo.service');
+const { isValidVNPhone, VN_PHONE_ERROR_MSG } = require('../utils/validation.util');
 
 // Helper functions for email sending
 const ensureBookingPopulated = async (booking) => {
@@ -53,6 +54,10 @@ exports.createGuestBooking = async (req, res) => {
 
     if (!fullName || !email || !phoneNumber) {
         return res.status(400).json({ message: 'Full name, email and phone number are required.' });
+    }
+
+    if (!isValidVNPhone(phoneNumber)) {
+        return res.status(400).json({ message: VN_PHONE_ERROR_MSG });
     }
 
     const parkingSpot = await ParkingSpot.findById(spot);
@@ -200,6 +205,10 @@ exports.getLeadStatus = async (req, res) => {
  */
 exports.createBooking = async (req, res) => {
     const { spot, startTime, endTime, phoneNumber } = req.body;
+
+    if (phoneNumber && !isValidVNPhone(phoneNumber)) {
+        return res.status(400).json({ message: VN_PHONE_ERROR_MSG });
+    }
 
     const parkingSpot = await ParkingSpot.findById(spot);
     if (!parkingSpot) {

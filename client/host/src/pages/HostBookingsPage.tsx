@@ -10,11 +10,12 @@ interface Booking {
     spotAddress: string;
     customerName: string;
     customerEmail: string;
+    customerPhone?: string;
     startTime: string;
     endTime: string;
     totalPrice: number;
-    status: 'pending' | 'confirmed' | 'cancelled' | 'completed';
-    paymentStatus: 'pending' | 'paid' | 'refunded' | 'failed';
+    status: 'pending' | 'confirmed' | 'cancelled' | 'completed' | 'PENDING' | 'CONFIRMED' | 'CANCELLED' | 'COMPLETED';
+    paymentStatus: 'pending' | 'paid' | 'refunded' | 'failed' | 'unpaid' | 'cancelled' | 'PENDING' | 'PAID' | 'REFUNDED' | 'FAILED' | 'UNPAID' | 'CANCELLED';
     paymentMethod: string;
     createdAt: string;
 }
@@ -76,6 +77,21 @@ async function cancelBooking(bookingId: string, reason: string): Promise<void> {
     }
 }
 
+async function markBookingAsPaid(bookingId: string): Promise<void> {
+    const response = await fetch(`${API_BASE_URL}/host/bookings/${bookingId}/mark-paid`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('hostToken')}`,
+        },
+    });
+
+    if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || 'Failed to update payment status');
+    }
+}
+
 // ============ Components ============
 
 function StatusBadge({ status }: { status: string }) {
@@ -103,11 +119,15 @@ function StatusBadge({ status }: { status: string }) {
 
 function PaymentBadge({ status }: { status: string }) {
     const t = useTranslations();
+    const normalizedStatus = status ? status.toLowerCase() : '';
+    
     const styles: Record<string, string> = {
-        paid: 'text-green-600 bg-green-50 border-green-200',
-        pending: 'text-yellow-600 bg-yellow-50 border-yellow-200',
-        failed: 'text-red-600 bg-red-50 border-red-200',
-        refunded: 'text-gray-600 bg-gray-50 border-gray-200',
+        paid: 'bg-green-100 text-green-800',
+        pending: 'bg-yellow-100 text-yellow-800',
+        failed: 'bg-red-100 text-red-800',
+        refunded: 'bg-gray-100 text-gray-800',
+        unpaid: 'bg-orange-100 text-orange-800',
+        cancelled: 'bg-red-100 text-red-800',
     };
 
     const labels: Record<string, string> = {
@@ -115,11 +135,13 @@ function PaymentBadge({ status }: { status: string }) {
         pending: t.pending,
         failed: t.paymentFailed,
         refunded: t.refunded,
+        unpaid: t.unpaid,
+        cancelled: t.cancelled,
     };
 
     return (
-        <span className={`px-2 py-0.5 rounded text-xs border ${styles[status] || 'text-gray-600 border-gray-200'}`}>
-            {labels[status]?.toUpperCase() || status.toUpperCase()}
+        <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium ${styles[normalizedStatus] || 'bg-gray-100 text-gray-800'}`}>
+            {labels[normalizedStatus] || status}
         </span>
     );
 }
@@ -141,6 +163,7 @@ export default function HostBookingsPage() {
     const [selectedBookingId, setSelectedBookingId] = useState<string | null>(null);
     const [cancelReason, setCancelReason] = useState('');
     const [isCancelling, setIsCancelling] = useState(false);
+    const [isMarkingPaid, setIsMarkingPaid] = useState<string | null>(null);
 
     // Filters State
     const [statusFilter, setStatusFilter] = useState(searchParams.get('status') || '');
@@ -226,6 +249,20 @@ export default function HostBookingsPage() {
             alert((err as Error).message);
         } finally {
             setIsCancelling(false);
+        }
+    };
+
+    const handleMarkAsPaid = async (bookingId: string) => {
+        if (!window.confirm(t.confirmMarkPaid || 'Are you sure you want to mark this booking as paid?')) return;
+        
+        setIsMarkingPaid(bookingId);
+        try {
+            await markBookingAsPaid(bookingId);
+            loadBookings(); // Refresh list
+        } catch (err) {
+            alert((err as Error).message);
+        } finally {
+            setIsMarkingPaid(null);
         }
     };
 
@@ -329,6 +366,7 @@ export default function HostBookingsPage() {
                                     <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">{t.dateTime}</th>
                                     <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">{t.amount}</th>
                                     <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">{t.status}</th>
+                                    <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">{t.paymentStatus || 'Payment Status'}</th>
                                     <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">{t.actions}</th>
                                 </tr>
                             </thead>
@@ -343,6 +381,9 @@ export default function HostBookingsPage() {
                                         <td className="px-6 py-4">
                                             <div className="text-sm font-medium text-gray-900">{booking.customerName}</div>
                                             <div className="text-sm text-gray-500">{booking.customerEmail}</div>
+                                            {booking.customerPhone && (
+                                                <div className="text-sm text-gray-500 mt-0.5">{booking.customerPhone}</div>
+                                            )}
                                         </td>
                                         <td className="px-6 py-4">
                                             <div className="text-sm text-gray-900">
@@ -355,12 +396,26 @@ export default function HostBookingsPage() {
                                         </td>
                                         <td className="px-6 py-4">
                                             <div className="font-medium text-gray-900">{booking.totalPrice.toLocaleString()}đ</div>
-                                            <div className="mt-1">
-                                                <PaymentBadge status={booking.paymentStatus} />
-                                            </div>
                                         </td>
                                         <td className="px-6 py-4">
                                             <StatusBadge status={booking.status} />
+                                        </td>
+                                        <td className="px-6 py-4">
+                                            <PaymentBadge status={booking.paymentStatus} />
+                                            <div className="mt-1 text-xs text-gray-500">
+                                                {t.via || 'via'} <span className="capitalize">{booking.paymentMethod.toLowerCase()}</span>
+                                            </div>
+                                            {booking.paymentMethod.toLowerCase() === 'cash' && 
+                                             booking.paymentStatus.toLowerCase() === 'unpaid' && 
+                                             booking.status.toLowerCase() !== 'cancelled' && (
+                                                <button
+                                                    onClick={() => handleMarkAsPaid(booking.id)}
+                                                    disabled={isMarkingPaid === booking.id}
+                                                    className="mt-1 bg-emerald-100 text-emerald-800 hover:bg-emerald-200 px-2.5 py-0.5 rounded-full text-xs font-medium disabled:opacity-50 flex items-center gap-1 transition-colors w-max"
+                                                >
+                                                    ✓ {isMarkingPaid === booking.id ? t.loading : (t.markPaid || 'Mark Paid')}
+                                                </button>
+                                            )}
                                         </td>
                                         <td className="px-6 py-4">
                                             {['pending', 'confirmed'].includes(booking.status) && (

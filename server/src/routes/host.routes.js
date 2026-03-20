@@ -18,7 +18,8 @@ const {
 const {
     getHostBookings,
     cancelHostBooking,
-    getHostBookingById
+    getHostBookingById,
+    markBookingAsPaid
 } = require('../controllers/hostBooking.controller');
 
 const {
@@ -49,6 +50,7 @@ router.patch('/spots/:id/toggle-active', toggleSpotActive);
 router.get('/bookings', getHostBookings);
 router.get('/bookings/:id', getHostBookingById);
 router.put('/bookings/:id/cancel', cancelHostBooking);
+router.put('/bookings/:id/mark-paid', markBookingAsPaid);
 
 // ============ Host Analytics Routes ============
 router.get('/analytics/overview', getHostAnalyticsOverview);
