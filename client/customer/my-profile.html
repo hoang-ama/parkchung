@@ -445,13 +445,13 @@
         <div class="header-content">
             <div class="logo-area">
                 <a href="index.html" class="logo-text">PARKCHUNG</a>
-                <span class="logo-slogan">Seamless Smart Parking, Safe & Easy</span>
+                <span class="logo-slogan" data-i18n="logo_slogan">Seamless Smart Parking, Safe & Easy</span>
             </div>
             <nav class="nav-menu">
                 <a href="#" class="nav-item" id="host-link" data-i18n="becomeHost">Host</a>
                 <a href="my-bookings.html" class="nav-item" data-i18n="my_bookings">My Bookings</a>
                 <a href="my-profile.html" class="nav-item active" data-i18n="my_profile">My Profile</a>
-                <a href="index.html" class="nav-item" id="user-welcome">Welcome</a>
+                <a href="index.html" class="nav-item" id="user-welcome" data-i18n="welcome">Welcome</a>
                 <a href="login.html" class="nav-item" id="logout-link" data-i18n="logout">Logout</a>
                 <span style="margin: 0 10px; color: #ccc;">|</span>
                 <button id="lang-en" class="lang-btn"
@@ -466,7 +466,7 @@
     <!-- Page Title -->
     <div class="page-title-section">
         <div class="page-title-content">
-            <h1 class="page-title">My Profile</h1>
+            <h1 class="page-title" data-i18n="profile_page_title">My Profile</h1>
             <a href="index.html" class="back-link">← Back to Home</a>
         </div>
     </div>
@@ -476,7 +476,7 @@
         <div id="message-container"></div>
 
         <div id="profile-content">
-            <p class="loading">Loading profile...</p>
+            <p class="loading" data-i18n="loading_profile">Loading profile...</p>
         </div>
     </div>
 
@@ -486,7 +486,7 @@
             <h3 class="modal-title">🔐 Change Password</h3>
 
             <div class="password-input-wrapper">
-                <input type="password" class="modal-input" id="current-password" placeholder="Current Password">
+                <input type="password" class="modal-input" id="current-password" placeholder="Current Password" data-i18n-placeholder="current_password_placeholder">
                 <svg class="password-toggle-icon" onclick="togglePasswordVisibility('current-password')"
                     xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                     stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -496,7 +496,7 @@
             </div>
 
             <div class="password-input-wrapper">
-                <input type="password" class="modal-input" id="new-password" placeholder="New Password (min 6 chars)">
+                <input type="password" class="modal-input" id="new-password" placeholder="New Password (min 6 chars)" data-i18n-placeholder="new_password_placeholder">
                 <svg class="password-toggle-icon" onclick="togglePasswordVisibility('new-password')"
                     xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                     stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -506,7 +506,7 @@
             </div>
 
             <div class="password-input-wrapper">
-                <input type="password" class="modal-input" id="confirm-password" placeholder="Confirm New Password">
+                <input type="password" class="modal-input" id="confirm-password" placeholder="Confirm New Password" data-i18n-placeholder="confirm_password_placeholder">
                 <svg class="password-toggle-icon" onclick="togglePasswordVisibility('confirm-password')"
                     xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                     stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -516,8 +516,8 @@
             </div>
 
             <div class="modal-buttons">
-                <button class="btn btn-secondary" onclick="closePasswordModal()">Cancel</button>
-                <button class="btn btn-primary" onclick="submitPasswordChange()">Change Password</button>
+                <button class="btn btn-secondary" onclick="closePasswordModal()" data-i18n="cancel">Cancel</button>
+                <button class="btn btn-primary" onclick="submitPasswordChange()" data-i18n="change_password_cta">Change Password</button>
             </div>
         </div>
     </div>
@@ -529,10 +529,10 @@
             <p style="margin-bottom: 15px; color: #666;">This action is <strong>permanent</strong> and cannot be undone.
                 All your bookings will be deleted.</p>
             <input type="password" class="modal-input" id="delete-password"
-                placeholder="Enter your password to confirm">
+                placeholder="Enter your password to confirm" data-i18n-placeholder="delete_password_placeholder">
             <div class="modal-buttons">
-                <button class="btn btn-secondary" onclick="closeDeleteModal()">Cancel</button>
-                <button class="btn btn-danger" onclick="submitDeleteAccount()">Delete My Account</button>
+                <button class="btn btn-secondary" onclick="closeDeleteModal()" data-i18n="cancel">Cancel</button>
+                <button class="btn btn-danger" onclick="submitDeleteAccount()" data-i18n="delete_account_cta">Delete My Account</button>
             </div>
         </div>
     </div>

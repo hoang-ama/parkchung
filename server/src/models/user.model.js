@@ -1,24 +1,36 @@
 // File: server/src/models/user.model.js
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
-const { VN_PHONE_REGEX } = require('../utils/validation.util');
+const {
+    normalizePhoneNumber,
+    isValidEmail,
+    isValidVietnamPhoneNumber,
+} = require('../utils/validation');
 
 const userSchema = new mongoose.Schema({
     fullName: { type: String, required: true, trim: true },
-    email: { type: String, required: true, unique: true, lowercase: true, trim: true },
+    email: {
+        type: String,
+        required: [true, 'Email is required.'],
+        unique: true,
+        lowercase: true,
+        trim: true,
+        validate: {
+            validator: isValidEmail,
+            message: 'Please provide a valid email address.',
+        },
+    },
     password: { type: String, required: true },
     role: { type: String, enum: ['user', 'host', 'admin'], default: 'user' },
     phone: {
         type: String,
         required: false,
         trim: true,
+        set: normalizePhoneNumber,
         validate: {
-            validator: function (v) {
-                if (!v || v === '') return true;
-                return VN_PHONE_REGEX.test(v);
-            },
-            message: 'Số điện thoại không hợp lệ. Vui lòng nhập đúng định dạng Việt Nam (VD: 0901234567 hoặc 84901234567).'
-        }
+            validator: (value) => !value || isValidVietnamPhoneNumber(value),
+            message: 'Phone number must be a valid Vietnamese number (0xxxxxxxxx or +84xxxxxxxxx).',
+        },
     },
     vehicleLicensePlate: { type: String, required: false, trim: true },
 }, { timestamps: true });

@@ -1,65 +1,147 @@
 // File: client/customer/js/my-bookings.js
 
-// Translations for my-bookings page
 const translations = {
     en: {
         my_bookings: 'My Bookings',
+        my_profile: 'My Profile',
         back_home: 'Back to Home',
         becomeHost: 'Host',
+        welcome: 'Welcome',
         logout: 'Logout',
+        logo_slogan: 'Seamless Smart Parking, Safe & Easy',
         loading: 'Loading your bookings...',
-        no_bookings: 'No bookings found. Start exploring parking spots!',
-        explore_spots: 'Explore Spots',
-        booking_confirmed: 'Confirmed',
-        booking_pending: 'Pending',
-        booking_cancelled: 'Cancelled',
-        booking_completed: 'Completed',
-        arrival: 'Arrival',
-        departure: 'Departure',
-        duration: 'Duration',
-        total: 'Total',
-        hours: 'hours',
-        view_details: 'View Details',
-        cancel_booking: 'Cancel Booking'
+        login_required: 'Please log in to view your bookings.',
+        no_bookings_title: 'No bookings found',
+        no_bookings_desc: 'You have not made any bookings yet.',
+        start_booking: 'Start Booking',
+        error_loading_title: 'Error loading bookings',
+        retry: 'Retry',
+        previous: 'Previous',
+        next: 'Next',
+        customer: 'Customer',
+        email: 'Email',
+        phone: 'Phone',
+        from: 'From',
+        to: 'To',
+        order_time: 'Order Time',
+        booking_status: 'Booking Status',
+        payment_method: 'Payment Method',
+        payment_status: 'Payment Status',
+        payment_total: 'Payment Total',
+        unknown_location: 'Unknown Location',
+        not_available: 'N/A',
+        cancel_booking: 'Cancel Booking',
+        pay_now: 'Pay Now',
+        cancelling: 'Cancelling...',
+        processing: 'Processing...',
+        cancel_confirm: 'Are you sure you want to cancel this booking? This action cannot be undone.',
+        cancel_success: 'Booking cancelled successfully!',
+        cancel_failed: 'Failed to cancel booking',
+        pay_login_required: 'Please log in to complete payment.',
+        pay_init_failed: 'Failed to initiate payment',
+        no_payment_url: 'No payment URL received',
+        failed_to_fetch: 'Failed to fetch bookings',
+        confirmed: 'Confirmed',
+        pending: 'Pending',
+        cancelled: 'Cancelled',
+        completed: 'Completed',
+        paid: 'Paid',
+        refunded: 'Refunded',
+        cash: 'Cash',
+        paypal: 'PayPal',
     },
     vi: {
         my_bookings: 'Đặt chỗ của tôi',
+        my_profile: 'Hồ sơ của tôi',
         back_home: 'Về Trang chủ',
         becomeHost: 'Đăng bãi',
+        welcome: 'Xin chào',
         logout: 'Đăng xuất',
+        logo_slogan: 'Bãi đỗ thông minh, an toàn và dễ dàng',
         loading: 'Đang tải danh sách đặt chỗ...',
-        no_bookings: 'Không có đặt chỗ nào. Bắt đầu khám phá các bãi đỗ xe!',
-        explore_spots: 'Khám phá Bãi đỗ',
-        booking_confirmed: 'Đã xác nhận',
-        booking_pending: 'Đang chờ',
-        booking_cancelled: 'Đã hủy',
-        booking_completed: 'Hoàn thành',
-        arrival: 'Đến',
-        departure: 'Rời đi',
-        duration: 'Thời lượng',
-        total: 'Tổng cộng',
-        hours: 'giờ',
-        view_details: 'Xem chi tiết',
-        cancel_booking: 'Hủy đặt chỗ'
-    }
+        login_required: 'Vui lòng đăng nhập để xem danh sách đặt chỗ.',
+        no_bookings_title: 'Chưa có đặt chỗ nào',
+        no_bookings_desc: 'Bạn chưa thực hiện đặt chỗ nào.',
+        start_booking: 'Bắt đầu đặt chỗ',
+        error_loading_title: 'Lỗi khi tải danh sách đặt chỗ',
+        retry: 'Thử lại',
+        previous: 'Trước',
+        next: 'Tiếp',
+        customer: 'Khách hàng',
+        email: 'Email',
+        phone: 'Số điện thoại',
+        from: 'Từ',
+        to: 'Đến',
+        order_time: 'Thời gian đặt',
+        booking_status: 'Trạng thái đặt chỗ',
+        payment_method: 'Phương thức thanh toán',
+        payment_status: 'Trạng thái thanh toán',
+        payment_total: 'Tổng thanh toán',
+        unknown_location: 'Chưa có địa điểm',
+        not_available: 'Không có',
+        cancel_booking: 'Hủy đặt chỗ',
+        pay_now: 'Thanh toán ngay',
+        cancelling: 'Đang hủy...',
+        processing: 'Đang xử lý...',
+        cancel_confirm: 'Bạn có chắc muốn hủy đặt chỗ này không? Hành động này không thể hoàn tác.',
+        cancel_success: 'Hủy đặt chỗ thành công!',
+        cancel_failed: 'Không thể hủy đặt chỗ',
+        pay_login_required: 'Vui lòng đăng nhập để thanh toán.',
+        pay_init_failed: 'Không thể khởi tạo thanh toán',
+        no_payment_url: 'Không nhận được đường dẫn thanh toán',
+        failed_to_fetch: 'Không thể tải danh sách đặt chỗ',
+        confirmed: 'Đã xác nhận',
+        pending: 'Đang chờ',
+        cancelled: 'Đã hủy',
+        completed: 'Hoàn thành',
+        paid: 'Đã thanh toán',
+        refunded: 'Đã hoàn tiền',
+        cash: 'Tiền mặt',
+        paypal: 'PayPal',
+    },
 };
 
 let currentLang = localStorage.getItem('lang') || 'vi';
+let allBookings = [];
+let currentPage = 1;
+let pageState = 'loading';
+let lastErrorMessage = '';
+const bookingsPerPage = 3;
 
 function getTranslation(key) {
     return translations[currentLang]?.[key] || translations.en[key] || key;
 }
 
-function applyTranslations() {
-    const t = translations[currentLang] || translations.en;
+function getDateLocale() {
+    return currentLang === 'vi' ? 'vi-VN' : 'en-GB';
+}
 
-    // Apply data-i18n translations
-    document.querySelectorAll('[data-i18n]').forEach(el => {
-        const key = el.getAttribute('data-i18n');
-        if (t[key]) el.textContent = t[key];
+function getUserDisplayName() {
+    try {
+        const userData = JSON.parse(localStorage.getItem('userData') || 'null');
+        return userData?.fullName?.trim() || '';
+    } catch (error) {
+        console.warn('Unable to read userData from localStorage:', error);
+        return '';
+    }
+}
+
+function applyTranslations() {
+    document.title = `${getTranslation('my_bookings')} | Parkchung`;
+
+    document.querySelectorAll('[data-i18n]').forEach((element) => {
+        const key = element.getAttribute('data-i18n');
+        element.textContent = getTranslation(key);
     });
 
-    // Update language button styles
+    const welcomeElement = document.getElementById('user-welcome');
+    if (welcomeElement) {
+        const fullName = getUserDisplayName();
+        welcomeElement.textContent = fullName
+            ? `${getTranslation('welcome')}, ${fullName}!`
+            : getTranslation('welcome');
+    }
+
     const langEnBtn = document.getElementById('lang-en');
     const langViBtn = document.getElementById('lang-vi');
     if (langEnBtn) {
@@ -72,112 +154,134 @@ function applyTranslations() {
     }
 }
 
+function formatDateTime(value) {
+    if (!value) {
+        return getTranslation('not_available');
+    }
+
+    return new Intl.DateTimeFormat(getDateLocale(), {
+        hour: '2-digit',
+        minute: '2-digit',
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+    }).format(new Date(value));
+}
+
+function formatCurrency(amount) {
+    return `${Number(amount || 0).toLocaleString('vi-VN')} VND`;
+}
+
+function getBookingStatusLabel(status) {
+    const normalizedStatus = String(status || '').toLowerCase();
+    return getTranslation(normalizedStatus) || status || getTranslation('not_available');
+}
+
+function getPaymentStatusLabel(status) {
+    const normalizedStatus = String(status || '').toLowerCase();
+    return getTranslation(normalizedStatus) || status || getTranslation('not_available');
+}
+
+function getPaymentMethodLabel(method) {
+    const normalizedMethod = String(method || '').toLowerCase();
+
+    if (normalizedMethod === 'cash') {
+        return getTranslation('cash');
+    }
+
+    if (normalizedMethod === 'paypal') {
+        return getTranslation('paypal');
+    }
+
+    return method || getTranslation('not_available');
+}
+
+function renderLoadingState() {
+    const bookingListContainer = document.querySelector('.booking-list');
+    if (!bookingListContainer) return;
+
+    pageState = 'loading';
+    bookingListContainer.innerHTML = `<p style="text-align: center; color: white; font-size: 18px;">${getTranslation('loading')}</p>`;
+}
+
+function renderEmptyState() {
+    const bookingListContainer = document.querySelector('.booking-list');
+    if (!bookingListContainer) return;
+
+    pageState = 'empty';
+    bookingListContainer.innerHTML = `
+        <div style="text-align: center; padding: 60px 20px;">
+            <h2 style="color: white; font-size: 24px; margin-bottom: 20px;">${getTranslation('no_bookings_title')}</h2>
+            <p style="color: rgba(255,255,255,0.8); font-size: 16px; margin-bottom: 30px;">${getTranslation('no_bookings_desc')}</p>
+            <a href="index.html" style="display: inline-block; padding: 12px 28px; background: rgba(255, 255, 255, 0.2); color: white; border: 2px solid rgba(255, 255, 255, 0.3); border-radius: 50px; text-decoration: none; font-weight: 600;">${getTranslation('start_booking')}</a>
+        </div>
+    `;
+}
+
+function renderErrorState(errorMessage = '') {
+    const bookingListContainer = document.querySelector('.booking-list');
+    if (!bookingListContainer) return;
+
+    pageState = 'error';
+    lastErrorMessage = errorMessage;
+    bookingListContainer.innerHTML = `
+        <div style="text-align: center; padding: 60px 20px;">
+            <h2 style="color: white; font-size: 24px; margin-bottom: 20px;">${getTranslation('error_loading_title')}</h2>
+            <p style="color: rgba(255,255,255,0.8); font-size: 16px; margin-bottom: 30px;">${errorMessage}</p>
+            <button id="retry-bookings-btn" type="button" style="padding: 12px 28px; background: rgba(255, 255, 255, 0.2); color: white; border: 2px solid rgba(255, 255, 255, 0.3); border-radius: 50px; font-weight: 600; cursor: pointer;">${getTranslation('retry')}</button>
+        </div>
+    `;
+
+    document.getElementById('retry-bookings-btn')?.addEventListener('click', () => {
+        window.location.reload();
+    });
+}
+
 function setLanguage(lang) {
     localStorage.setItem('lang', lang);
     currentLang = lang;
     applyTranslations();
-    // Re-render bookings with new language
-    if (allBookings.length > 0) {
-        renderBookings(allBookings);
-    }
-}
 
-// Pagination state
-let allBookings = [];
-let currentPage = 1;
-const bookingsPerPage = 3;
-
-document.addEventListener('DOMContentLoaded', async () => {
-    const bookingListContainer = document.querySelector('.booking-list');
-    const token = localStorage.getItem('userToken');
-
-    // Set Host Portal link from config
-    const hostLink = document.getElementById('host-link');
-    if (hostLink && window.HOST_URL) {
-        hostLink.href = window.HOST_URL + '/login';
-    }
-
-    // Setup language switcher
-    const langEnBtn = document.getElementById('lang-en');
-    const langViBtn = document.getElementById('lang-vi');
-    if (langEnBtn) langEnBtn.addEventListener('click', () => setLanguage('en'));
-    if (langViBtn) langViBtn.addEventListener('click', () => setLanguage('vi'));
-
-    // Apply initial translations
-    applyTranslations();
-
-    if (!token) {
-        alert('Please login to view your bookings');
-        window.location.href = 'login.html';
+    if (pageState === 'list') {
+        displayBookings();
         return;
     }
 
-    // Show loading state
-    bookingListContainer.innerHTML = `<p style="text-align: center; color: white; font-size: 18px;">${getTranslation('loading')}</p>`;
-
-    try {
-        // Fetch user's bookings
-        const response = await fetch(`${API_URL}/bookings/mybookings`, {
-            headers: {
-                'Authorization': `Bearer ${token}`
-            }
-        });
-
-        if (!response.ok) {
-            throw new Error('Failed to fetch bookings');
-        }
-
-        const bookings = await response.json();
-
-        if (bookings.length === 0) {
-            bookingListContainer.innerHTML = `
-                <div style="text-align: center; padding: 60px 20px;">
-                    <h2 style="color: white; font-size: 24px; margin-bottom: 20px;">No bookings found</h2>
-                    <p style="color: rgba(255,255,255,0.8); font-size: 16px; margin-bottom: 30px;">You haven't made any bookings yet.</p>
-                    <a href="index.html" style="display: inline-block; padding: 12px 28px; background: rgba(255, 255, 255, 0.2); color: white; border: 2px solid rgba(255, 255, 255, 0.3); border-radius: 50px; text-decoration: none; font-weight: 600;">Start Booking</a>
-                </div>
-            `;
-            return;
-        }
-
-        // Sort bookings by createdAt date (newest first)
-        allBookings = bookings.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-
-        // Display first page
-        displayBookings();
-
-    } catch (error) {
-        console.error('Error loading bookings:', error);
-        bookingListContainer.innerHTML = `
-            <div style="text-align: center; padding: 60px 20px;">
-                <h2 style="color: white; font-size: 24px; margin-bottom: 20px;">Error loading bookings</h2>
-                <p style="color: rgba(255,255,255,0.8); font-size: 16px; margin-bottom: 30px;">${error.message}</p>
-                <button onclick="location.reload()" style="padding: 12px 28px; background: rgba(255, 255, 255, 0.2); color: white; border: 2px solid rgba(255, 255, 255, 0.3); border-radius: 50px; font-weight: 600; cursor: pointer;">Retry</button>
-            </div>
-        `;
+    if (pageState === 'empty') {
+        renderEmptyState();
+        return;
     }
-});
+
+    if (pageState === 'error') {
+        renderErrorState(lastErrorMessage);
+        return;
+    }
+
+    renderLoadingState();
+}
 
 function displayBookings() {
     const bookingListContainer = document.querySelector('.booking-list');
+    if (!bookingListContainer) return;
+
+    pageState = 'list';
     bookingListContainer.innerHTML = '';
 
-    // Calculate pagination
     const totalPages = Math.ceil(allBookings.length / bookingsPerPage);
+    if (currentPage > totalPages) {
+        currentPage = totalPages || 1;
+    }
+
     const startIndex = (currentPage - 1) * bookingsPerPage;
     const endIndex = startIndex + bookingsPerPage;
     const bookingsToDisplay = allBookings.slice(startIndex, endIndex);
 
-    // Display bookings for current page
-    bookingsToDisplay.forEach(booking => {
-        const bookingCard = createBookingCard(booking);
-        bookingListContainer.appendChild(bookingCard);
+    bookingsToDisplay.forEach((booking) => {
+        bookingListContainer.appendChild(createBookingCard(booking));
     });
 
-    // Add pagination controls
     if (totalPages > 1) {
-        const paginationContainer = createPaginationControls(totalPages);
-        bookingListContainer.appendChild(paginationContainer);
+        bookingListContainer.appendChild(createPaginationControls(totalPages));
     }
 }
 
@@ -193,9 +297,9 @@ function createPaginationControls(totalPages) {
         padding: 20px;
     `;
 
-    // Previous button
     const prevButton = document.createElement('button');
-    prevButton.textContent = '← Previous';
+    prevButton.type = 'button';
+    prevButton.textContent = `← ${getTranslation('previous')}`;
     prevButton.disabled = currentPage === 1;
     prevButton.style.cssText = `
         padding: 12px 24px;
@@ -210,24 +314,12 @@ function createPaginationControls(totalPages) {
         opacity: ${currentPage === 1 ? '0.5' : '1'};
     `;
     prevButton.addEventListener('click', () => {
-        if (currentPage > 1) {
-            currentPage--;
-            displayBookings();
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
+        if (currentPage === 1) return;
+        currentPage -= 1;
+        displayBookings();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     });
-    if (currentPage > 1) {
-        prevButton.addEventListener('mouseenter', (e) => {
-            e.target.style.background = 'rgba(255, 255, 255, 0.3)';
-            e.target.style.transform = 'translateY(-2px)';
-        });
-        prevButton.addEventListener('mouseleave', (e) => {
-            e.target.style.background = 'rgba(255, 255, 255, 0.2)';
-            e.target.style.transform = 'translateY(0)';
-        });
-    }
 
-    // Page numbers
     const pageNumbersDiv = document.createElement('div');
     pageNumbersDiv.style.cssText = `
         display: flex;
@@ -235,8 +327,9 @@ function createPaginationControls(totalPages) {
         align-items: center;
     `;
 
-    for (let i = 1; i <= totalPages; i++) {
+    for (let i = 1; i <= totalPages; i += 1) {
         const pageButton = document.createElement('button');
+        pageButton.type = 'button';
         pageButton.textContent = i;
         pageButton.style.cssText = `
             width: 40px;
@@ -257,22 +350,12 @@ function createPaginationControls(totalPages) {
             displayBookings();
             window.scrollTo({ top: 0, behavior: 'smooth' });
         });
-        if (i !== currentPage) {
-            pageButton.addEventListener('mouseenter', (e) => {
-                e.target.style.background = 'rgba(255, 255, 255, 0.3)';
-                e.target.style.transform = 'scale(1.1)';
-            });
-            pageButton.addEventListener('mouseleave', (e) => {
-                e.target.style.background = 'rgba(255, 255, 255, 0.2)';
-                e.target.style.transform = 'scale(1)';
-            });
-        }
         pageNumbersDiv.appendChild(pageButton);
     }
 
-    // Next button
     const nextButton = document.createElement('button');
-    nextButton.textContent = 'Next →';
+    nextButton.type = 'button';
+    nextButton.textContent = `${getTranslation('next')} →`;
     nextButton.disabled = currentPage === totalPages;
     nextButton.style.cssText = `
         padding: 12px 24px;
@@ -287,27 +370,15 @@ function createPaginationControls(totalPages) {
         opacity: ${currentPage === totalPages ? '0.5' : '1'};
     `;
     nextButton.addEventListener('click', () => {
-        if (currentPage < totalPages) {
-            currentPage++;
-            displayBookings();
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
+        if (currentPage === totalPages) return;
+        currentPage += 1;
+        displayBookings();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     });
-    if (currentPage < totalPages) {
-        nextButton.addEventListener('mouseenter', (e) => {
-            e.target.style.background = 'rgba(255, 255, 255, 0.3)';
-            e.target.style.transform = 'translateY(-2px)';
-        });
-        nextButton.addEventListener('mouseleave', (e) => {
-            e.target.style.background = 'rgba(255, 255, 255, 0.2)';
-            e.target.style.transform = 'translateY(0)';
-        });
-    }
 
     paginationDiv.appendChild(prevButton);
     paginationDiv.appendChild(pageNumbersDiv);
     paginationDiv.appendChild(nextButton);
-
     return paginationDiv;
 }
 
@@ -316,32 +387,12 @@ function createBookingCard(booking) {
     card.className = 'booking-card';
     card.dataset.bookingId = booking._id;
 
-    // Format dates
-    const startDate = new Date(booking.startTime).toLocaleString('en-GB', {
-        hour: '2-digit',
-        minute: '2-digit',
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric'
-    });
-    const endDate = new Date(booking.endTime).toLocaleString('en-GB', {
-        hour: '2-digit',
-        minute: '2-digit',
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric'
-    });
-    const orderDate = new Date(booking.createdAt).toLocaleString('en-GB', {
-        hour: '2-digit',
-        minute: '2-digit',
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric'
-    });
+    const canCancel = booking.status?.toLowerCase() === 'confirmed' && new Date(booking.startTime) > new Date();
+    const paymentStatus = String(booking.paymentStatus || '').toLowerCase();
+    const shouldShowPayNow = paymentStatus === 'pending' && booking.status?.toLowerCase() !== 'cancelled';
 
-    // Get badge color based on status
     const getBadgeStyle = (status) => {
-        switch (status.toLowerCase()) {
+        switch (String(status || '').toLowerCase()) {
             case 'confirmed':
                 return 'background: linear-gradient(135deg, #13b47e 0%, #1f6f35 100%);';
             case 'cancelled':
@@ -353,9 +404,8 @@ function createBookingCard(booking) {
         }
     };
 
-    // Get payment status badge style
     const getPaymentBadgeStyle = (status) => {
-        switch (status.toLowerCase()) {
+        switch (String(status || '').toLowerCase()) {
             case 'paid':
                 return 'background: linear-gradient(135deg, #13b47e 0%, #1f6f35 100%);';
             case 'pending':
@@ -367,63 +417,60 @@ function createBookingCard(booking) {
         }
     };
 
-    // Determine if cancel button should be shown
-    const canCancel = booking.status.toLowerCase() === 'confirmed' && new Date(booking.startTime) > new Date();
-
     card.innerHTML = `
         <div class="card-icon-col">
             <div class="parking-icon">P</div>
         </div>
         <div class="card-details-col">
-            <h2 class="parking-name">${booking.spot?.address || 'Unknown Location'}</h2>
+            <h2 class="parking-name">${booking.spot?.address || getTranslation('unknown_location')}</h2>
             <div class="details-grid">
                 <div class="detail-row">
-                    <span class="detail-label">Customer:</span>
-                    <span class="detail-value">${booking.user?.fullName || booking.guestFullName || 'N/A'}</span>
+                    <span class="detail-label">${getTranslation('customer')}:</span>
+                    <span class="detail-value">${booking.user?.fullName || booking.guestFullName || getTranslation('not_available')}</span>
                 </div>
                 <div class="detail-row">
-                    <span class="detail-label">Email:</span>
-                    <span class="detail-value">${booking.user?.email || booking.guestEmail || 'N/A'}</span>
+                    <span class="detail-label">${getTranslation('email')}:</span>
+                    <span class="detail-value">${booking.user?.email || booking.guestEmail || getTranslation('not_available')}</span>
                 </div>
                 <div class="detail-row">
-                    <span class="detail-label">Phone:</span>
-                    <span class="detail-value">${booking.phoneNumber || booking.guestPhoneNumber || 'N/A'}</span>
+                    <span class="detail-label">${getTranslation('phone')}:</span>
+                    <span class="detail-value">${booking.phoneNumber || booking.guestPhoneNumber || getTranslation('not_available')}</span>
                 </div>
                 <div class="detail-row">
-                    <span class="detail-label">From:</span>
-                    <span class="detail-value">${startDate}</span>
+                    <span class="detail-label">${getTranslation('from')}:</span>
+                    <span class="detail-value">${formatDateTime(booking.startTime)}</span>
                 </div>
                 <div class="detail-row">
-                    <span class="detail-label">To:</span>
-                    <span class="detail-value">${endDate}</span>
+                    <span class="detail-label">${getTranslation('to')}:</span>
+                    <span class="detail-value">${formatDateTime(booking.endTime)}</span>
                 </div>
                 <div class="detail-row">
-                    <span class="detail-label">Order Time:</span>
-                    <span class="detail-value">${orderDate}</span>
+                    <span class="detail-label">${getTranslation('order_time')}:</span>
+                    <span class="detail-value">${formatDateTime(booking.createdAt)}</span>
                 </div>
                 <div class="detail-row">
-                    <span class="detail-label">Booking Status:</span>
+                    <span class="detail-label">${getTranslation('booking_status')}:</span>
                     <span class="detail-value">
-                        <span class="badge" style="${getBadgeStyle(booking.status)}">${booking.status}</span>
+                        <span class="badge" style="${getBadgeStyle(booking.status)}">${getBookingStatusLabel(booking.status)}</span>
                     </span>
                 </div>
                 <div class="detail-row">
-                    <span class="detail-label">Payment Method:</span>
-                    <span class="detail-value">${booking.paymentMethod || 'N/A'}</span>
+                    <span class="detail-label">${getTranslation('payment_method')}:</span>
+                    <span class="detail-value">${getPaymentMethodLabel(booking.paymentMethod)}</span>
                 </div>
                 <div class="detail-row">
-                    <span class="detail-label">Payment Status:</span>
+                    <span class="detail-label">${getTranslation('payment_status')}:</span>
                     <span class="detail-value">
-                        <span class="badge" style="${getPaymentBadgeStyle(booking.paymentStatus)}">${booking.paymentStatus}</span>
+                        <span class="badge" style="${getPaymentBadgeStyle(booking.paymentStatus)}">${getPaymentStatusLabel(booking.paymentStatus)}</span>
                     </span>
                 </div>
                 <div class="detail-row">
-                    <span class="detail-label">Payment Total:</span>
-                    <span class="detail-value">${booking.totalPrice?.toLocaleString('vi-VN')} VND</span>
+                    <span class="detail-label">${getTranslation('payment_total')}:</span>
+                    <span class="detail-value">${formatCurrency(booking.totalPrice)}</span>
                 </div>
                 ${canCancel ? `
                 <div class="detail-row" style="margin-top: 15px; border-top: 2px solid rgba(0,0,0,0.1); padding-top: 15px;">
-                    <button class="cancel-booking-btn" data-booking-id="${booking._id}" style="
+                    <button class="cancel-booking-btn" data-booking-id="${booking._id}" type="button" style="
                         width: 100%;
                         padding: 12px 24px;
                         background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
@@ -436,13 +483,13 @@ function createBookingCard(booking) {
                         transition: all 0.3s ease;
                         box-shadow: 0 4px 15px rgba(231, 76, 60, 0.3);
                     ">
-                        Cancel Booking
+                        ${getTranslation('cancel_booking')}
                     </button>
                 </div>
                 ` : ''}
-                ${booking.paymentStatus.toLowerCase() === 'pending' && booking.status.toLowerCase() !== 'cancelled' ? `
+                ${shouldShowPayNow ? `
                 <div class="detail-row" style="margin-top: 15px; border-top: 2px solid rgba(0,0,0,0.1); padding-top: 15px;">
-                    <button class="pay-now-btn" data-booking-id="${booking._id}" style="
+                    <button class="pay-now-btn" data-booking-id="${booking._id}" type="button" style="
                         width: 100%;
                         padding: 12px 24px;
                         background: linear-gradient(135deg, #13b47e 0%, #1f6f35 100%);
@@ -455,7 +502,7 @@ function createBookingCard(booking) {
                         transition: all 0.3s ease;
                         box-shadow: 0 4px 15px rgba(19, 180, 126, 0.3);
                     ">
-                        Pay Now
+                        ${getTranslation('pay_now')}
                     </button>
                 </div>
                 ` : ''}
@@ -463,146 +510,143 @@ function createBookingCard(booking) {
         </div>
     `;
 
-    // Add cancel button event listener
-    if (canCancel) {
-        const cancelBtn = card.querySelector('.cancel-booking-btn');
-        cancelBtn.addEventListener('click', () => handleCancelBooking(booking._id));
-        cancelBtn.addEventListener('mouseenter', (e) => {
-            e.target.style.transform = 'translateY(-2px)';
-            e.target.style.boxShadow = '0 8px 25px rgba(231, 76, 60, 0.4)';
-        });
-        cancelBtn.addEventListener('mouseleave', (e) => {
-            e.target.style.transform = 'translateY(0)';
-            e.target.style.boxShadow = '0 4px 15px rgba(231, 76, 60, 0.3)';
-        });
-    }
-
-    // Add pay now button event listener
-    const payNowBtn = card.querySelector('.pay-now-btn');
-    if (payNowBtn) {
-        payNowBtn.addEventListener('click', () => handlePayNow(booking._id));
-        payNowBtn.addEventListener('mouseenter', (e) => {
-            e.target.style.transform = 'translateY(-2px)';
-            e.target.style.boxShadow = '0 8px 25px rgba(19, 180, 126, 0.4)';
-        });
-        payNowBtn.addEventListener('mouseleave', (e) => {
-            e.target.style.transform = 'translateY(0)';
-            e.target.style.boxShadow = '0 4px 15px rgba(19, 180, 126, 0.3)';
-        });
-    }
-
+    card.querySelector('.cancel-booking-btn')?.addEventListener('click', () => handleCancelBooking(booking._id));
+    card.querySelector('.pay-now-btn')?.addEventListener('click', () => handlePayNow(booking._id));
     return card;
 }
 
-async function handleCancelBooking(bookingId) {
-    const confirmed = confirm('Are you sure you want to cancel this booking? This action cannot be undone.');
+async function loadBookings() {
+    const token = localStorage.getItem('userToken');
 
+    if (!token) {
+        alert(getTranslation('login_required'));
+        window.location.href = 'login.html';
+        return;
+    }
+
+    renderLoadingState();
+
+    try {
+        const response = await fetch(`${API_URL}/bookings/mybookings`, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+
+        if (!response.ok) {
+            throw new Error(getTranslation('failed_to_fetch'));
+        }
+
+        const bookings = await response.json();
+        allBookings = bookings.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+        if (allBookings.length === 0) {
+            renderEmptyState();
+            return;
+        }
+
+        displayBookings();
+    } catch (error) {
+        console.error('Error loading bookings:', error);
+        renderErrorState(error.message);
+    }
+}
+
+async function handleCancelBooking(bookingId) {
+    const confirmed = window.confirm(getTranslation('cancel_confirm'));
     if (!confirmed) return;
 
     const token = localStorage.getItem('userToken');
-    const cancelBtn = document.querySelector(`[data-booking-id="${bookingId}"]`);
+    const cancelButton = document.querySelector(`.cancel-booking-btn[data-booking-id="${bookingId}"]`);
 
-    if (cancelBtn) {
-        cancelBtn.disabled = true;
-        cancelBtn.textContent = 'Cancelling...';
+    if (cancelButton) {
+        cancelButton.disabled = true;
+        cancelButton.textContent = getTranslation('cancelling');
     }
 
     try {
         const response = await fetch(`${API_URL}/bookings/${bookingId}/cancel`, {
             method: 'PUT',
             headers: {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json'
-            }
+                Authorization: `Bearer ${token}`,
+                'Content-Type': 'application/json',
+            },
         });
 
         if (!response.ok) {
-            const error = await response.json();
-            throw new Error(error.message || 'Failed to cancel booking');
+            const error = await response.json().catch(() => ({}));
+            throw new Error(error.message || getTranslation('cancel_failed'));
         }
 
-        alert('Booking cancelled successfully!');
-
-        // Reload bookings data and refresh the current page
-        const bookingsResponse = await fetch(`${API_URL}/bookings/mybookings`, {
-            headers: {
-                'Authorization': `Bearer ${token}`
-            }
-        });
-
-        if (bookingsResponse.ok) {
-            const bookings = await bookingsResponse.json();
-            allBookings = bookings.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-
-            // Adjust current page if needed (in case we deleted the last item on a page)
-            const totalPages = Math.ceil(allBookings.length / bookingsPerPage);
-            if (currentPage > totalPages && totalPages > 0) {
-                currentPage = totalPages;
-            }
-
-            displayBookings();
-        } else {
-            location.reload();
-        }
-
+        alert(getTranslation('cancel_success'));
+        await loadBookings();
     } catch (error) {
         console.error('Error cancelling booking:', error);
-        alert(`Failed to cancel booking: ${error.message}`);
+        alert(`${getTranslation('cancel_failed')}: ${error.message}`);
 
-        if (cancelBtn) {
-            cancelBtn.disabled = false;
-            cancelBtn.textContent = 'Cancel Booking';
+        if (cancelButton) {
+            cancelButton.disabled = false;
+            cancelButton.textContent = getTranslation('cancel_booking');
         }
     }
 }
 
 async function handlePayNow(bookingId) {
     const token = localStorage.getItem('userToken');
-
     if (!token) {
-        alert('Please login to complete payment');
+        alert(getTranslation('pay_login_required'));
         window.location.href = 'login.html';
         return;
     }
 
-    const payNowBtn = document.querySelector(`[data-booking-id="${bookingId}"].pay-now-btn`);
+    const payNowButton = document.querySelector(`.pay-now-btn[data-booking-id="${bookingId}"]`);
 
-    if (payNowBtn) {
-        payNowBtn.disabled = true;
-        payNowBtn.textContent = 'Processing...';
+    if (payNowButton) {
+        payNowButton.disabled = true;
+        payNowButton.textContent = getTranslation('processing');
     }
 
     try {
         const response = await fetch(`${API_URL}/payments/paypal/retry`, {
             method: 'POST',
             headers: {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json'
+                Authorization: `Bearer ${token}`,
+                'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ bookingId })
+            body: JSON.stringify({ bookingId }),
         });
 
         if (!response.ok) {
-            const error = await response.json();
-            throw new Error(error.message || 'Failed to initiate payment');
+            const error = await response.json().catch(() => ({}));
+            throw new Error(error.message || getTranslation('pay_init_failed'));
         }
 
         const data = await response.json();
-
-        // Redirect to PayPal checkout
-        if (data.redirectUrl) {
-            window.open(data.redirectUrl, '_blank');
-        } else {
-            throw new Error('No payment URL received');
+        if (!data.redirectUrl) {
+            throw new Error(getTranslation('no_payment_url'));
         }
 
+        window.open(data.redirectUrl, '_blank');
     } catch (error) {
         console.error('Error initiating payment:', error);
-        alert(`Failed to initiate payment: ${error.message}`);
+        alert(`${getTranslation('pay_init_failed')}: ${error.message}`);
 
-        if (payNowBtn) {
-            payNowBtn.disabled = false;
-            payNowBtn.textContent = 'Pay Now';
+        if (payNowButton) {
+            payNowButton.disabled = false;
+            payNowButton.textContent = getTranslation('pay_now');
         }
     }
 }
+
+document.addEventListener('DOMContentLoaded', async () => {
+    const hostLink = document.getElementById('host-link');
+    if (hostLink && window.HOST_URL) {
+        hostLink.href = `${window.HOST_URL}/login`;
+    }
+
+    document.getElementById('lang-en')?.addEventListener('click', () => setLanguage('en'));
+    document.getElementById('lang-vi')?.addEventListener('click', () => setLanguage('vi'));
+
+    applyTranslations();
+    await loadBookings();
+});
