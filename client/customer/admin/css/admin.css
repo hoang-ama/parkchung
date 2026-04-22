@@ -1,0 +1,875 @@
+/* ===================
+   PARKCHUNG THEME CSS
+   ===================
+   Includes:
+   - Login Page Styles
+   - Admin Dashboard Styles
+   - Light / Dark Mode Toggle
+*/
+
+:root {
+  /* Light Theme */
+  --primary: #13b47e;
+  --primary-dark: #0d9a6b;
+  --bg: #f4f7fa;
+  --text: #2c3e50;
+  --card-bg: #ffffff;
+  --muted: #7f8c8d;
+  --hover: #e6f5ef;
+  --border: #e1e7ec;
+  --shadow: rgba(0, 0, 0, 0.06);
+}
+
+[data-theme="dark"] {
+  --bg: #1e1e1e;
+  --card-bg: #2c2c2c;
+  --text: #ecf0f1;
+  --muted: #bdc3c7;
+  --border: #444;
+  --shadow: rgba(255, 255, 255, 0.05);
+}
+
+body {
+  margin: 0;
+  font-family: 'Montserrat', sans-serif;
+  background-color: var(--bg);
+  color: var(--text);
+  transition: background 0.3s, color 0.3s;
+}
+
+/* ========== LOGIN ========== */
+.login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: var(--bg);
+  padding: 20px;
+}
+
+.login-form {
+  background: var(--card-bg);
+  padding: 40px;
+  border-radius: 16px;
+  box-shadow: 0 8px 32px var(--shadow);
+  width: 100%;
+  max-width: 400px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.login-form h2 {
+  text-align: center;
+  color: var(--primary);
+  font-size: 2rem;
+  margin-bottom: 10px;
+}
+
+.form-group label {
+  font-weight: 600;
+  margin-bottom: 5px;
+  display: block;
+  color: var(--text);
+}
+
+.form-group input {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: #fff;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.form-group input:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px rgba(19, 180, 126, 0.2);
+  outline: none;
+}
+
+button {
+  padding: 12px;
+  width: 100%;
+  background: var(--primary);
+  color: #fff;
+  font-weight: 700;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+button:hover {
+  background-color: var(--primary-dark);
+}
+
+.error-message {
+  color: #e74c3c;
+  text-align: center;
+  font-weight: 500;
+}
+
+/* ========== ADMIN DASHBOARD ========== */
+.admin-panel {
+  display: flex;
+  min-height: 100vh;
+}
+
+.sidebar {
+  width: 250px;
+  background: var(--primary);
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.sidebar-header {
+  padding: 24px;
+  font-size: 1.4rem;
+  font-weight: bold;
+  text-align: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.sidebar-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.sidebar-nav a {
+  color: #fff;
+  padding: 14px 24px;
+  text-decoration: none;
+  transition: background 0.2s;
+  display: flex;
+  align-items: center;
+}
+
+.sidebar-nav a:hover,
+.sidebar-nav a.active {
+  background-color: var(--primary-dark);
+}
+
+.main-content {
+  flex-grow: 1;
+  background: var(--bg);
+  padding: 32px;
+}
+
+.main-header {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 24px;
+  border-bottom: 2px solid var(--border);
+  padding-bottom: 12px;
+}
+
+/* TABLE */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--card-bg);
+  box-shadow: 0 2px 6px var(--shadow);
+  border-radius: 8px;
+  overflow: hidden;
+  margin-top: 20px;
+}
+
+th,
+td {
+  padding: 14px 18px;
+  text-align: left;
+  border: 1px solid var(--border);
+}
+
+th {
+  background-color: var(--hover);
+  color: var(--primary);
+  font-weight: bold;
+}
+
+tbody tr:nth-child(even) {
+  background-color: #f8fafa;
+}
+
+/* STATUS COLORS */
+.status-pending {
+  color: #f39c12;
+  font-weight: bold;
+}
+
+.status-approved {
+  color: #2ecc71;
+  font-weight: bold;
+}
+
+.status-confirmed {
+  color: #2ecc71;
+  font-weight: bold;
+}
+
+/* (removed orphan btn-edit properties - duplicated in .action-btn) */
+
+.btn-edit:hover {
+  background-color: var(--primary-dark);
+}
+
+.action-btn {
+  padding: 6px 14px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  color: #fff;
+  font-size: 0.85rem;
+}
+
+.btn-approve {
+  background-color: #2ecc71;
+}
+
+.btn-approve:hover {
+  background-color: #27ae60;
+}
+
+.btn-reject {
+  background-color: #e74c3c;
+}
+
+.btn-reject:hover {
+  background-color: #c0392b;
+}
+
+.btn-delete {
+  background-color: #e74c3c;
+}
+
+.btn-delete:hover {
+  background-color: #c0392b;
+}
+
+.btn-image {
+  background-color: #3498db;
+}
+
+.btn-image:hover {
+  background-color: #2980b9;
+}
+
+/* EDITABLE INPUT */
+.editable-input {
+  width: 90%;
+  padding: 6px;
+  border: 1px solid var(--primary);
+  border-radius: 4px;
+  font-size: 0.9rem;
+}
+
+select.editable-input {
+  width: 95%;
+}
+
+.action-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: flex-start;
+  margin-top: 6px;
+}
+
+/* ========== THEME SWITCH ========== */
+.theme-switch {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 1000;
+}
+
+.theme-switch input[type="checkbox"] {
+  display: none;
+}
+
+.theme-switch label {
+  display: flex;
+  align-items: center;
+  background-color: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 6px 12px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--text);
+  gap: 6px;
+  box-shadow: 0 2px 4px var(--shadow);
+  transition: background 0.2s;
+}
+
+.theme-switch label:hover {
+  background-color: var(--hover);
+}
+
+/* === STYLING FOR SPOT IMAGE IN ADMIN TABLE === */
+.spot-image-column {
+  width: 120px;
+}
+
+.spot-thumbnail {
+  width: 100px;
+  height: 70px;
+  object-fit: cover;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+}
+
+/* ========== SPOT CODE BADGE ========== */
+.spot-code-column {
+  width: 80px;
+  text-align: center;
+}
+
+.spot-code-badge {
+  display: inline-block;
+  padding: 4px 10px;
+  background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.85rem;
+  font-family: 'Courier New', monospace;
+  border-radius: 6px;
+  letter-spacing: 0.5px;
+}
+
+.spot-code-na {
+  display: inline-block;
+  padding: 4px 10px;
+  background: #ecf0f1;
+  color: #95a5a6;
+  font-weight: 600;
+  font-size: 0.8rem;
+  border-radius: 6px;
+}
+
+/* ========== EXPANDABLE SPOT DETAILS ========== */
+.spot-details-row {
+  display: none;
+}
+
+.spot-details-row.expanded {
+  display: table-row;
+}
+
+.spot-details-row td {
+  padding: 0;
+  background-color: #f8fafa;
+  border-top: none;
+}
+
+.spot-details-content {
+  padding: 20px 24px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px;
+  border-top: 2px dashed var(--border);
+}
+
+.detail-section {
+  background: var(--card-bg);
+  padding: 16px;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px var(--shadow);
+}
+
+.detail-section-title {
+  font-weight: 700;
+  color: var(--primary);
+  margin-bottom: 12px;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 8px;
+}
+
+.detail-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 6px 0;
+  border-bottom: 1px dotted var(--border);
+}
+
+.detail-item:last-child {
+  border-bottom: none;
+}
+
+.detail-label {
+  font-weight: 600;
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.detail-value {
+  font-weight: 500;
+  color: var(--text);
+  text-align: right;
+  max-width: 60%;
+}
+
+/* Badges for categories */
+.badge-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  justify-content: flex-end;
+}
+
+.badge {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.badge-vehicle {
+  background-color: #e8f4fd;
+  color: #1976d2;
+}
+
+.badge-booking {
+  background-color: #e8f5e9;
+  color: #388e3c;
+}
+
+.badge-payment {
+  background-color: #fff3e0;
+  color: #f57c00;
+}
+
+.badge-addon {
+  background-color: #f3e5f5;
+  color: #7b1fa2;
+}
+
+.badge-yes {
+  background-color: #c8e6c9;
+  color: #2e7d32;
+}
+
+.badge-no {
+  background-color: #ffcdd2;
+  color: #c62828;
+}
+
+.badge-active {
+  background-color: #c8e6c9;
+  color: #2e7d32;
+}
+
+.badge-inactive {
+  background-color: #ffcdd2;
+  color: #c62828;
+}
+
+/* Description field */
+.detail-description {
+  grid-column: 1 / -1;
+  background: var(--card-bg);
+  padding: 16px;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px var(--shadow);
+}
+
+.detail-description .detail-section-title {
+  margin-bottom: 8px;
+}
+
+.detail-description-text {
+  color: var(--text);
+  line-height: 1.6;
+  font-size: 0.9rem;
+  white-space: pre-wrap;
+}
+
+/* Expand button */
+.btn-expand {
+  background-color: #9b59b6;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.btn-expand:hover {
+  background-color: #8e44ad;
+}
+
+.btn-expand .expand-icon {
+  transition: transform 0.2s ease;
+  display: inline-block;
+}
+
+.btn-expand.expanded .expand-icon {
+  transform: rotate(180deg);
+}
+
+/* Rating stars */
+.rating-stars {
+  color: #f1c40f;
+  font-size: 0.9rem;
+}
+
+.rating-value {
+  color: var(--text);
+  font-weight: 600;
+  margin-left: 4px;
+}
+
+/* Edit mode indicator */
+.btn-edit {
+  background-color: var(--primary);
+}
+
+/* ========== BULK ACTIONS ========== */
+.bulk-actions-container {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  border-radius: 8px;
+  margin: 12px 0;
+  border: 1px solid var(--border);
+  flex-wrap: wrap;
+}
+
+.bulk-count {
+  font-weight: 600;
+  color: var(--primary);
+  padding: 6px 12px;
+  background: white;
+  border-radius: 4px;
+  border: 1px solid var(--primary);
+}
+
+.bulk-action-btn {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.85rem;
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: transform 0.1s, box-shadow 0.2s;
+}
+
+.bulk-action-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.bulk-action-btn.bulk-approve {
+  background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
+}
+
+.bulk-action-btn.bulk-reject {
+  background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
+}
+
+.bulk-action-btn.bulk-delete {
+  background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+}
+
+/* Bulk delete button for bookings (existing) */
+.bulk-delete-btn {
+  padding: 10px 20px;
+  background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  margin: 12px 0;
+}
+
+/* ========== ACTIVATE/DEACTIVATE BUTTONS ========== */
+.btn-activate {
+  background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
+}
+
+.btn-activate:hover {
+  background: linear-gradient(135deg, #219a52 0%, #27ae60 100%);
+}
+
+.btn-deactivate {
+  background: linear-gradient(135deg, #95a5a6 0%, #7f8c8d 100%);
+}
+
+.btn-deactivate:hover {
+  background: linear-gradient(135deg, #7f8c8d 0%, #6c7a7b 100%);
+}
+
+/* ========== PAGINATION CONTROLS ========== */
+.pagination-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  margin-top: 16px;
+  background: var(--card-bg);
+  border-radius: 8px;
+  box-shadow: 0 2px 6px var(--shadow);
+  border: 1px solid var(--border);
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.pagination-info {
+  font-size: 0.9rem;
+  color: var(--muted);
+  font-weight: 500;
+}
+
+.pagination-buttons {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.pagination-btn {
+  padding: 8px 14px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--card-bg);
+  color: var(--text);
+  font-weight: 600;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  width: auto;
+}
+
+.pagination-btn:hover:not(:disabled):not(.pagination-active) {
+  background: var(--hover);
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.pagination-btn.pagination-active {
+  background: var(--primary);
+  color: #fff;
+  border-color: var(--primary);
+}
+
+.pagination-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  background: var(--card-bg);
+}
+
+.pagination-ellipsis {
+  padding: 4px 8px;
+  color: var(--muted);
+  font-weight: 600;
+  user-select: none;
+}
+
+/* ========== SPOTS HEADER + SEARCH ========== */
+.spots-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 4px;
+}
+
+.spots-header h2 {
+  margin: 0;
+}
+
+.spots-search-box {
+  display: flex;
+  align-items: center;
+  background: var(--card-bg);
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  padding: 8px 14px;
+  gap: 8px;
+  box-shadow: 0 1px 4px var(--shadow);
+  transition: border-color 0.2s, box-shadow 0.2s;
+  min-width: 280px;
+}
+
+.spots-search-box:focus-within {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(19, 180, 126, 0.15);
+}
+
+.search-icon {
+  font-size: 1rem;
+  flex-shrink: 0;
+  opacity: 0.7;
+}
+
+.spots-search-input {
+  border: none;
+  outline: none;
+  background: transparent;
+  font-size: 0.9rem;
+  color: var(--text);
+  width: 100%;
+  font-family: 'Montserrat', sans-serif;
+  padding: 0;
+}
+
+.spots-search-input::placeholder {
+  color: var(--muted);
+}
+
+/* ========== BOOKINGS TOOLBAR ========== */
+.bookings-toolbar {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 4px;
+}
+
+.bookings-toolbar h2 {
+  margin: 0;
+}
+
+.bookings-filters {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+/* Search box (mirrors spots pattern) */
+.bookings-search-box {
+  display: flex;
+  align-items: center;
+  background: var(--card-bg);
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  padding: 8px 14px;
+  gap: 8px;
+  box-shadow: 0 1px 4px var(--shadow);
+  transition: border-color 0.2s, box-shadow 0.2s;
+  min-width: 240px;
+}
+
+.bookings-search-box:focus-within {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(19, 180, 126, 0.15);
+}
+
+.bookings-search-input {
+  border: none;
+  outline: none;
+  background: transparent;
+  font-size: 0.9rem;
+  color: var(--text);
+  width: 100%;
+  font-family: 'Montserrat', sans-serif;
+  padding: 0;
+}
+
+.bookings-search-input::placeholder {
+  color: var(--muted);
+}
+
+/* Status Pills */
+.status-pills {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.status-pill {
+  padding: 6px 16px;
+  border: 1.5px solid var(--border);
+  border-radius: 20px;
+  background: var(--card-bg);
+  color: var(--text);
+  font-weight: 600;
+  font-size: 0.82rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  width: auto;
+}
+
+.status-pill:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+  background: var(--hover);
+}
+
+.status-pill.active {
+  background: var(--primary);
+  color: #fff;
+  border-color: var(--primary);
+}
+
+.status-pill.pill-pending.active {
+  background: #f39c12;
+  border-color: #f39c12;
+}
+
+.status-pill.pill-confirmed.active {
+  background: #2ecc71;
+  border-color: #2ecc71;
+}
+
+.status-pill.pill-completed.active {
+  background: #3498db;
+  border-color: #3498db;
+}
+
+.status-pill.pill-cancelled.active {
+  background: #e74c3c;
+  border-color: #e74c3c;
+}
+
+/* Filter Selects */
+.filter-select {
+  padding: 8px 14px;
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  background: var(--card-bg);
+  color: var(--text);
+  font-weight: 600;
+  font-size: 0.85rem;
+  font-family: 'Montserrat', sans-serif;
+  cursor: pointer;
+  transition: border-color 0.2s;
+  width: auto;
+  min-width: 140px;
+}
+
+.filter-select:focus {
+  border-color: var(--primary);
+  outline: none;
+}
+
+.filter-select:hover {
+  border-color: var(--primary);
+}
+
+/* Cancelled status color */
+.status-cancelled {
+  color: #e74c3c;
+  font-weight: bold;
+}
+
+.status-completed {
+  color: #3498db;
+  font-weight: bold;
+}
