@@ -1,0 +1,25 @@
+name: Deploy to EC2 Server
+
+on:
+  push:
+    branches:
+      - development
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: SSH into EC2 and update code
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            cd /var/www/parkchung
+            # Reset any local changes just in case
+            git reset --hard HEAD
+            # Update the code
+            git pull origin ${{ github.ref_name }}
+            echo "Deployment completed successfully!"

@@ -1,0 +1,15 @@
+registry: https://github.com/HoangNguyen0403/agent-skills-standard
+agents: [gemini, cursor, copilot, claude]
+skills:
+  common:
+    ref: common-v2.0.4
+  javascript:
+    ref: javascript-v1.3.4
+  database:
+    ref: database-v1.3.3
+  quality-engineering:
+    ref: quality-engineering-v1.4.4
+mcp:
+  enabled: true
+  scope: project
+  prompted: true
