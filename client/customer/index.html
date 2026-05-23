@@ -1,277 +1,402 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="description"
-    content="Parkchung - Your online parking platform for easy and eco-friendly parking solutions." />
-  <title>Parkchung, online parking platform</title>
+    content="Parkchung - Nền tảng đặt chỗ đỗ xe trực tuyến. Tối ưu hóa hành trình với giải pháp đặt trước bãi đỗ thông minh." />
+  <title>ParkChung - Smart Parking Hero</title>
   <link rel="icon" type="image/png" href="/assets/logo/favicon.png" />
-  <link rel="stylesheet" href="css/styles.css" />
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+  <link rel="stylesheet" href="/customer/css/styles.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
   <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 </head>
 
 <body>
-  <!-- 1.Header Section -->
-  <header>
-    <div class="logo">
-      <img src="/assets/logo/logo.svg" alt="Parkchung Logo" />
-      <div>
-        <h1>PARKCHUNG</h1>
-        <p class="tagline" data-i18n="tagline">Save time. Save money. Save Earth</p>
-      </div>
+  <!-- ============ HEADER V3 ============ -->
+  <header class="header-v3">
+    <div class="header-inner">
+      <a href="index.html" class="header-logo">
+        <img src="/assets/logo/logo.png" alt="Parkchung Logo" />
+        <div class="header-logo-text">
+          <span class="header-brand">PARKCHUNG</span>
+          <span class="header-tagline" data-i18n="tagline">Save time. Save money. Save Earth</span>
+        </div>
+      </a>
+
+      <nav class="header-nav" id="main-nav">
+        <!-- Will be dynamically populated by app.js, including lang switcher -->
+        <a href="#" class="nav-link" data-i18n="becomeHost">Trở thành đối tác <i class="fas fa-chevron-down" style="font-size: 0.7rem; margin-left: 3px; vertical-align: middle;"></i></a>
+        <a href="login.html" class="btn-nav btn-nav-primary" data-i18n="login">Đăng nhập</a>
+        <a href="register.html" class="btn-nav btn-nav-outline" data-i18n="registerText">Đăng ký</a>
+        <div class="lang-switcher" id="lang-switcher">
+          <img src="https://flagcdn.com/w40/vn.png" alt="VI" class="lang-flag" id="lang-flag" />
+          <span class="lang-arrow">▼</span>
+        </div>
+      </nav>
+      
+      <button class="mobile-menu-btn" id="mobile-menu-btn">
+        <i class="fas fa-bars"></i>
+      </button>
     </div>
-    <nav id="main-nav">
-      <!-- Navigation will be dynamically rendered by app.js -->
-      <a href="register.html">Become a Host / Register</a>
-      <a href="login.html">Login</a>
-    </nav>
   </header>
 
-  <!-- 2.Slider/ Search Section -->
-  <section class="search-section">
-    <div class="search-box">
-      <form id="searchForm">
-        <div class="search-tabs">
-          <button type="button" class="tab active" data-i18n="tab_hourly">Hourly/Daily</button>
-          <button type="button" class="tab" id="monthly-tab" data-i18n="tab_monthly">Monthly</button>
+  <!-- ============ HERO V3 ============ -->
+  <section class="hero-v3">
+    <div class="hero-bg" id="hero-bg"></div>
+    <div class="hero-overlay"></div>
+    <div class="hero-content">
+      <h1 class="hero-title" data-i18n="hero_title">Tối ưu hóa hành trình với giải pháp đặt trước bãi đỗ thông minh</h1>
+      
+      <!-- ============ SEARCH BOX V3 ============ -->
+      <div class="search-box-v3">
+        <div class="booking-tabs">
+          <button type="button" class="booking-tab active" id="tab-pre" data-type="pre">Pre booking</button>
+          <button type="button" class="booking-tab" id="tab-valet" data-type="valet">Valet booking</button>
         </div>
-        <div class="search-row">
-          <label for="location" class="search-label" data-i18n="label_park_at">Park at</label>
-          <div class="search-input-wrapper">
-            <input type="text" id="location" placeholder="Enter a place or postcode" data-i18n-placeholder="ph_location"
-              required />
-            <span class="search-icon"><i class="fa fa-search"></i></span>
-            <div class="autocomplete-suggestions" id="suggestions-box"></div>
-          </div>
-        </div>
-        <div class="search-row date-row">
-          <div class="date-group">
-            <label for="start-datetime" class="search-label" data-i18n="label_from">From</label>
-            <input type="datetime-local" id="start-datetime" name="startDateTime" required />
-          </div>
-          <span class="arrow-icon"><i class="fa fa-arrow-right"></i></span>
-          <div class="date-group">
-            <label for="end-datetime" class="search-label" data-i18n="label_until">Until</label>
-            <input type="datetime-local" id="end-datetime" name="endDateTime" required />
-          </div>
-        </div>
-        <button type="submit" class="search-btn" data-i18n="btn_show_spaces">Show parking spaces</button>
-      </form>
-    </div>
-  </section>
-
-  <!-- 3. Benifits Section -->
-
-  <section class="benefits">
-    <h2 data-i18n="why_title">Why Parkchung</h2>
-    <div class="benefit-items">
-      <div class="benefit-item">
-        <!-- <img src="https://img.icons8.com/fluency/48/000000/time.png" alt="Save Time" /> -->
-        <img src="../assets/image/save_time.jpg" alt="Save Time" />
-        <h3 data-i18n="benefit_time_title">Save Time</h3>
-        <p data-i18n="benefit_time_desc">Book your parking spot in advance, no more endless searching.</p>
-      </div>
-      <div class="benefit-item">
-        <!--   <img src="https://img.icons8.com/fluency/48/000000/money-bag.png" alt="Transparent Pricing" />  -->
-        <img src="/assets/image/price-tag.png" alt="Transparent Pricing" />
-        <h3 data-i18n="benefit_price_title">Transparent Pricing</h3>
-        <p data-i18n="benefit_price_desc">Clear pricing, no surprises when you book.</p>
-      </div>
-      <div class="benefit-item">
-        <!--   <img src="https://img.icons8.com/fluency/48/000000/security-checked.png" alt="Safe Parking" />  -->
-        <img src="/assets/image/parking-area.jpg" alt="Safe Parking" />
-        <h3 data-i18n="benefit_safe_title">Safe Parking</h3>
-        <p data-i18n="benefit_safe_desc">Secure spots monitored with security systems.</p>
-      </div>
-    </div>
-  </section>
-
-  <!-- 4. Location Section -->
-
-  <section class="locations">
-    <h2 data-i18n="locations_title">Featured Locations</h2>
-    <div class="location-cards">
-      <div class="location-card">
-        <img src="../assets/image/airport.png" alt="Airports" />
-        <div class="caption" data-i18n="loc_airports">Airports</div>
-      </div>
-      <div class="location-card">
-        <img src="../assets/image/city_centre.jpg" alt="City Centers" />
-        <div class="caption" data-i18n="loc_city">City Centers</div>
-      </div>
-      <div class="location-card">
-        <img src="../assets/image/home_parking.jpg" alt="Private Homes" />
-        <div class="caption" data-i18n="loc_homes">Private Homes</div>
-      </div>
-    </div>
-  </section>
-
-  <!-- 5. Private Park Section -->
-
-  <section class="rent-space-section">
-    <div class="content-container">
-      <h1 data-i18n="rent_title">Rent out your parking or EV charging space</h1>
-      <p data-i18n="rent_desc">Make easy tax free money by renting out your parking or EV charging space. It‘s free to
-        list and only takes a few minutes to et up and running.</p>
-      <a href="#" class="cta-button" data-i18n="rent_cta">Learn how to earn today</a>
-    </div>
-  </section>
-
-  <!-- 6. Park Management Section -->
-
-  <section class="car-park-section">
-    <div class="content-container">
-      <h1 data-i18n="carpark_title">Car park management</h1>
-      <p data-i18n="carpark_desc">Maximise yield from underused car parks and vacant land, or transform payments with
-        the favourite parking app.</p>
-      <a href="#" class="cta-button" data-i18n="carpark_cta">Learn about our solutions</a>
-    </div>
-  </section>
-
-  <!--7. Testimonials Section -->
-
-  <section class="testimonials">
-    <div class="testimonials-header">
-      <p class="badge" data-i18n="press_badge">PRESS MENTIONS</p>
-      <h2 data-i18n="press_title">The press talks about us</h2>
-      <p class="testimonials-subtitle" data-i18n="press_subtitle">
-        Global media highlight how Parkchung is shaping the future of shared mobility in Vietnam.
-      </p>
-    </div>
-    <div class="testimonials-grid">
-      <article class="testimonial-card">
-        <a href="https://www.facebook.com/undpvietnam/posts/1156081896700955?ref=embed_post" target="_blank"
-          rel="noopener" class="testimonial-link">
-          <div class="testimonial-media">
-            <img src="../assets/image/stu1.jpg" alt="UNDP highlight – VietChallenge 2019 Finals" />
-          </div>
-          <div class="testimonial-content">
-            <p class="testimonial-source" data-i18n="press_article1_source">UNDP Vietnam · VietChallenge 2019</p>
-            <h3 data-i18n="press_article1_title">Congratulations to 12 startups officially advancing to the deep
-              training phase of the Vietnam - Japan Incubation Program!</h3>
-            <span class="testimonial-cta" data-i18n="press_read_article">Read article</span>
-          </div>
-        </a>
-      </article>
-      <article class="testimonial-card">
-        <a href="https://startup.vnexpress.net/tin-tuc/y-tuong-moi/doanh-nhan-8x-va-nen-tang-truc-tuyen-chia-se-xe-tu-lai-3833028.html"
-          target="_blank" rel="noopener" class="testimonial-link">
-          <div class="testimonial-media">
-            <img src="../assets/image/stu2.jpg" alt="Startup VnExpress feature on Parkchung" />
-          </div>
-          <div class="testimonial-content">
-            <p class="testimonial-source" data-i18n="press_article2_source">Startup VnExpress</p>
-            <h3 data-i18n="press_article2_title">PROJECT PARKCHUNG</h3>
-            <span class="testimonial-cta" data-i18n="press_read_article">Read article</span>
-          </div>
-        </a>
-      </article>
-      <article class="testimonial-card">
-        <a href="https://cafebiz.vn/y-tuong-bookingcom-trong-linh-vuc-cho-thue-xe-o-to-dat-giai-nhat-cuoc-thi-lap-trinh-ve-giao-thong-thong-minh-20180717153509249.chn"
-          target="_blank" rel="noopener" class="testimonial-link">
-          <div class="testimonial-media">
-            <img src="../assets/image/stu3.jpg" alt="Cafebiz article on Parkchung" />
-          </div>
-          <div class="testimonial-content">
-            <p class="testimonial-source" data-i18n="press_article3_source">Cafebiz</p>
-            <h3 data-i18n="press_article3_title">ANNOUNCING 12 STARTUPS - advancing to the deep training round -</h3>
-            <span class="testimonial-cta" data-i18n="press_read_article">Read article</span>
-          </div>
-        </a>
-      </article>
-    </div>
-  </section>
-
-  <!-- Footer Section -->
-
-  <footer class="footer">
-    <div class="footer-container">
-      <div class="footer-column">
-        <h3 data-i18n="footer_contact">CONTACT</h3>
-        <p>
-          <b><i data-i18n="footer_brand">Parkchung, online parking platform</i></b>
-        </p>
-        <p>
-          Add: BK Alumni House, <br />
-          Hanoi University of Science and Technology, <br />
-          No. 1 Dai Co Viet street, Hanoi
-        </p>
-        <p class="contact-line"><i class="fas fa-envelope"></i>&nbsp;<a
-            href="mailto:contact@parkchung.com">contact@parkchung.com</a></p>
-        <p class="contact-line"><i class="fas fa-phone"></i>&nbsp;<a href="tel:0903229906">0903.229.906 (8:00 AM - 9:00
-            PM)</a></p>
-        <div class="social-icons">
-          <a href="https://www.facebook.com" target="_blank"><img src="../assets/image/facebookicon.png"
-              alt="Facebook" /></a>
-          <a href="https://www.youtube.com" target="_blank"><img src="../assets/image/youtube-20200619043955.png"
-              alt="Youtube" /></a>
-          <a href="https://www.linkedin.com" target="_blank"><img src="../assets/image/linkedin.png"
-              alt="Linkedin" /></a>
-          <a href="https://twitter.com" target="_blank"><img src="../assets/image/twitter.png" alt="Twitter" /></a>
-        </div>
-      </div>
-      <div class="footer-column">
-        <h3 data-i18n="footer_intro">INTRODUCTION</h3>
-        <a href="footer/about-us.html" data-i18n="footer_about">About Us</a>
-        <div class="email-subscription">
-          <form name="email-subscription-form" class="subscribe-form">
-            <p data-i18n="footer_subscribe_text">Subscribe to receive promotions</p>
-            <div class="subscribe-wrapper">
-              <input type="email" id="subscriber-email" name="email" placeholder="Enter your email..."
-                data-i18n-placeholder="ph_email" class="subscribe-input" required />
-              <button type="submit" class="subscribe-button" data-i18n="btn_signup">Sign-up</button>
+        
+        <form class="booking-form" id="searchForm" data-mode="pre">
+          <!-- PRE-BOOKING FIELDS (default) -->
+          <div class="form-fields pre-fields" id="pre-fields">
+            <div class="form-group">
+              <label class="form-label" data-i18n="label_park_at">Đỗ tại</label>
+              <div class="input-icon-wrapper">
+                <i class="fas fa-map-marker-alt input-icon"></i>
+                <input type="text" id="location" placeholder="Nhập địa điểm hoặc mã bưu chính"
+                  data-i18n-placeholder="ph_location" required />
+                <div class="autocomplete-suggestions" id="suggestions-box"></div>
+              </div>
             </div>
+            
+            <div class="form-row-2col">
+              <div class="form-group">
+                <label class="form-label" data-i18n="label_from">Từ</label>
+                <div class="input-icon-wrapper">
+                  <i class="far fa-calendar-alt input-icon"></i>
+                  <input type="text" id="start-datetime" placeholder="Chọn ngày/giờ" data-i18n-placeholder="ph_select_datetime" value="10.02.26 11:25" readonly required />
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="form-label" data-i18n="label_until">Đến</label>
+                <div class="input-icon-wrapper">
+                  <i class="far fa-calendar-alt input-icon"></i>
+                  <input type="text" id="end-datetime" placeholder="Chọn ngày/giờ" data-i18n-placeholder="ph_select_datetime" value="10.02.26 13:25" readonly required />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- VALET BOOKING FIELDS (hidden by default) -->
+          <div class="form-fields valet-fields" id="valet-fields" style="display:none;">
+            <!-- Row 1: Dropoff & Pickup locations (Initially pickup is hidden) -->
+            <div class="form-row-2col" id="valet-locations-row">
+              <div class="form-group full-width-v3" id="valet-dropoff-group" style="position: relative;">
+                <label class="form-label" data-i18n="label_dropoff">Giao xe tại</label>
+                <div class="input-icon-wrapper">
+                  <i class="fas fa-plane-departure input-icon"></i>
+                  <input type="text" id="valet-dropoff" placeholder="Nhập địa điểm hoặc mã bưu chính"
+                    data-i18n-placeholder="ph_location" autocomplete="off" />
+                  
+                  <!-- Dropdown 2 cột cho Giao xe tại -->
+                  <div class="valet-dropdown-v2" id="valet-dropdown-dropoff">
+                    <div class="valet-dropdown-tabs">
+                      <div class="valet-tab-item active" data-category="airport"><i class="fas fa-plane"></i> <span data-i18n="valet_tab_airport">Sân bay</span></div>
+                      <div class="valet-tab-item" data-category="station"><i class="fas fa-train"></i> <span data-i18n="valet_tab_station">Nhà ga</span></div>
+                      <div class="valet-tab-item" data-category="hospital"><i class="fas fa-hospital"></i> <span data-i18n="valet_tab_hospital">Bệnh viện</span></div>
+                      <div class="valet-tab-item" data-category="other"><i class="fas fa-map-marker-alt"></i> <span data-i18n="valet_tab_other">Khác</span></div>
+                    </div>
+                    <div class="valet-dropdown-content" id="valet-dropdown-content-dropoff">
+                      <!-- Nạp động qua JS -->
+                    </div>
+                  </div>
+                </div>
+                <!-- Link toggle hiển thị điểm trả xe -->
+                <a href="#" class="valet-toggle-link" id="toggle-pickup-link" data-i18n="valet_toggle_different_return">+ Địa điểm trả về khác</a>
+              </div>
+
+              <div class="form-group" id="valet-pickup-group" style="position: relative; display: none;">
+                <label class="form-label" data-i18n="label_pickup">Điểm trả xe</label>
+                <div class="input-icon-wrapper">
+                  <i class="fas fa-plane-arrival input-icon"></i>
+                  <input type="text" id="valet-pickup" placeholder="Nhập địa điểm hoặc mã bưu chính"
+                    data-i18n-placeholder="ph_location" autocomplete="off" />
+                  
+                  <!-- Dropdown 2 cột cho Điểm trả xe -->
+                  <div class="valet-dropdown-v2" id="valet-dropdown-pickup">
+                    <div class="valet-dropdown-tabs">
+                      <div class="valet-tab-item active" data-category="airport"><i class="fas fa-plane"></i> <span data-i18n="valet_tab_airport">Sân bay</span></div>
+                      <div class="valet-tab-item" data-category="station"><i class="fas fa-train"></i> <span data-i18n="valet_tab_station">Nhà ga</span></div>
+                      <div class="valet-tab-item" data-category="hospital"><i class="fas fa-hospital"></i> <span data-i18n="valet_tab_hospital">Bệnh viện</span></div>
+                      <div class="valet-tab-item" data-category="other"><i class="fas fa-map-marker-alt"></i> <span data-i18n="valet_tab_other">Khác</span></div>
+                    </div>
+                    <div class="valet-dropdown-content" id="valet-dropdown-content-pickup">
+                      <!-- Nạp động qua JS -->
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Row 2: Date Pickers -->
+            <div class="form-row-2col">
+              <div class="form-group">
+                <label class="form-label" data-i18n="label_from">Từ</label>
+                <div class="input-icon-wrapper">
+                  <i class="far fa-calendar-alt input-icon"></i>
+                  <input type="text" id="valet-start" placeholder="Chọn ngày/giờ" data-i18n-placeholder="ph_select_datetime" readonly />
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="form-label" data-i18n="label_until">Đến</label>
+                <div class="input-icon-wrapper">
+                  <i class="far fa-calendar-alt input-icon"></i>
+                  <input type="text" id="valet-end" placeholder="Chọn ngày/giờ" data-i18n-placeholder="ph_select_datetime" readonly />
+                </div>
+              </div>
+            </div>
+
+            <!-- Price Preview Container (hidden by default, shown when inputs are valid) -->
+            <div class="valet-price-preview-wrapper" id="valet-price-preview" style="display: none;">
+              <div class="valet-price-info">
+                <span class="valet-price-period" id="valet-price-period">1 ngày đỗ xe + đỗ xe hộ</span>
+                <span class="valet-price-amount" id="valet-price-amount">30.000 đ</span>
+                <span class="valet-price-note" id="valet-price-note">trung bình 30.000 đ/ngày</span>
+              </div>
+            </div>
+          </div>
+
+          <button type="submit" class="search-btn-v3"><span data-i18n="btn_find_spot">Tìm chỗ phù hợp</span> <i class="fas fa-plus"></i></button>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ WHY CHOOSE PARKCHUNG ============ -->
+  <section class="why-section">
+    <!-- Leaf decorations matching Figma design -->
+    <div class="left-leaf"></div>
+    <div class="right-leaf"></div>
+    
+    <h2 class="section-title" data-i18n="why_title">Vì sao chọn ParkChung</h2>
+    <p class="section-subtitle" data-i18n="why_subtitle">Chúng tôi cung cấp giải pháp đỗ xe an toàn, tiện lợi và minh bạch cho mọi hành trình của bạn</p>
+    <div class="why-grid">
+      <div class="why-card">
+        <div class="why-icon"><i class="far fa-clock"></i></div>
+        <h3 data-i18n="benefit_price_title">Giá cả minh bạch</h3>
+        <p data-i18n="benefit_price_desc">Hiển thị rõ ràng bảng giá chi tiết, không lo phụ phí phát sinh bất ngờ.</p>
+      </div>
+      <div class="why-card">
+        <div class="why-icon"><i class="fas fa-hand-holding-usd"></i></div>
+        <h3 data-i18n="benefit_safe_title">Bãi đỗ an toàn</h3>
+        <p data-i18n="benefit_safe_desc">Bãi đỗ xe liên kết uy tín, có bảo vệ giám sát và hệ thống camera 24/7.</p>
+      </div>
+      <div class="why-card">
+        <div class="why-icon"><i class="fas fa-map-marker-alt"></i></div>
+        <h3 data-i18n="benefit_time_title">Tiết kiệm thời gian</h3>
+        <p data-i18n="benefit_time_desc">Đặt trước chỗ đỗ xe nhanh chóng, không mất thời gian tìm kiếm lúc đến bãi.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ ECOSYSTEM PARKCHUNG ============ -->
+  <section class="ecosystem-section">
+    <h2 class="section-title" data-i18n="eco_title">Hệ sinh thái của ParkChung</h2>
+    <div class="ecosystem-grid">
+      <div class="ecosystem-text">
+        <h3 data-i18n="eco_coop_title">Hợp tác cùng ParkChung – Tối ưu thu nhập bãi đỗ</h3>
+        <ul class="eco-features">
+          <li><i class="fas fa-check" style="color: var(--primary); font-size: 0.95rem; margin-right: 8px;"></i> <span data-i18n="eco_f1">Khởi tạo nguồn thu nhập thụ động mới từ bãi đỗ trống của bạn</span></li>
+          <li><i class="fas fa-check" style="color: var(--primary); font-size: 0.95rem; margin-right: 8px;"></i> <span data-i18n="eco_f2">Quản lý bãi đỗ và nguồn thu trực quan qua Dashboard tiện dụng</span></li>
+          <li><i class="fas fa-check" style="color: var(--primary); font-size: 0.95rem; margin-right: 8px;"></i> <span data-i18n="eco_f3">Tiếp cận hàng triệu khách hàng di chuyển có nhu cầu</span></li>
+        </ul>
+        <a href="create-spot.html" class="btn-eco" data-i18n="eco_cta">Tìm hiểu ngay</a>
+      </div>
+      <div class="ecosystem-slider">
+        <div class="eco-slide-track" id="eco-slide-track">
+          <div class="eco-slide active">
+            <img src="/assets/image/ground_parking.jpg" alt="Bãi đỗ xe ParkChung" />
+          </div>
+          <div class="eco-slide">
+            <img src="/assets/image/Parking_slider.jpg" alt="Hệ thống đỗ xe thông minh" />
+          </div>
+          <div class="eco-slide">
+            <img src="/assets/image/parking_management_background.jpg" alt="Quản lý bãi đỗ" />
+          </div>
+        </div>
+        <div class="eco-dots" id="eco-dots">
+          <span class="eco-dot active" data-index="0"></span>
+          <span class="eco-dot" data-index="1"></span>
+          <span class="eco-dot" data-index="2"></span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ QUOTE & TESTIMONIALS ============ -->
+  <section class="testimonials-v3">
+    <div class="quote-banner">
+      <h2 data-i18n="quote_text">Giải pháp đỗ xe càng thuận tiện, hành trình càng trở nên dễ dàng và chúng ta càng gắn kết với nhau hơn.</h2>
+      <p class="quote-author">LÊ HOÀNG MẠNH | CEO</p>
+    </div>
+
+    <div class="reviews-grid">
+      <div class="review-card">
+        <div class="review-quote">“</div>
+        <p class="review-text" data-i18n="review_1_text">Tôi thường xuyên đi công tác và việc tìm chỗ đỗ xe ở sân bay luôn là nỗi ám ảnh. ParkChung giúp tôi đặt trước chỗ đỗ chỉ trong 2 phút. Thật sự tiện lợi!</p>
+        <div class="review-author">
+          <img src="/assets/image/avatar_phong_anh.png" alt="PHONG ANH" class="review-avatar" />
+          <div>
+            <strong>PHONG ANH</strong>
+            <span class="review-role">Người dùng dịch vụ</span>
+          </div>
+        </div>
+      </div>
+      <div class="review-card">
+        <div class="review-quote">“</div>
+        <p class="review-text" data-i18n="review_2_text">Giao diện thân thiện, dễ sử dụng. Từ ngày dùng ParkChung tôi không còn phải loay hoay tìm chỗ đỗ xe mỗi khi vào trung tâm thành phố nữa.</p>
+        <div class="review-author">
+          <img src="/assets/image/avatar_phong_anh.png" alt="PHONG ANH" class="review-avatar" />
+          <div>
+            <strong>PHONG ANH</strong>
+            <span class="review-role">Người dùng dịch vụ</span>
+          </div>
+        </div>
+      </div>
+      <div class="review-card">
+        <div class="review-quote">“</div>
+        <p class="review-text" data-i18n="review_3_text">Hệ thống hỗ trợ đặt chỗ nhanh chóng, thanh toán minh bạch và dịch vụ chăm sóc khách hàng cực kỳ nhiệt tình. Rất đáng trải nghiệm!</p>
+        <div class="review-author">
+          <img src="/assets/image/avatar_phong_anh.png" alt="PHONG ANH" class="review-avatar" />
+          <div>
+            <strong>PHONG ANH</strong>
+            <span class="review-role">Người dùng dịch vụ</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ PRESS SECTION ============ -->
+  <section class="press-section">
+    <div class="press-header">
+      <span class="press-badge" data-i18n="press_badge">BÁO CHÍ</span>
+      <h2 class="section-title" data-i18n="press_title">Báo chí nói gì về chúng tôi</h2>
+      <p class="press-subtitle" data-i18n="press_subtitle">Truyền thông quốc tế và trong nước ghi nhận ParkChung đang định hình tương lai di chuyển thông minh tại Việt Nam.</p>
+    </div>
+    <div class="press-grid">
+      <div class="press-card">
+        <a href="https://www.vn.undp.org/content/vietnam/vi/home/presscenter/pressreleases/StartupsIncubationProgram.html" target="_blank" class="press-link">
+          <div class="press-media">
+            <img src="/assets/image/press_conference.png" alt="UNDP VIETNAM - VIETCHALLENGE 2019" />
+          </div>
+          <div class="press-content">
+            <span class="press-source">UNDP VIETNAM - VIETCHALLENGE 2019</span>
+            <h3>Chúc mừng 12 startups chính thức bước vào vòng đào tạo chuyên sâu của Chương trình Ươm tạo Việt Nam - Nhật Bản!</h3>
+            <span class="press-cta" data-i18n="press_read_article">Đọc bài viết →</span>
+          </div>
+        </a>
+      </div>
+
+      <div class="press-card">
+        <a href="https://www.vn.undp.org/content/vietnam/vi/home/presscenter/pressreleases/StartupsIncubationProgram.html" target="_blank" class="press-link">
+          <div class="press-media">
+            <img src="/assets/image/press_conference.png" alt="UNDP VIETNAM - VIETCHALLENGE 2019" />
+          </div>
+          <div class="press-content">
+            <span class="press-source">UNDP VIETNAM - VIETCHALLENGE 2019</span>
+            <h3>Chúc mừng 12 startups chính thức bước vào vòng đào tạo chuyên sâu của Chương trình Ươm tạo Việt Nam - Nhật Bản!</h3>
+            <span class="press-cta" data-i18n="press_read_article">Đọc bài viết →</span>
+          </div>
+        </a>
+      </div>
+
+      <div class="press-card">
+        <a href="https://www.vn.undp.org/content/vietnam/vi/home/presscenter/pressreleases/StartupsIncubationProgram.html" target="_blank" class="press-link">
+          <div class="press-media">
+            <img src="/assets/image/press_conference.png" alt="UNDP VIETNAM - VIETCHALLENGE 2019" />
+          </div>
+          <div class="press-content">
+            <span class="press-source">UNDP VIETNAM - VIETCHALLENGE 2019</span>
+            <h3>Chúc mừng 12 startups chính thức bước vào vòng đào tạo chuyên sâu của Chương trình Ươm tạo Việt Nam - Nhật Bản!</h3>
+            <span class="press-cta" data-i18n="press_read_article">Đọc bài viết →</span>
+          </div>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ FOOTER V3 ============ -->
+  <footer class="footer-v3">
+    <div class="footer-v3-inner">
+      <div class="footer-v3-col footer-v3-brand">
+        <div class="footer-logo">
+          <img src="/assets/logo/logo.png" alt="ParkChung" />
+          <div>
+            <span class="footer-brand-name">PARKCHUNG</span>
+            <span class="footer-brand-tag">Smart Parking Hero</span>
+          </div>
+        </div>
+        <div class="footer-newsletter">
+          <p data-i18n="footer_subscribe_text">Đăng ký nhận khuyến mãi</p>
+          <form class="footer-subscribe-form" name="email-subscription-form">
+            <input type="email" id="subscriber-email" placeholder="Nhập email của bạn..."
+              data-i18n-placeholder="ph_email" required />
+            <button type="submit" data-i18n="btn_signup">Đăng ký</button>
           </form>
         </div>
-        <a href="http://online.gov.vn/Home/WebDetails/80805?AspxAutoDetectCookieSupport=1" target="_blank"
-          style="margin-top: 15px; display: inline-block">
-          <img src="../assets/image/tmdtlogo.png" alt="E-commerce Registered" style="height: 50px" />
-        </a>
       </div>
-      <div class="footer-column">
-        <h3 data-i18n="footer_policies">POLICIES</h3>
-        <a href="footer/privacy-policy.html" data-i18n="pol_privacy">Privacy Policy</a>
-        <a href="footer/terms-of-service.html" data-i18n="pol_terms_service">Terms of Service</a>
-        <a href="footer/insurance-liability-policy.html" data-i18n="pol_insurance">Insurance & Liability
-          Policy</a>
-        <a href="footer/dispute-resolution-policy.html" data-i18n="pol_dispute">Dispute Resolution
-          Policy</a>
-        <a href="footer/security-policy.html" data-i18n="pol_security">Security Policy</a>
-        <a href="footer/driver-terms-booking-policies.html" data-i18n="pol_driver">Driver Terms & Booking
-          Policies</a>
-        <a href="footer/supplier-terms-policies.html" data-i18n="pol_supplier">Supplier Terms & Policies</a>
-        <a href="footer/complaint-process.html" data-i18n="pol_incidents">Incidents & Complaints</a>
-        <a href="create-spot.html" data-i18n="pol_host">Become a Host</a>
+
+      <div class="footer-v3-col">
+        <h4 data-i18n="footer_contact">THÔNG TIN CHUNG</h4>
+        <p><i class="fas fa-map-marker-alt"></i> Nhà Cựu sinh viên BK, ĐH Bách khoa Hà Nội</p>
+        <p><i class="fas fa-envelope"></i> <a href="mailto:contact@parkchung.com">contact@parkchung.com</a></p>
+        <p><i class="fas fa-phone"></i> <a href="tel:0903229906">0903.229.906</a></p>
       </div>
-      <div class="footer-column">
-        <h3 data-i18n="footer_support">SUPPORT</h3>
-        <a href="#" data-i18n="sup_booking" style="display: none;">Parking Booking Guide</a>
-        <a href="#" data-i18n="sup_listing" style="display: none;">Parking Listing Guide</a>
-        <a href="footer/faq.html" data-i18n="sup_faq">FAQs</a>
-        <a href="https://blog.parkchung.com/" id="footer-blog-link" data-i18n="sup_blog">Blog</a>
+
+      <div class="footer-v3-col">
+        <h4 data-i18n="footer_policies">CHÍNH SÁCH</h4>
+        <a href="footer/privacy-policy.html" data-i18n="pol_privacy">Chính sách bảo mật</a>
+        <a href="footer/terms-of-service.html" data-i18n="pol_terms_service">Điều khoản dịch vụ</a>
+        <a href="footer/insurance-liability-policy.html" data-i18n="pol_insurance">Bảo hiểm & Trách nhiệm</a>
+        <a href="footer/dispute-resolution-policy.html" data-i18n="pol_dispute">Giải quyết tranh chấp</a>
+      </div>
+
+      <div class="footer-v3-col">
+        <h4 data-i18n="footer_intro">HỖ TRỢ</h4>
+        <a href="footer/faq.html" data-i18n="sup_faq">Câu hỏi thường gặp</a>
+        <a href="https://blog.parkchung.com/" data-i18n="sup_blog">Blog</a>
+        <h4 style="color:#fff; font-size:0.9rem; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; margin: 15px 0 10px;">GIỚI THIỆU</h4>
+        <a href="footer/about-us.html" data-i18n="footer_about">Về chúng tôi</a>
+      </div>
+
+      <div class="footer-v3-col">
+        <h4>THEO DÕI CHÚNG TÔI</h4>
+        <div class="footer-socials">
+          <a href="https://www.facebook.com" target="_blank" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+          <a href="https://twitter.com" target="_blank" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+          <a href="https://www.youtube.com" target="_blank" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
+        </div>
       </div>
     </div>
-    <div class="footer-bottom">
-      <p><span data-i18n="footer_copy">Copyright © 2025 A product of</span> <a href="https://chungxe.vn/#/"
-          target="_blank">Chungxe</a></p>
+    <div class="footer-v3-bottom">
+      <p><span data-i18n="footer_copy">Copyright © 2025 thuộc ParkChung. Bản quyền của Chungxe</span></p>
     </div>
   </footer>
 
-  <!-- ANNEX: FLOATING BUTTONS -->
-
+  <!-- FLOATING BUTTONS -->
   <div class="floating-buttons">
-    <a href="tel:0903229906" class="floating-button call-button" title="Call now">
-      <img src="../assets/image/phone-icon.svg" alt="Call now" />
+    <a href="tel:0903229906" class="floating-button call-button" title="Gọi ngay">
+      <img src="/assets/image/phone-icon.svg" alt="Call" />
     </a>
-    <a href="https://zalo.me/0902223080" class="floating-button zalo-button" title="Chat with us via Zalo">
-      <img src="../assets/image/zalo-icon.svg" alt="Chat with us via Zalo" />
+    <a href="https://zalo.me/0902223080" class="floating-button zalo-button" title="Chat Zalo">
+      <img src="/assets/image/zalo-icon.svg" alt="Zalo" />
     </a>
   </div>
+
   <script src="/customer/js/custom-modal.js"></script>
   <script src="/customer/js/config.js"></script>
   <script src="/customer/js/utils.js"></script>
