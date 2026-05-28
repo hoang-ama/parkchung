@@ -35,7 +35,7 @@ exports.searchSpots = async (req, res) => {
                     }
                 },
                 status: 'approved',
-                isActive: true  // Only show active spots
+                isActive: { $ne: false }  // Only show active spots (or undefined, treating as active by default)
             };
 
             if (escapedSearchVal) {
@@ -63,7 +63,7 @@ exports.searchSpots = async (req, res) => {
                 { address: { $regex: escapedSearchVal ? escapedSearchVal.trim() : '', $options: 'i' } }
             ],
             status: 'approved',
-            isActive: true  // Only show active spots
+            isActive: { $ne: false }  // Only show active spots (or undefined)
         };
 
         console.log('[DEBUG] searchSpots query:', { searchVal, escapedSearchVal, startTime, endTime });
@@ -145,7 +145,7 @@ exports.getSpotById = async (req, res) => {
     try {
         const spot = await ParkingSpot.findById(req.params.id).populate('owner', 'fullName email phone');
         // Only return approved and active spots to customers
-        if (spot && spot.status === 'approved' && spot.isActive) {
+        if (spot && spot.status === 'approved' && spot.isActive !== false) {
             res.json(spot);
         } else {
             res.status(404).json({ message: 'Parking spot not found' });
@@ -166,7 +166,7 @@ exports.getAutocompleteSuggestions = async (req, res) => {
         const activeCategory = category || type;
         const queryObj = {
             status: 'approved',
-            isActive: true
+            isActive: { $ne: false }
         };
 
         // Filter by category type using regex if requested
@@ -309,7 +309,7 @@ exports.geocodeAddress = async (req, res) => {
                 { address: { $regex: escapedQuery, $options: 'i' } }
             ],
             status: 'approved',
-            isActive: true
+            isActive: { $ne: false }
         });
         if (localSpot && localSpot.location && localSpot.location.coordinates) {
             console.log('[GEOCORDING] Found spot in local database:', localSpot.name);

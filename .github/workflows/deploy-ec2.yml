@@ -22,4 +22,9 @@ jobs:
             git reset --hard HEAD
             # Update the code
             git pull origin ${{ github.ref_name }}
+            # Install any new dependencies
+            cd server && npm install --production
+            cd ..
+            # Restart server to apply new code
+            pm2 reload all --update-env
             echo "Deployment completed successfully!"

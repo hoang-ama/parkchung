@@ -909,17 +909,35 @@ function renderPagination(totalPages) {
     pag.appendChild(next);
 }
 
-// Helpers for date string parsing (duplicated here for independence)
 function parseVietnameseDateString(dateString) {
     if (!dateString) return null;
-    const parts = dateString.match(/(\d{2})[./](\d{2})[./](\d{2,4}) (\d{2}):(\d{2})/);
-    if (!parts) return null;
-    const day = parts[1], month = parts[2];
-    let year = parts[3];
-    const hours = parts[4], minutes = parts[5];
-    if (year.length === 2) {
-        year = '20' + year;
+    
+    // First try standard Date parsing if it already looks like an ISO/UTC format
+    const standardDate = new Date(dateString);
+    if (!isNaN(standardDate.getTime()) && dateString.includes('-') && dateString.includes('T')) {
+        return standardDate;
     }
-    const isoString = `${year}-${month}-${day}T${hours}:${minutes}:00`;
-    return new Date(isoString);
+    
+    // Custom regex matching dd/mm/yyyy HH:MM, dd.mm.yyyy HH:MM, dd-mm-yyyy HH:MM
+    const parts = dateString.match(/(\d{1,2})[./-](\d{1,2})[./-](\d{2,4})\s+(\d{1,2}):(\d{2})/);
+    if (parts) {
+        const day = parts[1].padStart(2, '0');
+        const month = parts[2].padStart(2, '0');
+        let year = parts[3];
+        const hours = parts[4].padStart(2, '0');
+        const minutes = parts[5].padStart(2, '0');
+        if (year.length === 2) {
+            year = '20' + year;
+        }
+        const isoString = `${year}-${month}-${day}T${hours}:${minutes}:00`;
+        const d = new Date(isoString);
+        if (!isNaN(d.getTime())) return d;
+    }
+    
+    // Fallback to native constructor if anything else is parseable
+    if (!isNaN(standardDate.getTime())) {
+        return standardDate;
+    }
+    
+    return null;
 }
