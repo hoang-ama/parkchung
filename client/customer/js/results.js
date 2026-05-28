@@ -913,30 +913,32 @@ function parseVietnameseDateString(dateString) {
     if (!dateString) return null;
     
     // First try standard Date parsing if it already looks like an ISO/UTC format
-    const standardDate = new Date(dateString);
-    if (!isNaN(standardDate.getTime()) && dateString.includes('-') && dateString.includes('T')) {
-        return standardDate;
+    if (dateString.includes && dateString.includes('T') && dateString.includes('-')) {
+        const standardDate = new Date(dateString);
+        if (!isNaN(standardDate.getTime())) {
+            return standardDate;
+        }
     }
     
     // Custom regex matching dd/mm/yyyy HH:MM, dd.mm.yyyy HH:MM, dd-mm-yyyy HH:MM
     const parts = dateString.match(/(\d{1,2})[./-](\d{1,2})[./-](\d{2,4})\s+(\d{1,2}):(\d{2})/);
     if (parts) {
-        const day = parts[1].padStart(2, '0');
-        const month = parts[2].padStart(2, '0');
-        let year = parts[3];
-        const hours = parts[4].padStart(2, '0');
-        const minutes = parts[5].padStart(2, '0');
-        if (year.length === 2) {
-            year = '20' + year;
+        const day = parseInt(parts[1], 10);
+        const month = parseInt(parts[2], 10);
+        let year = parseInt(parts[3], 10);
+        const hours = parseInt(parts[4], 10);
+        const minutes = parseInt(parts[5], 10);
+        if (parts[3].length === 2) {
+            year = 2000 + year;
         }
-        const isoString = `${year}-${month}-${day}T${hours}:${minutes}:00`;
-        const d = new Date(isoString);
+        const d = new Date(year, month - 1, day, hours, minutes, 0);
         if (!isNaN(d.getTime())) return d;
     }
     
     // Fallback to native constructor if anything else is parseable
-    if (!isNaN(standardDate.getTime())) {
-        return standardDate;
+    const fallbackDate = new Date(dateString);
+    if (!isNaN(fallbackDate.getTime())) {
+        return fallbackDate;
     }
     
     return null;

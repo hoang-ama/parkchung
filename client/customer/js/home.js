@@ -82,7 +82,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     // Redirect directly to spot details page with the spot ID
                     // This allows users to select arrival/departure times on the details page
                     // Note: spot-details.js expects the parameter to be named 'id'
-                    window.location.href = `/customer/spot-details?id=${item.id}`;
+                    window.location.href = `/customer/spot-details.html?id=${item.id}`;
                 };
                 suggestionsBox.appendChild(div);
             });
