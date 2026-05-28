@@ -372,3 +372,20 @@ exports.geocodeAddress = async (req, res) => {
         res.status(500).json({ message: 'Lỗi server trong quá trình phân tích địa điểm', error: error.message });
     }
 };
+
+exports.debugDb = async (req, res) => {
+    try {
+        const mongoose = require('mongoose');
+        const ParkingSpot = mongoose.model('ParkingSpot');
+        const count = await ParkingSpot.countDocuments();
+        const spots = await ParkingSpot.find({}).limit(5);
+        res.json({
+            connectionHost: mongoose.connection.host,
+            databaseName: mongoose.connection.name,
+            totalSpots: count,
+            firstFiveSpots: spots.map(s => ({ id: s._id, name: s.name, status: s.status, isActive: s.isActive }))
+        });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+};
