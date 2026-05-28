@@ -39,12 +39,12 @@ const callCancelEndpoint = async () => {
 const setupButtons = () => {
     if (retryBtn) {
         retryBtn.addEventListener('click', () => {
-            window.location.href = '/customer/results';
+            window.location.href = 'results.html';
         });
     }
     if (bookingsBtn) {
         bookingsBtn.addEventListener('click', () => {
-            window.location.href = '/customer/my-bookings.html';
+            window.location.href = 'my-bookings.html';
         });
     }
 };

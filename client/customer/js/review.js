@@ -24,12 +24,12 @@ const bookingId = urlParams.get('bookingId');
 
 document.addEventListener('DOMContentLoaded', async () => {
     if (!token) {
-        window.location.href = '/customer/login.html';
+        window.location.href = 'login.html';
         return;
     }
 
     if (!bookingId) {
-        window.location.href = '/customer/my-bookings.html';
+        window.location.href = 'my-bookings.html';
         return;
     }
 
@@ -52,7 +52,7 @@ function setupHeaderNav() {
             <a href="${window.HOST_URL || '#'}/login" class="become-host-link">
                 Trở thành chủ bãi đậu xe <i class="fas fa-chevron-down" style="font-size: 10px; margin-left: 2px;"></i>
             </a>
-            <button class="my-account-btn" onclick="window.location.href='/customer/my-profile.html'">
+            <button class="my-account-btn" onclick="window.location.href='my-profile.html'">
                 <i class="fas fa-user-circle"></i>
                 <span>${userData.fullName}</span>
             </button>
@@ -63,7 +63,7 @@ function setupHeaderNav() {
             e.preventDefault();
             localStorage.removeItem('userToken');
             localStorage.removeItem('userData');
-            window.location.href = '/customer/index.html';
+            window.location.href = 'index.html';
         });
     }
 }
@@ -104,7 +104,7 @@ async function loadBookingDetails() {
     } catch (error) {
         console.error('Error loading booking:', error);
         alert(error.message);
-        window.location.href = '/customer/my-bookings.html';
+        window.location.href = 'my-bookings.html';
     }
 }
 
@@ -302,7 +302,7 @@ function showSuccessScreen() {
 
     // View spot details redirects to spot info
     document.getElementById('view-spot-details-btn').addEventListener('click', () => {
-        window.location.href = `/customer/spot-details.html?id=${spot._id}`;
+        window.location.href = `spot-details.html?id=${spot._id}`;
     });
 
     // Populate user review details

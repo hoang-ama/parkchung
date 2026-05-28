@@ -82,7 +82,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     // Redirect directly to spot details page with the spot ID
                     // This allows users to select arrival/departure times on the details page
                     // Note: spot-details.js expects the parameter to be named 'id'
-                    window.location.href = `/customer/spot-details.html?id=${item.id}`;
+                    window.location.href = `spot-details.html?id=${item.id}`;
                 };
                 suggestionsBox.appendChild(div);
             });
@@ -229,7 +229,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     arrival: startDate.toISOString(),
                     leaving: endDate.toISOString()
                 });
-                window.location.href = `/customer/valet-offer?${queryParams.toString()}`;
+                window.location.href = `valet-offer.html?${queryParams.toString()}`;
             } else {
                 await updateValetPricePreview();
                 lastPreviewQuery = currentQuery;
@@ -266,7 +266,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 endTime: endDate.toISOString(),
                 q: locationText
             });
-            window.location.href = `/customer/results?${queryParams.toString()}`;
+            window.location.href = `results.html?${queryParams.toString()}`;
         }
     });
 

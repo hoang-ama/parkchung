@@ -342,7 +342,7 @@ async function initializeSpotBookingPage(spotId) {
                         callToBookBtn.addEventListener('click', (e) => {
                             e.preventDefault();
                             if (confirm('Vui lòng đăng nhập để xem số điện thoại đầy đủ. Bạn có muốn đăng nhập ngay?')) {
-                                window.location.href = `/customer/login?redirect=${encodeURIComponent(window.location.href)}`;
+                                window.location.href = `login.html?redirect=${encodeURIComponent(window.location.href)}`;
                             }
                         });
                     }
@@ -410,7 +410,7 @@ async function initializeSpotBookingPage(spotId) {
             params.set('pickup', urlParams.get('pickup') || '');
         }
 
-        window.location.href = `/customer/booking-config?${params.toString()}`;
+        window.location.href = `booking-config.html?${params.toString()}`;
     });
 
     loadSpotDetails(); // Gọi khi initializeSpotBookingPage được gọi

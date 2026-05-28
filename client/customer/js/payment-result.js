@@ -42,12 +42,12 @@ const setViewBookings = () => {
         if (!isLoggedIn) {
             bookingsBtn.innerHTML = 'Đăng nhập để xem vé của bạn →';
             bookingsBtn.addEventListener('click', () => {
-                window.location.href = '/customer/login.html';
+                window.location.href = 'login.html';
             });
         } else {
             bookingsBtn.innerHTML = 'Xem lịch sử đặt chỗ →';
             bookingsBtn.addEventListener('click', () => {
-                window.location.href = '/customer/my-bookings.html';
+                window.location.href = 'my-bookings.html';
             });
         }
     }

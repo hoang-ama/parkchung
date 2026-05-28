@@ -35,7 +35,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     if (!bookingId) {
         alert('Không tìm thấy thông tin đặt chỗ!');
-        window.location.href = '/customer/index.html';
+        window.location.href = 'index.html';
         return;
     }
 
@@ -86,7 +86,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     if (!bookingData) {
         alert('Không thể tải thông tin đơn đặt chỗ!');
-        window.location.href = '/customer/index.html';
+        window.location.href = 'index.html';
         return;
     }
 
@@ -195,7 +195,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             sessionStorage.setItem('guestBookingData', JSON.stringify(bookingData));
             
             // Redirect to payment result page
-            window.location.href = `/customer/payment-result?success=true&bookingId=${bookingId}&isGuest=${isGuest}&paymentMethod=BANK_TRANSFER`;
+            window.location.href = `payment-result.html?success=true&bookingId=${bookingId}&isGuest=${isGuest}&paymentMethod=BANK_TRANSFER`;
         });
     }
 });

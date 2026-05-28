@@ -16,7 +16,7 @@ document.addEventListener('DOMContentLoaded', () => {
    // check login
     if (!localStorage.getItem('userToken')) {
         alert('You must be logged in to list a spot.');
-        window.location.href = `/customer/login.html?redirect=/customer/create-spot.html`;
+        window.location.href = `login.html?redirect=create-spot.html`;
         return;
     }
 
@@ -95,7 +95,7 @@ document.addEventListener('DOMContentLoaded', () => {
             await api.createSpot(formData);
             
             alert('Spot submitted successfully! It will be visible after admin approval.');
-            window.location.href = '/customer/index.html';
+            window.location.href = 'index.html';
 
         } catch (error) {
             console.error(error);

@@ -123,7 +123,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (!spotId) {
         alert(getOfferText().missingSpotId);
-        window.location.href = '/customer/index.html';
+        window.location.href = 'index.html';
         return;
     }
 
@@ -506,7 +506,7 @@ async function initializeValetOfferPage({ spotId, arrivalParam, leavingParam }) 
             
             // Redirect to booking-config
             const currentUrl = new URL(window.location.href);
-            const configUrl = `/customer/booking-config?${currentUrl.searchParams.toString()}`;
+            const configUrl = `booking-config.html?${currentUrl.searchParams.toString()}`;
             window.location.href = configUrl;
         });
     }

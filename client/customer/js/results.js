@@ -826,7 +826,7 @@ function navigateToBookingConfig(spotId) {
     const startDate = parseVietnameseDateString(startTimeStr);
     const endDate = parseVietnameseDateString(endTimeStr);
 
-    let detailUrl = `/customer/booking-config?spotId=${spotId}&startTime=${encodeURIComponent(startDate.toISOString())}&endTime=${encodeURIComponent(endDate.toISOString())}`;
+    let detailUrl = `booking-config.html?spotId=${spotId}&startTime=${encodeURIComponent(startDate.toISOString())}&endTime=${encodeURIComponent(endDate.toISOString())}`;
     window.location.href = detailUrl;
 }
 

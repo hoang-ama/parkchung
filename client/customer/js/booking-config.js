@@ -190,7 +190,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (!spotId) {
         alert(getBookingText().missingSpotId);
-        window.location.href = '/customer/results';
+        window.location.href = 'results.html';
         return;
     }
 
@@ -248,7 +248,7 @@ async function initializeBookingConfigPage({ spotId, arrivalParam, leavingParam 
             btnBackToOffer.style.display = 'flex';
             btnBackToOffer.addEventListener('click', () => {
                 const currentUrl = new URL(window.location.href);
-                window.location.href = `/customer/valet-offer?${currentUrl.searchParams.toString()}`;
+                window.location.href = `valet-offer.html?${currentUrl.searchParams.toString()}`;
             });
         }
 
@@ -781,9 +781,9 @@ async function initializeBookingConfigPage({ spotId, arrivalParam, leavingParam 
             sessionStorage.setItem('guestBookingData', JSON.stringify(guestBookingData));
 
             if (paymentMethod === 'bank_transfer') {
-                window.location.href = `/customer/bank-transfer?bookingId=${data._id}&isGuest=true&paymentMethod=BANK_TRANSFER`;
+                window.location.href = `bank-transfer.html?bookingId=${data._id}&isGuest=true&paymentMethod=BANK_TRANSFER`;
             } else {
-                window.location.href = `/customer/payment-result?success=true&bookingId=${data._id}&isGuest=true&paymentMethod=${paymentMethod.toUpperCase()}`;
+                window.location.href = `payment-result.html?success=true&bookingId=${data._id}&isGuest=true&paymentMethod=${paymentMethod.toUpperCase()}`;
             }
         } catch (error) {
             console.error('Guest booking error:', error);
@@ -821,9 +821,9 @@ async function initializeBookingConfigPage({ spotId, arrivalParam, leavingParam 
 
             const data = await response.json();
             if (paymentMethod === 'bank_transfer') {
-                window.location.href = `/customer/bank-transfer?bookingId=${data._id}&paymentMethod=BANK_TRANSFER`;
+                window.location.href = `bank-transfer.html?bookingId=${data._id}&paymentMethod=BANK_TRANSFER`;
             } else {
-                window.location.href = `/customer/payment-result?success=true&bookingId=${data._id}&paymentMethod=${paymentMethod.toUpperCase()}`;
+                window.location.href = `payment-result.html?success=true&bookingId=${data._id}&paymentMethod=${paymentMethod.toUpperCase()}`;
             }
         } catch (error) {
             console.error('Logged in booking error:', error);

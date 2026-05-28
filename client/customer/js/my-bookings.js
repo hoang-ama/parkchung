@@ -169,7 +169,7 @@ function renderHeaderNav() {
                 ${currentLang === 'vi' ? 'Trở thành chủ bãi đậu xe' : 'Become a Partner'} 
                 <i class="fas fa-chevron-down" style="font-size: 10px; margin-left: 2px;"></i>
             </a>
-            <button class="my-account-btn" onclick="window.location.href='/customer/my-profile.html'">
+            <button class="my-account-btn" onclick="window.location.href='my-profile.html'">
                 <i class="fas fa-user-circle"></i>
                 <span>${userData.fullName}</span>
             </button>
@@ -181,10 +181,10 @@ function renderHeaderNav() {
             e.preventDefault();
             localStorage.removeItem('userToken');
             localStorage.removeItem('userData');
-            window.location.href = '/customer/index.html';
+            window.location.href = 'index.html';
         });
     } else {
-        window.location.href = '/customer/login.html';
+        window.location.href = 'login.html';
     }
 
     document.getElementById('lang-switcher-btn')?.addEventListener('click', () => {
@@ -234,7 +234,7 @@ function renderEmptyState() {
             <i class="far fa-frown status-icon"></i>
             <h2 class="status-title">${getTranslation('no_bookings_title')}</h2>
             <p class="status-desc">${getTranslation('no_bookings_desc')}</p>
-            <a href="/customer/index.html" class="status-btn">
+            <a href="index.html" class="status-btn">
                 <i class="fas fa-search"></i>
                 <span>${getTranslation('start_booking')}</span>
             </a>
@@ -487,13 +487,13 @@ function createTicketCard(booking, state) {
             } else if (action === 'pay') {
                 handlePayNow(bId);
             } else if (action === 'extend') {
-                window.location.href = `/customer/index.html`; // Extend redirects to search for booking
+                window.location.href = `index.html`; // Extend redirects to search for booking
             } else if (action === 'details') {
-                window.location.href = `/customer/spot-details.html?id=${booking.spot?._id}`;
+                window.location.href = `spot-details.html?id=${booking.spot?._id}`;
             } else if (action === 'rebook') {
-                window.location.href = `/customer/index.html`;
+                window.location.href = `index.html`;
             } else if (action === 'review') {
-                window.location.href = `/customer/review?bookingId=${bId}`;
+                window.location.href = `review.html?bookingId=${bId}`;
             }
         });
     }
@@ -527,7 +527,7 @@ async function loadBookings() {
     const token = localStorage.getItem('userToken');
 
     if (!token) {
-        window.location.href = '/customer/login.html';
+        window.location.href = 'login.html';
         return;
     }
 
@@ -558,7 +558,7 @@ async function handlePayNow(bookingId) {
     const token = localStorage.getItem('userToken');
     if (!token) {
         alert(getTranslation('pay_login_required'));
-        window.location.href = '/customer/login.html';
+        window.location.href = 'login.html';
         return;
     }
 
