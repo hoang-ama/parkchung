@@ -1,113 +1,384 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Search Results - ParkChung</title>
+    <meta name="description" content="ParkChung – Kết quả tìm kiếm chỗ đỗ xe trực tuyến. Chọn bãi đỗ phù hợp và đặt ngay trong vài giây.">
+    <title>Kết quả tìm kiếm – ParkChung</title>
     <link rel="icon" type="image/png" href="/assets/logo/favicon.png" />
-    <link rel="stylesheet" href="css/styles.css" />
-    <link rel="stylesheet" href="css/results-filters.css" />
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap"
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" />
+    <link rel="stylesheet" href="/customer/css/styles.css" />
+    <link rel="stylesheet" href="/customer/css/results-filters.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat+Alternates:wght@400;500;600;700;800&family=Manrope:wght@400;500;600;700;800&family=Montserrat:wght@400;500;600;700;800&display=swap"
         rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+    <style>
+        /* ===== RESULTS PAGE SPECIFIC STYLES ===== */
+        body {
+            background: #f7fdf9;
+            padding-top: 87px; /* Account for fixed header-v3 */
+        }
+
+        /* Valet Mode Banner */
+        .valet-mode-banner {
+            display: none;
+            background: linear-gradient(135deg, #13b47e 0%, #0e9268 100%);
+            color: #fff;
+            padding: 14px 40px;
+            text-align: center;
+            font-size: 0.9rem;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+        }
+
+        .valet-mode-banner.show {
+            display: block;
+        }
+
+        .valet-mode-banner i {
+            margin-right: 8px;
+        }
+
+        .valet-mode-banner .valet-banner-details {
+            font-weight: 400;
+            opacity: 0.9;
+            margin-top: 4px;
+            font-size: 0.82rem;
+        }
+
+        /* Results page layout */
+        .results-page-main {
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 0 24px;
+        }
+
+        .results-page-header {
+            margin-bottom: 28px;
+        }
+
+        .results-page-header h2 {
+            text-align: left;
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: #1a1a1a;
+            padding: 0;
+            margin: 0 0 6px;
+        }
+
+        .results-page-header p {
+            color: #666;
+            margin: 0;
+            font-size: 0.9rem;
+        }
+
+        .results-container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 28px;
+            align-items: start;
+        }
+
+        @media (max-width: 900px) {
+            .results-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Spot cards */
+        .spot-card {
+            background: #fff;
+            border-radius: 14px;
+            overflow: hidden;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.07);
+            text-decoration: none;
+            color: inherit;
+            display: block;
+            transition: transform 0.2s, box-shadow 0.2s;
+            animation: fadeInUp 0.4s ease both;
+        }
+
+        .spot-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 32px rgba(19,180,126,0.15);
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(16px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        .spot-card__image {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+            display: block;
+        }
+
+        .spot-card__content {
+            padding: 16px 18px 18px;
+        }
+
+        .spot-card__content h3 {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin: 0 0 8px;
+            line-height: 1.4;
+            text-align: left;
+            padding: 0;
+        }
+
+        .spot-card__info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+
+        .spot-card__info-price {
+            font-size: 0.85rem;
+            color: #13b47e;
+            font-weight: 700;
+        }
+
+        .spot-card__cta {
+            background: #13b47e;
+            color: #fff;
+            text-align: center;
+            padding: 9px 14px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+            transition: background 0.2s;
+        }
+
+        .spot-card:hover .spot-card__cta {
+            background: #0fa06e;
+        }
+
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 20px;
+        }
+
+        .no-results {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 60px 20px;
+            color: #666;
+            font-size: 1rem;
+        }
+
+        .results-count {
+            font-size: 0.85rem;
+            color: #888;
+            margin-top: 4px;
+        }
+    </style>
 </head>
 
 <body>
-    <header>
-        <div class="logo">
-            <a href="index.html" style="display: flex; align-items: center; text-decoration: none; color: inherit;">
-                <img src="../assets/logo/logo.svg" alt="Parkchung Logo" />
-                <div>
-                    <h1>PARKCHUNG</h1>
-                    <p class="tagline" data-i18n="tagline">Save time. Save money. Save Earth</p>
+
+    <!-- ======= HEADER V3 (nhất quán trang chủ) ======= -->
+    <header class="header-v3">
+        <div class="header-inner">
+            <a href="/customer/index.html" class="header-logo">
+                <img src="/assets/logo/logo.svg" alt="ParkChung Logo" />
+                <div class="header-logo-text">
+                    <span class="header-brand">PARKCHUNG</span>
+                    <span class="header-tagline" data-i18n="tagline">Tiết kiệm thời gian. Tiết kiệm chi phí. Bảo vệ Trái Đất</span>
                 </div>
             </a>
+            <nav class="header-nav" id="main-nav">
+                <!-- Rendered by app.js -->
+                <a href="/customer/register.html" class="nav-link" data-i18n="becomeHostRegister">Trở thành Chủ bãi / Đăng ký</a>
+                <a href="/customer/login.html" class="btn-nav btn-nav-primary" data-i18n="login">Đăng nhập</a>
+            </nav>
+            <button class="mobile-menu-btn" id="mobile-menu-btn" aria-label="Menu">
+                <i class="fas fa-bars"></i>
+            </button>
         </div>
-        <nav>
-        </nav>
     </header>
 
-    <main class="results-page-main">
-        <div class="results-container">
-            <!-- Filter Sidebar -->
-            <aside class="filters-sidebar">
-                <div class="filters-header">
-                    <h3 data-i18n="filter_title">Filters</h3>
-                    <button id="clear-filters-btn" class="clear-filters-btn" data-i18n="filter_clear">Clear All</button>
-                </div>
+    <!-- ======= VALET MODE BANNER ======= -->
+    <div class="valet-mode-banner" id="valet-mode-banner">
+        <div><i class="fas fa-concierge-bell"></i> <span id="valet-banner-title">Dịch vụ Valet Booking</span></div>
+        <div class="valet-banner-details" id="valet-banner-details"></div>
+    </div>
 
-                <!-- Vehicle Type Filter -->
-                <div class="filter-section">
-                    <h4 data-i18n="filter_vehicle_type">Vehicle Type</h4>
-                    <div class="filter-options">
-                        <label class="filter-option">
-                            <input type="checkbox" name="vehicleType" value="car">
-                            <span>🚗 <span data-i18n="filter_car">Car</span></span>
-                        </label>
-                        <label class="filter-option">
-                            <input type="checkbox" name="vehicleType" value="motorbike">
-                            <span>🏍️ <span data-i18n="filter_motorbike">Motorbike</span></span>
-                        </label>
-                        <label class="filter-option">
-                            <input type="checkbox" name="vehicleType" value="bicycle">
-                            <span>🚲 <span data-i18n="filter_bicycle">Bicycle</span></span>
-                        </label>
-                        <label class="filter-option">
-                            <input type="checkbox" name="vehicleType" value="truck">
-                            <span>🚚 <span data-i18n="filter_truck">Truck / Large Vehicle</span></span>
-                        </label>
-                    </div>
+    <!-- ======= RESULTS SEARCH HEADER (Frame 10382) ======= -->
+    <div class="results-search-header">
+        <div class="search-bar-container">
+            <div class="search-input-group address-group">
+                <i class="fa-solid fa-location-dot font-primary"></i>
+                <div class="input-details">
+                    <label>ĐỖ TẠI</label>
+                    <input type="text" id="results-location-input" placeholder="Nhập địa điểm hoặc mã bưu chính..." autocomplete="off">
                 </div>
+                <div class="results-suggestions-box" id="results-suggestions-box" style="display: none;"></div>
+            </div>
+            
+            <div class="divider-vertical"></div>
 
-                <!-- Booking Type Filter -->
-                <div class="filter-section">
-                    <h4 data-i18n="filter_booking_type">Booking Type</h4>
-                    <div class="filter-options">
-                        <label class="filter-option">
-                            <input type="checkbox" name="bookingType" value="online">
-                            <span>🌐 <span data-i18n="filter_online">Online Booking</span></span>
-                        </label>
-                        <label class="filter-option">
-                            <input type="checkbox" name="bookingType" value="call">
-                            <span>📞 <span data-i18n="filter_call">Call Booking</span></span>
-                        </label>
-                    </div>
-                </div>
-
-                <!-- Payment Method Filter -->
-                <div class="filter-section">
-                    <h4 data-i18n="filter_payment">Payment Methods</h4>
-                    <div class="filter-options">
-                        <label class="filter-option">
-                            <input type="checkbox" name="paymentMethod" value="cash">
-                            <span>💵 <span data-i18n="filter_cash">Cash</span></span>
-                        </label>
-                        <label class="filter-option">
-                            <input type="checkbox" name="paymentMethod" value="paypal">
-                            <span>💳 <span data-i18n="filter_paypal">PayPal</span></span>
-                        </label>
-                    </div>
-                </div>
-            </aside>
-
-            <!-- Results Content -->
-            <div class="results-content">
-                <div class="results-header">
-                    <h2 data-i18n="results_title">Available Parking Spots</h2>
-                    <p data-i18n="results_desc">Choose the best spot for you and book in seconds.</p>
-                    <div id="results-count" class="results-count"></div>
-                </div>
-                <div id="results-grid" class="results-grid">
-                    <p>Loading...</p>
+            <div class="search-input-group date-group">
+                <i class="fa-solid fa-calendar-days font-primary"></i>
+                <div class="input-details">
+                    <label>ĐỖ TỪ</label>
+                    <input type="text" id="results-start-time" placeholder="Chọn thời gian đến">
                 </div>
             </div>
+
+            <div class="divider-vertical"></div>
+
+            <div class="search-input-group date-group">
+                <i class="fa-solid fa-calendar-days font-primary"></i>
+                <div class="input-details">
+                    <label>LẤY XE</label>
+                    <input type="text" id="results-end-time" placeholder="Chọn thời gian đi">
+                </div>
+            </div>
+
+            <button class="btn-search-execute" id="btn-search-execute">
+                <i class="fa-solid fa-magnifying-glass"></i>
+            </button>
         </div>
-        <div id="spots-container"></div>
+
+        <!-- Mode Switcher (Lưới / Bản đồ) - View Switcher from Figma -->
+        <div class="layout-toggle-container" id="layout-toggle-container">
+            <button class="toggle-btn btn-grid" data-mode="grid">Lưới</button>
+            <button class="toggle-btn btn-map active" data-mode="map">Bản đồ</button>
+        </div>
+    </div>
+
+    <main class="results-page-main-v3 map-mode" id="results-page-layout">
+        <!-- 1. Filters Sidebar (260px) -->
+        <aside class="filters-sidebar-v3">
+            <div class="filters-header">
+                <h3>Bộ lọc</h3>
+                <button id="clear-filters-btn" class="clear-filters-btn">Xóa tất cả</button>
+            </div>
+
+            <!-- Vehicle Type Filter -->
+            <div class="filter-section">
+                <h4>LOẠI PHƯƠNG TIỆN</h4>
+                <div class="filter-options">
+                    <label class="filter-option">
+                        <input type="checkbox" name="vehicleType" value="car">
+                        <span>🚗 Ô tô</span>
+                    </label>
+                    <label class="filter-option">
+                        <input type="checkbox" name="vehicleType" value="motorbike">
+                        <span>🏍️ Xe máy</span>
+                    </label>
+                    <label class="filter-option">
+                        <input type="checkbox" name="vehicleType" value="bicycle">
+                        <span>🚲 Xe đạp</span>
+                    </label>
+                    <label class="filter-option">
+                        <input type="checkbox" name="vehicleType" value="truck">
+                        <span>🚚 Xe tải / Xe lớn</span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Booking Type Filter -->
+            <div class="filter-section">
+                <h4>LOẠI ĐẬ CHỔ</h4>
+                <div class="filter-options">
+                    <label class="filter-option">
+                        <input type="checkbox" name="bookingType" value="online">
+                        <span>🌐 Đặt trực tuyến</span>
+                    </label>
+                    <label class="filter-option">
+                        <input type="checkbox" name="bookingType" value="call">
+                        <span>📞 Đặt qua điện thoại</span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Payment Method Filter -->
+            <div class="filter-section">
+                <h4>PHƯƠNG THỨC THANH TOÁN</h4>
+                <div class="filter-options">
+                    <label class="filter-option">
+                        <input type="checkbox" name="paymentMethod" value="cash">
+                        <span>💵 Tiền mặt</span>
+                    </label>
+                    <label class="filter-option">
+                        <input type="checkbox" name="paymentMethod" value="paypal">
+                        <span>💳 PayPal</span>
+                    </label>
+                </div>
+            </div>
+        </aside>
+
+        <!-- 2. Left List Panel (507px) -->
+        <section class="results-list-panel">
+            <!-- Sort Tabs: Gợi ý / Rẻ nhất / Gần nhất (Figma: List Header & Tabs) -->
+            <div class="sorting-tabs">
+                <button class="sort-tab-btn active" data-sort="recommend">Gợi ý</button>
+                <button class="sort-tab-btn" data-sort="price">Rẻ nhất</button>
+                <button class="sort-tab-btn" data-sort="distance">Gần nhất</button>
+            </div>
+            
+            <div class="results-scroll-container" id="results-scroll-container">
+                <div style="text-align: center; padding: 40px 20px; color: #6b7280;">
+                    <i class="fa-solid fa-spinner fa-spin" style="font-size: 32px; margin-bottom: 12px; color: #00B484;"></i>
+                    <p style="font-weight: 600;">Đang quét tìm kiếm bãi đỗ...</p>
+                </div>
+            </div>
+            
+            <div id="results-pagination" class="results-pagination"></div>
+        </section>
+
+        <!-- 3. Right Map Panel (Remaining Space) -->
+        <section class="results-map-panel">
+            <div id="leaflet-map" style="width: 100%; height: 100%;"></div>
+        </section>
     </main>
+
+    <!-- Detail Popup Panel (outside main so it works in both Map & Grid mode) -->
+    <div class="detail-popup-panel" id="detail-popup-panel" style="display: none;">
+        <!-- Rendered dynamically by results.js -->
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="/customer/js/custom-modal.js"></script>
     <script src="/customer/js/config.js"></script>
     <script type="module" src="/customer/js/app.js"></script>
     <script type="module" src="/customer/js/results.js"></script>
+
+    <script>
+        // Valet banner logic (chạy sớm, không cần module)
+        (function() {
+            const params = new URLSearchParams(window.location.search);
+            const isValet = params.get('type') === 'valet';
+            if (isValet) {
+                const banner = document.getElementById('valet-mode-banner');
+                const details = document.getElementById('valet-banner-details');
+                if (banner) banner.classList.add('show');
+                if (details) {
+                    const dropoff = params.get('dropoff') || '';
+                    const pickup = params.get('pickup') || '';
+                    const start = params.get('startTime') ? new Date(params.get('startTime')).toLocaleString('vi-VN') : '';
+                    const end = params.get('endTime') ? new Date(params.get('endTime')).toLocaleString('vi-VN') : '';
+                    let text = '';
+                    if (dropoff) text += `📍 Giao xe: ${dropoff}`;
+                    if (pickup && pickup !== dropoff) text += `  →  🏁 Trả xe: ${pickup}`;
+                    if (start) text += `  |  🕐 ${start}`;
+                    if (end) text += ` – ${end}`;
+                    details.textContent = text;
+                }
+            }
+        })();
+    </script>
+
 </body>
 
 </html>

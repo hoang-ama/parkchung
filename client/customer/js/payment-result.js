@@ -1,43 +1,28 @@
+// File: client/customer/js/payment-result.js
+
 const statusHeadingEl = document.getElementById('payment-status-heading');
 const statusDescriptionEl = document.getElementById('payment-status-description');
 const summaryEl = document.getElementById('payment-booking-summary');
 const refreshBtn = document.getElementById('refresh-status');
 const bookingsBtn = document.getElementById('view-bookings');
+const iconBoxEl = document.getElementById('result-icon-box');
+const iconEl = document.getElementById('result-icon');
 
 const params = new URLSearchParams(window.location.search);
 const bookingId = params.get('bookingId');
 const paymentId = params.get('paymentId');
 const paypalToken = params.get('token');
-const leadId = params.get('leadId');
 const isGuest = params.get('isGuest') === 'true';
 const paymentMethodParam = params.get('paymentMethod');
 
-const paymentStatusMessages = {
-    PAID: {
-        title: 'Payment completed successfully!',
-        description: 'Your booking is now confirmed. You can view the full details on the My Bookings page.',
-    },
-    PENDING: {
-        title: 'Payment pending confirmation...',
-        description: 'We are still waiting for PayPal to confirm this payment. Please refresh the status after a moment.',
-    },
-    FAILED: {
-        title: 'Payment failed',
-        description: 'This booking could not be confirmed because the payment failed or was cancelled.',
-    },
-    REFUNDED: {
-        title: 'Payment refunded',
-        description: 'This payment was refunded. Please contact support if you have any questions.',
-    },
-    UNPAID: {
-        title: 'Payment not completed',
-        description: 'We did not detect a completed payment for this booking.',
-    },
-    // Guest cash booking success
-    CASH_CONFIRMED: {
-        title: 'Booking Confirmed!',
-        description: 'Your parking spot is reserved. A confirmation email has been sent to your email address. You can pay at the parking spot upon arrival.',
-    },
+const PAYMENT_METHOD_NAMES = {
+    'CASH': 'Tiền mặt (Thanh toán tại bãi)',
+    'BANK_TRANSFER': 'Chuyển khoản QR ngân hàng',
+    'DOMESTIC_CARD': 'Thẻ tín dụng nội địa',
+    'VNPAY': 'Visa, Master Card (qua VNPAY)',
+    'MOMO': 'Ví Momo',
+    'PAY_LATER': 'Trả sau (Nợ ghi sổ)',
+    'PAYPAL': 'PayPal'
 };
 
 const formatDate = (value) => value ? new Date(value).toLocaleString('vi-VN', {
@@ -46,261 +31,242 @@ const formatDate = (value) => value ? new Date(value).toLocaleString('vi-VN', {
     year: 'numeric',
     hour: '2-digit',
     minute: '2-digit',
-}) : 'N/A';
+}) : 'Không có';
 
-const formatCurrency = (amount) => amount ? `${Number(amount).toLocaleString('vi-VN')} VND` : 'N/A';
+const formatCurrency = (amount) => amount ? `${Number(amount).toLocaleString('vi-VN')}đ` : '0đ';
 
 const setViewBookings = () => {
     if (bookingsBtn) {
-        // For guest users, change the button to go home instead
-        if (isGuest) {
-            bookingsBtn.textContent = 'Back to Home';
+        const userToken = localStorage.getItem('userToken');
+        const isLoggedIn = Boolean(userToken);
+        if (!isLoggedIn) {
+            bookingsBtn.innerHTML = 'Đăng nhập để xem vé của bạn →';
             bookingsBtn.addEventListener('click', () => {
-                window.location.href = 'index.html';
+                window.location.href = '/customer/login.html';
             });
         } else {
+            bookingsBtn.innerHTML = 'Xem lịch sử đặt chỗ →';
             bookingsBtn.addEventListener('click', () => {
-                window.location.href = 'my-bookings.html';
+                window.location.href = '/customer/my-bookings.html';
             });
         }
     }
 };
 
-const buildSummaryHtml = (booking, payment) => {
-    const bookingStatus = String(booking.status || 'pending').toLowerCase();
-    const paymentStatus = (booking.paymentStatus || 'UNPAID').toLowerCase();
-    const paymentAmount = payment && typeof payment.amountVnd === 'number'
-        ? formatCurrency(payment.amountVnd)
-        : (booking.totalPrice ? formatCurrency(booking.totalPrice) : 'N/A');
+function setUIStatus(type) {
+    if (!iconBoxEl || !iconEl) return;
+    iconBoxEl.className = 'result-icon-container ' + type;
+    if (type === 'success') {
+        iconEl.className = 'fas fa-check';
+    } else if (type === 'pending') {
+        iconEl.className = 'fas fa-spinner fa-spin';
+    } else {
+        iconEl.className = 'fas fa-times';
+    }
+}
 
-    // For guest bookings, show guest name
-    const customerName = booking.fullName || booking.guestFullName || 'Guest';
+const buildSummaryHtml = (booking) => {
+    const statusText = booking.status === 'confirmed' ? 'Đã xác nhận' : 
+                       booking.status === 'pending' ? 'Đang xử lý' : 
+                       booking.status === 'cancelled' ? 'Đã hủy' : 'Đã hoàn thành';
+    const statusClass = (booking.status || 'pending').toLowerCase();
+    
+    const payStatusText = booking.paymentStatus === 'PAID' ? 'Đã thanh toán' :
+                          booking.paymentStatus === 'PENDING' ? 'Đang xử lý' : 'Chưa thanh toán';
+    const payStatusClass = (booking.paymentStatus || 'unpaid').toLowerCase();
+
+    const methodLabel = PAYMENT_METHOD_NAMES[booking.paymentMethod] || booking.paymentMethod || 'Không xác định';
+
+    const customerName = booking.fullName || booking.guestFullName || 'Khách hàng';
+    const email = booking.email || booking.guestEmail || 'Không có';
+    const phone = booking.phoneNumber || booking.guestPhoneNumber || 'Không có';
 
     return `
-        <p><strong>Customer:</strong> ${customerName}</p>
-        <p><strong>Spot:</strong> ${booking.spot?.address || booking.spot || 'N/A'}</p>
-        <p><strong>Booking:</strong> ${formatDate(booking.startTime)} → ${formatDate(booking.endTime)}</p>
-        <p><strong>Booking Status:</strong> <span class="booking-status status-${bookingStatus}">${booking.status || 'pending'}</span></p>
-        <p><strong>Payment Status:</strong> <span class="booking-status status-${paymentStatus}">${booking.paymentStatus || 'UNPAID'}</span></p>
-        <p><strong>Payment Method:</strong> ${booking.paymentMethod || 'N/A'}</p>
-        <p><strong>Amount:</strong> ${paymentAmount}</p>
-        <p><strong>Reference:</strong> ${booking._id || (payment ? payment._id : 'N/A')}</p>
+        <div class="summary-item">
+            <span class="summary-item-label">Mã đặt chỗ</span>
+            <span class="summary-item-value">${booking._id}</span>
+        </div>
+        <div class="summary-item">
+            <span class="summary-item-label">Bãi đỗ xe</span>
+            <span class="summary-item-value">${booking.spot?.name || booking.spot?.address || 'Bãi đỗ xe'}</span>
+        </div>
+        <div class="summary-item">
+            <span class="summary-item-label">Khách hàng</span>
+            <span class="summary-item-value">${customerName}</span>
+        </div>
+        <div class="summary-item">
+            <span class="summary-item-label">Số điện thoại</span>
+            <span class="summary-item-value">${phone}</span>
+        </div>
+        <div class="summary-item">
+            <span class="summary-item-label">Email</span>
+            <span class="summary-item-value">${email}</span>
+        </div>
+        <div class="summary-item">
+            <span class="summary-item-label">Nhận xe</span>
+            <span class="summary-item-value">${formatDate(booking.startTime)}</span>
+        </div>
+        <div class="summary-item">
+            <span class="summary-item-label">Trả xe</span>
+            <span class="summary-item-value">${formatDate(booking.endTime)}</span>
+        </div>
+        <div class="summary-item">
+            <span class="summary-item-label">Phương thức</span>
+            <span class="summary-item-value">${methodLabel}</span>
+        </div>
+        <div class="summary-item">
+            <span class="summary-item-label">Trạng thái đặt chỗ</span>
+            <span class="summary-item-value"><span class="status-badge ${statusClass}">${statusText}</span></span>
+        </div>
+        <div class="summary-item">
+            <span class="summary-item-label">Trạng thái thanh toán</span>
+            <span class="summary-item-value"><span class="status-badge ${payStatusClass}">${payStatusText}</span></span>
+        </div>
+        <div class="summary-item">
+            <span class="summary-item-label">Tổng tiền</span>
+            <span class="summary-item-value price">${formatCurrency(booking.totalPrice)}</span>
+        </div>
     `;
 };
 
-const showMissingParams = () => {
-    statusHeadingEl.textContent = 'Missing booking information';
-    statusDescriptionEl.textContent = 'We could not identify your booking. Please check the link and try again.';
-    if (refreshBtn) refreshBtn.disabled = true;
-};
-
-// Handle guest cash bookings (bookingId + isGuest + paymentMethod=CASH, no paymentId)
-const fetchGuestCashBookingStatus = async () => {
-    if (!bookingId) {
-        showMissingParams();
-        return;
-    }
-
-    try {
-        if (refreshBtn) {
-            refreshBtn.disabled = true;
-            updateButtonText(refreshBtn, 'Loading...');
-        }
-
-        // Try to get booking data from sessionStorage first
-        const storedData = sessionStorage.getItem('guestBookingData');
-        let guestData = storedData ? JSON.parse(storedData) : null;
-
-        // If we have stored data and it matches the bookingId, use it
-        if (guestData && guestData._id === bookingId) {
-            // Update card styling for success
-            const card = document.getElementById('payment-result-card');
-            if (card) {
-                card.classList.remove('loading');
-                card.classList.add('payment-success');
-            }
-
-            const icon = document.querySelector('.booking-card__icon i');
-            if (icon) {
-                icon.className = 'fas fa-check-circle';
-            }
-
-            const message = paymentStatusMessages.CASH_CONFIRMED;
-            statusHeadingEl.textContent = message.title;
-            statusDescriptionEl.textContent = message.description;
-
-            // Build detailed summary with all 11 fields in required order
-            summaryEl.innerHTML = `
-                <p><strong>Spot:</strong> ${guestData.spotName || 'N/A'}</p>
-                <p><strong>Customer:</strong> ${guestData.customerName || 'Guest'}</p>
-                <p><strong>Email:</strong> ${guestData.customerEmail || 'N/A'}</p>
-                <p><strong>Phone:</strong> ${guestData.customerPhone || 'N/A'}</p>
-                <p><strong>From:</strong> ${formatDate(guestData.startTime)}</p>
-                <p><strong>To:</strong> ${formatDate(guestData.endTime)}</p>
-                <p><strong>Order Time:</strong> ${formatDate(guestData.orderTime)}</p>
-                <p><strong>Booking Status:</strong> <span class="booking-status status-${(guestData.bookingStatus || 'confirmed').toLowerCase()}">${guestData.bookingStatus || 'Confirmed'}</span></p>
-                <p><strong>Payment Method:</strong> Cash (Pay at spot)</p>
-                <p><strong>Payment Status:</strong> <span class="booking-status status-${(guestData.paymentStatus || 'unpaid').toLowerCase()}">${guestData.paymentStatus || 'UNPAID'}</span></p>
-                <p><strong>Payment Total:</strong> ${formatCurrency(guestData.totalPrice)}</p>
-            `;
-
-            // Clear sessionStorage after displaying
-            sessionStorage.removeItem('guestBookingData');
-            return;
-        }
-
-        // Fallback: Try to fetch from backend endpoint
-        const response = await fetch(`${API_URL}/bookings/${bookingId}/status`);
-
-        if (!response.ok) {
-            // Show minimal success since the booking was created
-            const card = document.getElementById('payment-result-card');
-            if (card) {
-                card.classList.remove('loading');
-                card.classList.add('payment-success');
-            }
-
-            const icon = document.querySelector('.booking-card__icon i');
-            if (icon) {
-                icon.className = 'fas fa-check-circle';
-            }
-
-            const message = paymentStatusMessages.CASH_CONFIRMED;
-            statusHeadingEl.textContent = message.title;
-            statusDescriptionEl.textContent = message.description;
-
-            summaryEl.innerHTML = `
-                <p><strong>Booking Reference:</strong> ${bookingId}</p>
-                <p><strong>Payment Method:</strong> Cash (Pay at spot)</p>
-                <p><strong>Status:</strong> <span class="booking-status status-confirmed">Confirmed</span></p>
-            `;
-            return;
-        }
-
-        const { booking } = await response.json();
-
-        // Update card styling for success
-        const card = document.getElementById('payment-result-card');
-        if (card) {
-            card.classList.remove('loading');
-            card.classList.add('payment-success');
-        }
-
-        const icon = document.querySelector('.booking-card__icon i');
-        if (icon) {
-            icon.className = 'fas fa-check-circle';
-        }
-
-        const message = booking.status === 'confirmed'
-            ? paymentStatusMessages.CASH_CONFIRMED
-            : paymentStatusMessages.PENDING;
-
-        statusHeadingEl.textContent = message.title;
-        statusDescriptionEl.textContent = message.description;
-        summaryEl.innerHTML = buildSummaryHtml(booking, null);
-
-    } catch (error) {
-        // Even on error, show success for cash bookings since the create was successful
-        const card = document.getElementById('payment-result-card');
-        if (card) {
-            card.classList.remove('loading');
-            card.classList.add('payment-success');
-        }
-
-        const icon = document.querySelector('.booking-card__icon i');
-        if (icon) {
-            icon.className = 'fas fa-check-circle';
-        }
-
-        const message = paymentStatusMessages.CASH_CONFIRMED;
-        statusHeadingEl.textContent = message.title;
-        statusDescriptionEl.textContent = message.description;
-        summaryEl.innerHTML = `
-            <p><strong>Booking Reference:</strong> ${bookingId}</p>
-            <p><strong>Payment Method:</strong> Cash (Pay at spot)</p>
-            <p><strong>Status:</strong> <span class="booking-status status-confirmed">Confirmed</span></p>
-        `;
-    } finally {
-        if (refreshBtn) {
-            refreshBtn.disabled = false;
-            updateButtonText(refreshBtn, 'Refresh Status');
-        }
-    }
-};
-
 const fetchStatus = async () => {
-    // Handle guest cash booking (bookingId without paymentId)
-    if (bookingId && isGuest && paymentMethodParam === 'CASH' && !paymentId) {
-        await fetchGuestCashBookingStatus();
+    if (!bookingId) {
+        statusHeadingEl.textContent = 'Thiếu thông tin đặt chỗ';
+        statusDescriptionEl.textContent = 'Không tìm thấy ID đặt chỗ trong địa chỉ trang.';
+        setUIStatus('failed');
         return;
     }
 
-    if (!bookingId || !paymentId) {
-        showMissingParams();
-        return;
+    // Try to load from sessionStorage first for rapid load
+    const storedData = sessionStorage.getItem('guestBookingData');
+    if (storedData) {
+        try {
+            const guestData = JSON.parse(storedData);
+            if (guestData._id === bookingId) {
+                const isInstant = ['CASH', 'BANK_TRANSFER', 'DOMESTIC_CARD', 'VNPAY', 'MOMO', 'PAY_LATER'].includes(guestData.paymentMethod);
+                if (isInstant) {
+                    setUIStatus('success');
+                    
+                    const isPrepaid = ['BANK_TRANSFER', 'DOMESTIC_CARD', 'VNPAY', 'MOMO'].includes(guestData.paymentMethod);
+                    statusHeadingEl.textContent = isPrepaid ? 'Thanh toán thành công!' : 'Đặt chỗ thành công!';
+                    statusDescriptionEl.textContent = isPrepaid 
+                        ? 'Cảm ơn bạn! Đơn đặt chỗ đã được thanh toán thành công qua chuyển khoản/ví. Bạn đã sẵn sàng để gửi xe.' 
+                        : 'Yêu cầu đặt chỗ của bạn đã được xác nhận. Vui lòng thanh toán trực tiếp hoặc ghi sổ khi giao xe.';
+
+                    summaryEl.innerHTML = buildSummaryHtml({
+                        _id: guestData._id,
+                        spot: { name: guestData.spotName, address: guestData.spotAddress },
+                        guestFullName: guestData.customerName,
+                        guestEmail: guestData.customerEmail,
+                        guestPhoneNumber: guestData.customerPhone,
+                        startTime: guestData.startTime,
+                        endTime: guestData.endTime,
+                        paymentMethod: guestData.paymentMethod,
+                        paymentStatus: isPrepaid ? 'PAID' : 'UNPAID',
+                        status: guestData.bookingStatus || 'confirmed',
+                        totalPrice: guestData.totalPrice
+                    });
+                    
+                    sessionStorage.removeItem('guestBookingData');
+                    return;
+                }
+            }
+        } catch (e) {
+            console.error(e);
+        }
     }
 
     try {
         if (refreshBtn) {
             refreshBtn.disabled = true;
-            updateButtonText(refreshBtn, 'Refreshing...');
+            refreshBtn.textContent = 'Đang tải...';
         }
+        
         const headers = {};
         const authToken = localStorage.getItem('userToken');
         if (authToken) {
             headers['Authorization'] = `Bearer ${authToken}`;
         }
 
+        // If paypal token exists, capture it first
         if (paypalToken) {
-            updateButtonText(refreshBtn, 'Confirming Payment...');
-            statusHeadingEl.textContent = 'Confirming your payment...';
-            statusDescriptionEl.textContent = 'Please wait while we secure your booking.';
+            statusHeadingEl.textContent = 'Đang xác nhận thanh toán PayPal...';
+            statusDescriptionEl.textContent = 'Vui lòng chờ giây lát để chúng tôi xử lý giao dịch.';
+            setUIStatus('pending');
 
-            await fetch(`${API_URL}/payments/paypal/capture`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    ...headers
-                },
-                body: JSON.stringify({ token: paypalToken })
-            }).catch(err => console.error('Capture error (might be already captured)', err));
+            try {
+                await fetch(`${API_URL}/payments/paypal/capture`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        ...headers
+                    },
+                    body: JSON.stringify({ token: paypalToken })
+                });
+            } catch (err) {
+                console.error('Capture error', err);
+            }
 
-            // Remove token from URL to prevent re-capture on refresh
+            // Remove token from URL
             const newUrl = new URL(window.location.href);
             newUrl.searchParams.delete('token');
             newUrl.searchParams.delete('PayerID');
             window.history.replaceState({}, '', newUrl);
         }
 
-        const response = await fetch(`${API_URL}/bookings/${bookingId}/payments/${paymentId}`, { headers });
-        if (!response.ok) {
-            const errorPayload = await response.json().catch(() => ({}));
-            throw new Error(errorPayload.message || 'Unable to fetch booking status.');
-        }
-        const { booking, payment } = await response.json();
-        if (!booking) {
-            throw new Error('Booking not found.');
+        let booking = null;
+        if (paymentId) {
+            // PayPal flow
+            const res = await fetch(`${API_URL}/bookings/${bookingId}/payments/${paymentId}`, { headers });
+            if (res.ok) {
+                const data = await res.json();
+                booking = data.booking;
+            }
+        } else {
+            // General status flow
+            const res = await fetch(`${API_URL}/bookings/${bookingId}`, { headers });
+            if (res.ok) {
+                const data = await res.json();
+                booking = data.booking;
+            }
         }
 
-        const paymentStatusKey = (booking.paymentStatus || 'UNPAID').toUpperCase();
-        const message = paymentStatusMessages[paymentStatusKey] || paymentStatusMessages.UNPAID;
-        statusHeadingEl.textContent = message.title;
-        statusDescriptionEl.textContent = message.description;
-        summaryEl.innerHTML = buildSummaryHtml(booking, payment);
+        if (!booking) {
+            throw new Error('Không tìm thấy thông tin đơn hàng trên máy chủ.');
+        }
+
+        const isPrepaid = ['BANK_TRANSFER', 'DOMESTIC_CARD', 'VNPAY', 'MOMO', 'PAYPAL'].includes(booking.paymentMethod);
+
+        if (booking.status === 'confirmed' || booking.status === 'completed') {
+            setUIStatus('success');
+            statusHeadingEl.textContent = isPrepaid ? 'Thanh toán thành công!' : 'Đặt chỗ thành công!';
+            statusDescriptionEl.textContent = isPrepaid 
+                ? 'Đơn đặt chỗ đã được thanh toán và xác nhận hoàn tất. Bạn đã sẵn sàng để gửi xe!'
+                : 'Đặt chỗ của bạn đã được xác nhận thành công. Vui lòng thanh toán trực tiếp hoặc ghi sổ khi giao xe.';
+        } else if (booking.status === 'pending') {
+            setUIStatus('pending');
+            statusHeadingEl.textContent = 'Đang chờ xử lý...';
+            statusDescriptionEl.textContent = 'Đơn đặt chỗ đang chờ xác nhận hoặc xử lý giao dịch. Vui lòng tải lại trang sau vài phút.';
+            if (refreshBtn) refreshBtn.style.display = 'inline-flex';
+        } else {
+            setUIStatus('failed');
+            statusHeadingEl.textContent = 'Đặt chỗ đã bị hủy';
+            statusDescriptionEl.textContent = 'Đơn đặt chỗ này đã bị hủy hoặc không thể xử lý.';
+        }
+
+        summaryEl.innerHTML = buildSummaryHtml(booking);
+
     } catch (error) {
-        statusHeadingEl.textContent = 'Unable to fetch payment status';
-        statusDescriptionEl.textContent = error.message;
+        console.error(error);
+        setUIStatus('failed');
+        statusHeadingEl.textContent = 'Lỗi tải thông tin';
+        statusDescriptionEl.textContent = error.message || 'Không thể lấy thông tin chi tiết đặt chỗ từ hệ thống.';
     } finally {
         if (refreshBtn) {
             refreshBtn.disabled = false;
-            updateButtonText(refreshBtn, 'Refresh Status');
+            refreshBtn.innerHTML = '<i class="fas fa-sync-alt"></i> Tải lại trạng thái';
         }
     }
-};
-
-const updateButtonText = (button, text) => {
-    if (!button) return;
-    button.textContent = text;
 };
 
 document.addEventListener('DOMContentLoaded', () => {

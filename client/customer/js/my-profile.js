@@ -173,7 +173,7 @@ function setLanguage(lang) {
 document.addEventListener('DOMContentLoaded', () => {
     const token = localStorage.getItem('userToken');
     if (!token) {
-        window.location.href = 'login.html';
+        window.location.href = '/customer/login.html';
         return;
     }
 
@@ -188,7 +188,7 @@ document.addEventListener('DOMContentLoaded', () => {
             event.preventDefault();
             localStorage.removeItem('userToken');
             localStorage.removeItem('userData');
-            window.location.href = 'login.html';
+            window.location.href = '/customer/login.html';
         });
     }
 
@@ -214,7 +214,7 @@ async function loadProfile() {
             if (response.status === 401) {
                 localStorage.removeItem('userToken');
                 localStorage.removeItem('userData');
-                window.location.href = 'login.html';
+                window.location.href = '/customer/login.html';
                 return;
             }
 
@@ -450,7 +450,7 @@ async function submitDeleteAccount() {
         localStorage.removeItem('userToken');
         localStorage.removeItem('userData');
         alert(getTranslation('account_deleted_goodbye'));
-        window.location.href = 'index.html';
+        window.location.href = '/customer/index.html';
     } catch (error) {
         showMessage(error.message, 'error');
     }

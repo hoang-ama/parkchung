@@ -2,18 +2,12 @@
 
 const translations = {
     en: {
-        my_bookings: 'My Bookings',
-        my_profile: 'My Profile',
-        back_home: 'Back to Home',
-        becomeHost: 'Host',
-        welcome: 'Welcome',
-        logout: 'Logout',
         logo_slogan: 'Seamless Smart Parking, Safe & Easy',
         loading: 'Loading your bookings...',
         login_required: 'Please log in to view your bookings.',
-        no_bookings_title: 'No bookings found',
-        no_bookings_desc: 'You have not made any bookings yet.',
-        start_booking: 'Start Booking',
+        no_bookings_title: 'No tickets found',
+        no_bookings_desc: 'You have not bought any tickets yet. Please book in advance to enjoy stress-free parking.',
+        start_booking: 'Find parking spot',
         error_loading_title: 'Error loading bookings',
         retry: 'Retry',
         previous: 'Previous',
@@ -24,10 +18,6 @@ const translations = {
         from: 'From',
         to: 'To',
         order_time: 'Order Time',
-        booking_status: 'Booking Status',
-        payment_method: 'Payment Method',
-        payment_status: 'Payment Status',
-        payment_total: 'Payment Total',
         unknown_location: 'Unknown Location',
         not_available: 'N/A',
         cancel_booking: 'Cancel Booking',
@@ -41,28 +31,41 @@ const translations = {
         pay_init_failed: 'Failed to initiate payment',
         no_payment_url: 'No payment URL received',
         failed_to_fetch: 'Failed to fetch bookings',
-        confirmed: 'Confirmed',
-        pending: 'Pending',
-        cancelled: 'Cancelled',
-        completed: 'Completed',
-        paid: 'Paid',
-        refunded: 'Refunded',
-        cash: 'Cash',
-        paypal: 'PayPal',
+        nav_home: 'Home',
+        nav_help: 'Help & support',
+        my_profile: 'Account',
+        my_bookings: 'Manage my tickets',
+        btn_view_qr: 'View QR',
+        btn_extend: 'Extend now',
+        btn_pay_now: 'Pay now',
+        btn_details: 'Details',
+        btn_use: 'Use ticket',
+        btn_rebook: 'Re-book',
+        btn_review: 'Review',
+        badge_active: 'Active',
+        badge_warning: 'Expiring',
+        badge_expired: 'Overrun',
+        badge_pending_pay: 'Unpaid',
+        badge_upcoming_near: 'Due soon',
+        badge_upcoming_far: 'Unused ticket',
+        badge_completed: 'Completed',
+        badge_cancelled: 'Cancelled',
+        badge_overdue: 'Overdue',
+        fee_label: 'Fee',
+        total_label: 'Total',
+        penalty_label: 'Penalty',
+        due_label: 'Due',
+        paid_label: 'Paid',
+        prepaid_label: 'Prepaid',
+        refund_label: 'Refunded'
     },
     vi: {
-        my_bookings: 'Đặt chỗ của tôi',
-        my_profile: 'Hồ sơ của tôi',
-        back_home: 'Về Trang chủ',
-        becomeHost: 'Đăng bãi',
-        welcome: 'Xin chào',
-        logout: 'Đăng xuất',
         logo_slogan: 'Bãi đỗ thông minh, an toàn và dễ dàng',
         loading: 'Đang tải danh sách đặt chỗ...',
         login_required: 'Vui lòng đăng nhập để xem danh sách đặt chỗ.',
-        no_bookings_title: 'Chưa có đặt chỗ nào',
-        no_bookings_desc: 'Bạn chưa thực hiện đặt chỗ nào.',
-        start_booking: 'Bắt đầu đặt chỗ',
+        no_bookings_title: 'Bạn chưa mua vé nào',
+        no_bookings_desc: 'Hãy đặt chỗ trước để trải nghiệm đỗ xe thảnh thơi.',
+        start_booking: 'Tìm bãi đỗ',
         error_loading_title: 'Lỗi khi tải danh sách đặt chỗ',
         retry: 'Thử lại',
         previous: 'Trước',
@@ -73,10 +76,6 @@ const translations = {
         from: 'Từ',
         to: 'Đến',
         order_time: 'Thời gian đặt',
-        booking_status: 'Trạng thái đặt chỗ',
-        payment_method: 'Phương thức thanh toán',
-        payment_status: 'Trạng thái thanh toán',
-        payment_total: 'Tổng thanh toán',
         unknown_location: 'Chưa có địa điểm',
         not_available: 'Không có',
         cancel_booking: 'Hủy đặt chỗ',
@@ -90,39 +89,49 @@ const translations = {
         pay_init_failed: 'Không thể khởi tạo thanh toán',
         no_payment_url: 'Không nhận được đường dẫn thanh toán',
         failed_to_fetch: 'Không thể tải danh sách đặt chỗ',
-        confirmed: 'Đã xác nhận',
-        pending: 'Đang chờ',
-        cancelled: 'Đã hủy',
-        completed: 'Hoàn thành',
-        paid: 'Đã thanh toán',
-        refunded: 'Đã hoàn tiền',
-        cash: 'Tiền mặt',
-        paypal: 'PayPal',
-    },
+        nav_home: 'Trang chủ',
+        nav_help: 'Hỗ trợ & trợ giúp',
+        my_profile: 'Tài khoản',
+        my_bookings: 'Quản lý Vé của tôi',
+        btn_view_qr: 'View QR',
+        btn_extend: 'Gia hạn ngay',
+        btn_pay_now: 'Thanh toán ngay',
+        btn_details: 'Chi tiết',
+        btn_use: 'Sử dụng',
+        btn_rebook: 'Mua lại',
+        btn_review: 'Đánh giá',
+        badge_active: 'ĐANG DÙNG',
+        badge_warning: 'SẮP HẾT GIỜ ĐỖ',
+        badge_expired: 'QUÁ GIỜ ĐỖ',
+        badge_pending_pay: 'CHỜ THANH TOÁN',
+        badge_upcoming_near: 'SẮP ĐẾN HẠN',
+        badge_upcoming_far: 'VÉ CHƯA DÙNG',
+        badge_completed: 'ĐÃ DÙNG',
+        badge_cancelled: 'ĐÃ HỦY',
+        badge_overdue: 'VÉ QUÁ HẠN',
+        fee_label: 'PHÍ',
+        total_label: 'TỔNG',
+        penalty_label: 'PHẠT',
+        due_label: 'CẦN TRẢ',
+        paid_label: 'ĐÃ TRẢ',
+        prepaid_label: 'TRẢ TRƯỚC',
+        refund_label: 'HOÀN TIỀN'
+    }
 };
 
 let currentLang = localStorage.getItem('lang') || 'vi';
 let allBookings = [];
-let currentPage = 1;
-let pageState = 'loading';
-let lastErrorMessage = '';
-const bookingsPerPage = 3;
+let currentActiveTab = 'active'; // active, upcoming, past
 
 function getTranslation(key) {
     return translations[currentLang]?.[key] || translations.en[key] || key;
 }
 
-function getDateLocale() {
-    return currentLang === 'vi' ? 'vi-VN' : 'en-GB';
-}
-
-function getUserDisplayName() {
+function getUserData() {
     try {
-        const userData = JSON.parse(localStorage.getItem('userData') || 'null');
-        return userData?.fullName?.trim() || '';
-    } catch (error) {
-        console.warn('Unable to read userData from localStorage:', error);
-        return '';
+        return JSON.parse(localStorage.getItem('userData') || 'null');
+    } catch {
+        return null;
     }
 }
 
@@ -131,396 +140,394 @@ function applyTranslations() {
 
     document.querySelectorAll('[data-i18n]').forEach((element) => {
         const key = element.getAttribute('data-i18n');
-        element.textContent = getTranslation(key);
+        element.innerHTML = getTranslation(key);
     });
 
-    const welcomeElement = document.getElementById('user-welcome');
-    if (welcomeElement) {
-        const fullName = getUserDisplayName();
-        welcomeElement.textContent = fullName
-            ? `${getTranslation('welcome')}, ${fullName}!`
-            : getTranslation('welcome');
+    // Update active state class on language flags
+    renderHeaderNav();
+}
+
+function renderHeaderNav() {
+    const nav = document.getElementById('customer-nav');
+    if (!nav) return;
+
+    const userData = getUserData();
+    const langFlag = currentLang === 'vi'
+        ? 'https://flagcdn.com/w40/vn.png'
+        : 'https://flagcdn.com/w40/gb.png';
+
+    const langSwitcher = `
+        <div class="lang-switcher" id="lang-switcher-btn">
+            <img src="${langFlag}" alt="Flag" class="lang-flag" />
+            <span class="lang-arrow">▼</span>
+        </div>
+    `;
+
+    if (userData) {
+        nav.innerHTML = `
+            <a href="${window.HOST_URL || '#'}/login" class="become-host-link">
+                ${currentLang === 'vi' ? 'Trở thành chủ bãi đậu xe' : 'Become a Partner'} 
+                <i class="fas fa-chevron-down" style="font-size: 10px; margin-left: 2px;"></i>
+            </a>
+            <button class="my-account-btn" onclick="window.location.href='/customer/my-profile.html'">
+                <i class="fas fa-user-circle"></i>
+                <span>${userData.fullName}</span>
+            </button>
+            <a href="#" id="logout-btn" class="logout-link">${currentLang === 'vi' ? 'Đăng xuất' : 'Logout'}</a>
+            ${langSwitcher}
+        `;
+
+        document.getElementById('logout-btn')?.addEventListener('click', (e) => {
+            e.preventDefault();
+            localStorage.removeItem('userToken');
+            localStorage.removeItem('userData');
+            window.location.href = '/customer/index.html';
+        });
+    } else {
+        window.location.href = '/customer/login.html';
     }
 
-    const langEnBtn = document.getElementById('lang-en');
-    const langViBtn = document.getElementById('lang-vi');
-    if (langEnBtn) {
-        langEnBtn.style.color = currentLang === 'en' ? '#13b47e' : '#555';
-        langEnBtn.style.fontWeight = currentLang === 'en' ? '700' : '500';
-    }
-    if (langViBtn) {
-        langViBtn.style.color = currentLang === 'vi' ? '#13b47e' : '#555';
-        langViBtn.style.fontWeight = currentLang === 'vi' ? '700' : '500';
-    }
+    document.getElementById('lang-switcher-btn')?.addEventListener('click', () => {
+        const nextLang = currentLang === 'vi' ? 'en' : 'vi';
+        localStorage.setItem('lang', nextLang);
+        currentLang = nextLang;
+        applyTranslations();
+        filterAndDisplayBookings();
+    });
 }
 
 function formatDateTime(value) {
-    if (!value) {
-        return getTranslation('not_available');
-    }
-
-    return new Intl.DateTimeFormat(getDateLocale(), {
+    if (!value) return getTranslation('not_available');
+    const locale = currentLang === 'vi' ? 'vi-VN' : 'en-GB';
+    
+    return new Intl.DateTimeFormat(locale, {
         hour: '2-digit',
         minute: '2-digit',
         day: '2-digit',
         month: '2-digit',
-        year: 'numeric',
+        year: 'numeric'
     }).format(new Date(value));
 }
 
 function formatCurrency(amount) {
-    return `${Number(amount || 0).toLocaleString('vi-VN')} VND`;
-}
-
-function getBookingStatusLabel(status) {
-    const normalizedStatus = String(status || '').toLowerCase();
-    return getTranslation(normalizedStatus) || status || getTranslation('not_available');
-}
-
-function getPaymentStatusLabel(status) {
-    const normalizedStatus = String(status || '').toLowerCase();
-    return getTranslation(normalizedStatus) || status || getTranslation('not_available');
-}
-
-function getPaymentMethodLabel(method) {
-    const normalizedMethod = String(method || '').toLowerCase();
-
-    if (normalizedMethod === 'cash') {
-        return getTranslation('cash');
-    }
-
-    if (normalizedMethod === 'paypal') {
-        return getTranslation('paypal');
-    }
-
-    return method || getTranslation('not_available');
+    return `${Number(amount || 0).toLocaleString('vi-VN')} VNĐ`;
 }
 
 function renderLoadingState() {
-    const bookingListContainer = document.querySelector('.booking-list');
-    if (!bookingListContainer) return;
+    const listContainer = document.querySelector('.booking-list');
+    if (!listContainer) return;
 
-    pageState = 'loading';
-    bookingListContainer.innerHTML = `<p style="text-align: center; color: white; font-size: 18px;">${getTranslation('loading')}</p>`;
+    listContainer.innerHTML = `
+        <div class="status-container">
+            <i class="fas fa-spinner fa-spin status-icon" style="color: var(--primary);"></i>
+            <h2 class="status-title">${getTranslation('loading')}</h2>
+        </div>
+    `;
 }
 
 function renderEmptyState() {
-    const bookingListContainer = document.querySelector('.booking-list');
-    if (!bookingListContainer) return;
+    const listContainer = document.querySelector('.booking-list');
+    if (!listContainer) return;
 
-    pageState = 'empty';
-    bookingListContainer.innerHTML = `
-        <div style="text-align: center; padding: 60px 20px;">
-            <h2 style="color: white; font-size: 24px; margin-bottom: 20px;">${getTranslation('no_bookings_title')}</h2>
-            <p style="color: rgba(255,255,255,0.8); font-size: 16px; margin-bottom: 30px;">${getTranslation('no_bookings_desc')}</p>
-            <a href="index.html" style="display: inline-block; padding: 12px 28px; background: rgba(255, 255, 255, 0.2); color: white; border: 2px solid rgba(255, 255, 255, 0.3); border-radius: 50px; text-decoration: none; font-weight: 600;">${getTranslation('start_booking')}</a>
+    listContainer.innerHTML = `
+        <div class="status-container">
+            <i class="far fa-frown status-icon"></i>
+            <h2 class="status-title">${getTranslation('no_bookings_title')}</h2>
+            <p class="status-desc">${getTranslation('no_bookings_desc')}</p>
+            <a href="/customer/index.html" class="status-btn">
+                <i class="fas fa-search"></i>
+                <span>${getTranslation('start_booking')}</span>
+            </a>
         </div>
     `;
 }
 
-function renderErrorState(errorMessage = '') {
-    const bookingListContainer = document.querySelector('.booking-list');
-    if (!bookingListContainer) return;
+function renderErrorState(message) {
+    const listContainer = document.querySelector('.booking-list');
+    if (!listContainer) return;
 
-    pageState = 'error';
-    lastErrorMessage = errorMessage;
-    bookingListContainer.innerHTML = `
-        <div style="text-align: center; padding: 60px 20px;">
-            <h2 style="color: white; font-size: 24px; margin-bottom: 20px;">${getTranslation('error_loading_title')}</h2>
-            <p style="color: rgba(255,255,255,0.8); font-size: 16px; margin-bottom: 30px;">${errorMessage}</p>
-            <button id="retry-bookings-btn" type="button" style="padding: 12px 28px; background: rgba(255, 255, 255, 0.2); color: white; border: 2px solid rgba(255, 255, 255, 0.3); border-radius: 50px; font-weight: 600; cursor: pointer;">${getTranslation('retry')}</button>
+    listContainer.innerHTML = `
+        <div class="status-container">
+            <i class="fas fa-exclamation-triangle status-icon" style="color: #e53e3e;"></i>
+            <h2 class="status-title">${getTranslation('error_loading_title')}</h2>
+            <p class="status-desc">${message}</p>
+            <button id="retry-btn" class="status-btn" style="background-color: #e53e3e;">
+                <i class="fas fa-sync"></i>
+                <span>${getTranslation('retry')}</span>
+            </button>
         </div>
     `;
 
-    document.getElementById('retry-bookings-btn')?.addEventListener('click', () => {
+    document.getElementById('retry-btn')?.addEventListener('click', () => {
         window.location.reload();
     });
 }
 
-function setLanguage(lang) {
-    localStorage.setItem('lang', lang);
-    currentLang = lang;
-    applyTranslations();
+/**
+ * Filter bookings and render them based on active tab
+ */
+function filterAndDisplayBookings() {
+    const listContainer = document.querySelector('.booking-list');
+    if (!listContainer) return;
 
-    if (pageState === 'list') {
-        displayBookings();
-        return;
-    }
+    listContainer.innerHTML = '';
+    const now = new Date();
 
-    if (pageState === 'empty') {
+    const categorized = {
+        active: [],
+        upcoming: [],
+        past: []
+    };
+
+    allBookings.forEach(booking => {
+        const startTime = new Date(booking.startTime);
+        const endTime = new Date(booking.endTime);
+        const status = String(booking.status || '').toLowerCase();
+        const paymentStatus = String(booking.paymentStatus || '').toLowerCase();
+
+        // 1. Past Bookings: completed, cancelled, or pending bookings that have expired
+        if (status === 'completed' || status === 'cancelled' || (startTime < now && status === 'pending')) {
+            categorized.past.push({ booking, cardState: getPastCardState(booking, now) });
+        }
+        // 2. Upcoming Bookings: future bookings which are confirmed
+        else if (startTime > now && status === 'confirmed') {
+            categorized.upcoming.push({ booking, cardState: getUpcomingCardState(booking, now) });
+        }
+        // 3. Active Bookings: currently active or unpaid/pending payment
+        else {
+            categorized.active.push({ booking, cardState: getActiveCardState(booking, now) });
+        }
+    });
+
+    const displayList = categorized[currentActiveTab];
+
+    if (displayList.length === 0) {
         renderEmptyState();
         return;
     }
 
-    if (pageState === 'error') {
-        renderErrorState(lastErrorMessage);
-        return;
-    }
-
-    renderLoadingState();
+    displayList.forEach(({ booking, cardState }) => {
+        listContainer.appendChild(createTicketCard(booking, cardState));
+    });
 }
 
-function displayBookings() {
-    const bookingListContainer = document.querySelector('.booking-list');
-    if (!bookingListContainer) return;
+function getActiveCardState(booking, now) {
+    const startTime = new Date(booking.startTime);
+    const endTime = new Date(booking.endTime);
+    const paymentStatus = String(booking.paymentStatus || '').toLowerCase();
+    const status = String(booking.status || '').toLowerCase();
 
-    pageState = 'list';
-    bookingListContainer.innerHTML = '';
-
-    const totalPages = Math.ceil(allBookings.length / bookingsPerPage);
-    if (currentPage > totalPages) {
-        currentPage = totalPages || 1;
+    // 1. Pending payment (unpaid)
+    if (paymentStatus === 'pending' && status !== 'cancelled') {
+        return {
+            type: 'state-pending-pay',
+            badge: getTranslation('badge_pending_pay'),
+            icon: 'fa-wallet',
+            color: '#3182ce',
+            priceLabel: getTranslation('due_label'),
+            buttonText: getTranslation('btn_pay_now'),
+            action: 'pay'
+        };
     }
 
-    const startIndex = (currentPage - 1) * bookingsPerPage;
-    const endIndex = startIndex + bookingsPerPage;
-    const bookingsToDisplay = allBookings.slice(startIndex, endIndex);
-
-    bookingsToDisplay.forEach((booking) => {
-        bookingListContainer.appendChild(createBookingCard(booking));
-    });
-
-    if (totalPages > 1) {
-        bookingListContainer.appendChild(createPaginationControls(totalPages));
+    // 2. Expired / Overrun
+    if (status === 'confirmed' && endTime <= now) {
+        return {
+            type: 'state-expired',
+            badge: getTranslation('badge_expired'),
+            icon: 'fa-exclamation-triangle',
+            color: '#e53e3e',
+            priceLabel: getTranslation('penalty_label'),
+            buttonText: getTranslation('btn_pay_now'),
+            action: 'pay'
+        };
     }
+
+    // 3. Warning (expiring in less than 30 mins)
+    const timeLeftMs = endTime - now;
+    if (status === 'confirmed' && startTime <= now && endTime > now && timeLeftMs <= 30 * 60 * 1000) {
+        return {
+            type: 'state-warning',
+            badge: getTranslation('badge_warning'),
+            icon: 'fa-hourglass-half',
+            color: '#f26419',
+            priceLabel: getTranslation('total_label'),
+            buttonText: getTranslation('btn_extend'),
+            action: 'extend'
+        };
+    }
+
+    // 4. Normal active ticket
+    return {
+        type: 'state-active',
+        badge: getTranslation('badge_active'),
+        icon: 'fa-car',
+        color: '#2ec988',
+        priceLabel: getTranslation('fee_label'),
+        buttonText: getTranslation('btn_view_qr'),
+        action: 'qr'
+    };
 }
 
-function createPaginationControls(totalPages) {
-    const paginationDiv = document.createElement('div');
-    paginationDiv.className = 'pagination-controls';
-    paginationDiv.style.cssText = `
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        gap: 10px;
-        margin-top: 40px;
-        padding: 20px;
-    `;
+function getUpcomingCardState(booking, now) {
+    const startTime = new Date(booking.startTime);
+    const timeToStartMs = startTime - now;
 
-    const prevButton = document.createElement('button');
-    prevButton.type = 'button';
-    prevButton.textContent = `← ${getTranslation('previous')}`;
-    prevButton.disabled = currentPage === 1;
-    prevButton.style.cssText = `
-        padding: 12px 24px;
-        background: ${currentPage === 1 ? 'rgba(255, 255, 255, 0.1)' : 'rgba(255, 255, 255, 0.2)'};
-        color: white;
-        border: 2px solid rgba(255, 255, 255, 0.3);
-        border-radius: 50px;
-        font-weight: 600;
-        font-size: 14px;
-        cursor: ${currentPage === 1 ? 'not-allowed' : 'pointer'};
-        transition: all 0.3s ease;
-        opacity: ${currentPage === 1 ? '0.5' : '1'};
-    `;
-    prevButton.addEventListener('click', () => {
-        if (currentPage === 1) return;
-        currentPage -= 1;
-        displayBookings();
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-    });
-
-    const pageNumbersDiv = document.createElement('div');
-    pageNumbersDiv.style.cssText = `
-        display: flex;
-        gap: 8px;
-        align-items: center;
-    `;
-
-    for (let i = 1; i <= totalPages; i += 1) {
-        const pageButton = document.createElement('button');
-        pageButton.type = 'button';
-        pageButton.textContent = i;
-        pageButton.style.cssText = `
-            width: 40px;
-            height: 40px;
-            padding: 8px;
-            background: ${i === currentPage ? 'linear-gradient(135deg, #13b47e 0%, #1f6f35 100%)' : 'rgba(255, 255, 255, 0.2)'};
-            color: white;
-            border: 2px solid ${i === currentPage ? '#13b47e' : 'rgba(255, 255, 255, 0.3)'};
-            border-radius: 50%;
-            font-weight: ${i === currentPage ? '700' : '600'};
-            font-size: 14px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: ${i === currentPage ? '0 4px 15px rgba(19, 180, 126, 0.3)' : 'none'};
-        `;
-        pageButton.addEventListener('click', () => {
-            currentPage = i;
-            displayBookings();
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        });
-        pageNumbersDiv.appendChild(pageButton);
+    // 1. Upcoming near (within 2 hours)
+    if (timeToStartMs <= 2 * 60 * 60 * 1000) {
+        return {
+            type: 'state-upcoming-near',
+            badge: getTranslation('badge_upcoming_near'),
+            icon: 'fa-calendar-alt',
+            color: '#dd6b20',
+            priceLabel: getTranslation('paid_label'),
+            buttonText: getTranslation('btn_details'),
+            action: 'details'
+        };
     }
 
-    const nextButton = document.createElement('button');
-    nextButton.type = 'button';
-    nextButton.textContent = `${getTranslation('next')} →`;
-    nextButton.disabled = currentPage === totalPages;
-    nextButton.style.cssText = `
-        padding: 12px 24px;
-        background: ${currentPage === totalPages ? 'rgba(255, 255, 255, 0.1)' : 'rgba(255, 255, 255, 0.2)'};
-        color: white;
-        border: 2px solid rgba(255, 255, 255, 0.3);
-        border-radius: 50px;
-        font-weight: 600;
-        font-size: 14px;
-        cursor: ${currentPage === totalPages ? 'not-allowed' : 'pointer'};
-        transition: all 0.3s ease;
-        opacity: ${currentPage === totalPages ? '0.5' : '1'};
-    `;
-    nextButton.addEventListener('click', () => {
-        if (currentPage === totalPages) return;
-        currentPage += 1;
-        displayBookings();
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-    });
-
-    paginationDiv.appendChild(prevButton);
-    paginationDiv.appendChild(pageNumbersDiv);
-    paginationDiv.appendChild(nextButton);
-    return paginationDiv;
+    // 2. Upcoming far (unused ticket)
+    return {
+        type: 'state-upcoming-far',
+        badge: getTranslation('badge_upcoming_far'),
+        icon: 'fa-parking',
+        color: '#319795',
+        priceLabel: getTranslation('prepaid_label'),
+        buttonText: getTranslation('btn_use'),
+        action: 'qr'
+    };
 }
 
-function createBookingCard(booking) {
+function getPastCardState(booking, now) {
+    const status = String(booking.status || '').toLowerCase();
+    const startTime = new Date(booking.startTime);
+
+    if (status === 'completed') {
+        return {
+            type: 'state-completed',
+            badge: getTranslation('badge_completed'),
+            icon: 'fa-check-circle',
+            color: '#38a169',
+            priceLabel: getTranslation('total_label'),
+            buttonText: getTranslation('btn_review'),
+            action: 'review'
+        };
+    }
+
+    if (status === 'cancelled') {
+        return {
+            type: 'state-archived',
+            badge: getTranslation('badge_cancelled'),
+            icon: 'fa-times-circle',
+            color: '#a0aec0',
+            priceLabel: getTranslation('refund_label'),
+            buttonText: getTranslation('btn_rebook'),
+            action: 'rebook'
+        };
+    }
+
+    // Missed / expired unpaid booking
+    return {
+        type: 'state-archived',
+        badge: getTranslation('badge_overdue'),
+        icon: 'fa-times-circle',
+        color: '#a0aec0',
+        priceLabel: getTranslation('total_label'),
+        buttonText: getTranslation('btn_rebook'),
+        action: 'rebook'
+    };
+}
+
+function createTicketCard(booking, state) {
     const card = document.createElement('div');
-    card.className = 'booking-card';
+    card.className = `ticket-card ${state.type}`;
     card.dataset.bookingId = booking._id;
 
-    const canCancel = booking.status?.toLowerCase() === 'confirmed' && new Date(booking.startTime) > new Date();
-    const paymentStatus = String(booking.paymentStatus || '').toLowerCase();
-    const shouldShowPayNow = paymentStatus === 'pending' && booking.status?.toLowerCase() !== 'cancelled';
-
-    const getBadgeStyle = (status) => {
-        switch (String(status || '').toLowerCase()) {
-            case 'confirmed':
-                return 'background: linear-gradient(135deg, #13b47e 0%, #1f6f35 100%);';
-            case 'cancelled':
-                return 'background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);';
-            case 'completed':
-                return 'background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);';
-            default:
-                return 'background: linear-gradient(135deg, #95a5a6 0%, #7f8c8d 100%);';
-        }
-    };
-
-    const getPaymentBadgeStyle = (status) => {
-        switch (String(status || '').toLowerCase()) {
-            case 'paid':
-                return 'background: linear-gradient(135deg, #13b47e 0%, #1f6f35 100%);';
-            case 'pending':
-                return 'background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);';
-            case 'refunded':
-                return 'background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);';
-            default:
-                return 'background: linear-gradient(135deg, #95a5a6 0%, #7f8c8d 100%);';
-        }
-    };
+    // Build vehicle representation name from DB details
+    const spotName = booking.spot?.name || booking.spot?.address || getTranslation('unknown_location');
+    const ticketId = `TIC-${String(booking._id).substring(String(booking._id).length - 5).toUpperCase()}`;
 
     card.innerHTML = `
-        <div class="card-icon-col">
-            <div class="parking-icon">P</div>
-        </div>
-        <div class="card-details-col">
-            <h2 class="parking-name">${booking.spot?.address || getTranslation('unknown_location')}</h2>
-            <div class="details-grid">
-                <div class="detail-row">
-                    <span class="detail-label">${getTranslation('customer')}:</span>
-                    <span class="detail-value">${booking.user?.fullName || booking.guestFullName || getTranslation('not_available')}</span>
-                </div>
-                <div class="detail-row">
-                    <span class="detail-label">${getTranslation('email')}:</span>
-                    <span class="detail-value">${booking.user?.email || booking.guestEmail || getTranslation('not_available')}</span>
-                </div>
-                <div class="detail-row">
-                    <span class="detail-label">${getTranslation('phone')}:</span>
-                    <span class="detail-value">${booking.phoneNumber || booking.guestPhoneNumber || getTranslation('not_available')}</span>
-                </div>
-                <div class="detail-row">
-                    <span class="detail-label">${getTranslation('from')}:</span>
-                    <span class="detail-value">${formatDateTime(booking.startTime)}</span>
-                </div>
-                <div class="detail-row">
-                    <span class="detail-label">${getTranslation('to')}:</span>
-                    <span class="detail-value">${formatDateTime(booking.endTime)}</span>
-                </div>
-                <div class="detail-row">
-                    <span class="detail-label">${getTranslation('order_time')}:</span>
-                    <span class="detail-value">${formatDateTime(booking.createdAt)}</span>
-                </div>
-                <div class="detail-row">
-                    <span class="detail-label">${getTranslation('booking_status')}:</span>
-                    <span class="detail-value">
-                        <span class="badge" style="${getBadgeStyle(booking.status)}">${getBookingStatusLabel(booking.status)}</span>
-                    </span>
-                </div>
-                <div class="detail-row">
-                    <span class="detail-label">${getTranslation('payment_method')}:</span>
-                    <span class="detail-value">${getPaymentMethodLabel(booking.paymentMethod)}</span>
-                </div>
-                <div class="detail-row">
-                    <span class="detail-label">${getTranslation('payment_status')}:</span>
-                    <span class="detail-value">
-                        <span class="badge" style="${getPaymentBadgeStyle(booking.paymentStatus)}">${getPaymentStatusLabel(booking.paymentStatus)}</span>
-                    </span>
-                </div>
-                <div class="detail-row">
-                    <span class="detail-label">${getTranslation('payment_total')}:</span>
-                    <span class="detail-value">${formatCurrency(booking.totalPrice)}</span>
-                </div>
-                ${canCancel ? `
-                <div class="detail-row" style="margin-top: 15px; border-top: 2px solid rgba(0,0,0,0.1); padding-top: 15px;">
-                    <button class="cancel-booking-btn" data-booking-id="${booking._id}" type="button" style="
-                        width: 100%;
-                        padding: 12px 24px;
-                        background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
-                        color: white;
-                        border: none;
-                        border-radius: 50px;
-                        font-weight: 600;
-                        font-size: 14px;
-                        cursor: pointer;
-                        transition: all 0.3s ease;
-                        box-shadow: 0 4px 15px rgba(231, 76, 60, 0.3);
-                    ">
-                        ${getTranslation('cancel_booking')}
-                    </button>
-                </div>
-                ` : ''}
-                ${shouldShowPayNow ? `
-                <div class="detail-row" style="margin-top: 15px; border-top: 2px solid rgba(0,0,0,0.1); padding-top: 15px;">
-                    <button class="pay-now-btn" data-booking-id="${booking._id}" type="button" style="
-                        width: 100%;
-                        padding: 12px 24px;
-                        background: linear-gradient(135deg, #13b47e 0%, #1f6f35 100%);
-                        color: white;
-                        border: none;
-                        border-radius: 50px;
-                        font-weight: 600;
-                        font-size: 14px;
-                        cursor: pointer;
-                        transition: all 0.3s ease;
-                        box-shadow: 0 4px 15px rgba(19, 180, 126, 0.3);
-                    ">
-                        ${getTranslation('pay_now')}
-                    </button>
-                </div>
-                ` : ''}
+        <div class="ticket-icon-col">
+            <div class="ticket-icon-circle">
+                <i class="fas ${state.icon}"></i>
             </div>
+        </div>
+        <div class="ticket-details-col">
+            <div class="ticket-top-row">
+                <span class="ticket-code">#${ticketId}</span>
+                <span class="ticket-badge">${state.badge}</span>
+            </div>
+            <div class="ticket-info-item">
+                <i class="fas fa-map-marker-alt"></i>
+                <span>${spotName}</span>
+            </div>
+            <div class="ticket-info-item">
+                <i class="far fa-calendar-alt"></i>
+                <span>${formatDateTime(booking.startTime)} - ${formatDateTime(booking.endTime)}</span>
+            </div>
+        </div>
+        <div class="ticket-actions-col">
+            <span class="ticket-price-label">${state.priceLabel}</span>
+            <span class="ticket-price-value">${formatCurrency(booking.totalPrice)}</span>
+            <button class="ticket-btn" data-action="${state.action}" data-booking-id="${booking._id}">
+                ${state.buttonText}
+            </button>
         </div>
     `;
 
-    card.querySelector('.cancel-booking-btn')?.addEventListener('click', () => handleCancelBooking(booking._id));
-    card.querySelector('.pay-now-btn')?.addEventListener('click', () => handlePayNow(booking._id));
+    const button = card.querySelector('.ticket-btn');
+    if (button) {
+        button.addEventListener('click', (e) => {
+            const action = e.target.dataset.action;
+            const bId = e.target.dataset.bookingId;
+
+            if (action === 'qr') {
+                showQrCodeModal(ticketId);
+            } else if (action === 'pay') {
+                handlePayNow(bId);
+            } else if (action === 'extend') {
+                window.location.href = `/customer/index.html`; // Extend redirects to search for booking
+            } else if (action === 'details') {
+                window.location.href = `/customer/spot-details.html?id=${booking.spot?._id}`;
+            } else if (action === 'rebook') {
+                window.location.href = `/customer/index.html`;
+            } else if (action === 'review') {
+                window.location.href = `/customer/review?bookingId=${bId}`;
+            }
+        });
+    }
+
     return card;
+}
+
+/**
+ * QR Code modal triggers
+ */
+function showQrCodeModal(ticketCode) {
+    const modal = document.getElementById('qr-modal');
+    if (!modal) return;
+
+    const modalTitle = modal.querySelector('.qr-modal-title');
+    if (modalTitle) {
+        modalTitle.textContent = `Mã QR Vé: #${ticketCode}`;
+    }
+
+    modal.classList.add('active');
+}
+
+function closeQrCodeModal() {
+    const modal = document.getElementById('qr-modal');
+    if (modal) {
+        modal.classList.remove('active');
+    }
 }
 
 async function loadBookings() {
     const token = localStorage.getItem('userToken');
 
     if (!token) {
-        alert(getTranslation('login_required'));
-        window.location.href = 'login.html';
+        window.location.href = '/customer/login.html';
         return;
     }
 
@@ -529,8 +536,8 @@ async function loadBookings() {
     try {
         const response = await fetch(`${API_URL}/bookings/mybookings`, {
             headers: {
-                Authorization: `Bearer ${token}`,
-            },
+                Authorization: `Bearer ${token}`
+            }
         });
 
         if (!response.ok) {
@@ -540,54 +547,10 @@ async function loadBookings() {
         const bookings = await response.json();
         allBookings = bookings.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
-        if (allBookings.length === 0) {
-            renderEmptyState();
-            return;
-        }
-
-        displayBookings();
+        filterAndDisplayBookings();
     } catch (error) {
         console.error('Error loading bookings:', error);
         renderErrorState(error.message);
-    }
-}
-
-async function handleCancelBooking(bookingId) {
-    const confirmed = window.confirm(getTranslation('cancel_confirm'));
-    if (!confirmed) return;
-
-    const token = localStorage.getItem('userToken');
-    const cancelButton = document.querySelector(`.cancel-booking-btn[data-booking-id="${bookingId}"]`);
-
-    if (cancelButton) {
-        cancelButton.disabled = true;
-        cancelButton.textContent = getTranslation('cancelling');
-    }
-
-    try {
-        const response = await fetch(`${API_URL}/bookings/${bookingId}/cancel`, {
-            method: 'PUT',
-            headers: {
-                Authorization: `Bearer ${token}`,
-                'Content-Type': 'application/json',
-            },
-        });
-
-        if (!response.ok) {
-            const error = await response.json().catch(() => ({}));
-            throw new Error(error.message || getTranslation('cancel_failed'));
-        }
-
-        alert(getTranslation('cancel_success'));
-        await loadBookings();
-    } catch (error) {
-        console.error('Error cancelling booking:', error);
-        alert(`${getTranslation('cancel_failed')}: ${error.message}`);
-
-        if (cancelButton) {
-            cancelButton.disabled = false;
-            cancelButton.textContent = getTranslation('cancel_booking');
-        }
     }
 }
 
@@ -595,15 +558,14 @@ async function handlePayNow(bookingId) {
     const token = localStorage.getItem('userToken');
     if (!token) {
         alert(getTranslation('pay_login_required'));
-        window.location.href = 'login.html';
+        window.location.href = '/customer/login.html';
         return;
     }
 
-    const payNowButton = document.querySelector(`.pay-now-btn[data-booking-id="${bookingId}"]`);
-
-    if (payNowButton) {
-        payNowButton.disabled = true;
-        payNowButton.textContent = getTranslation('processing');
+    const payButton = document.querySelector(`.ticket-btn[data-booking-id="${bookingId}"]`);
+    if (payButton) {
+        payButton.disabled = true;
+        payButton.textContent = getTranslation('processing');
     }
 
     try {
@@ -611,9 +573,9 @@ async function handlePayNow(bookingId) {
             method: 'POST',
             headers: {
                 Authorization: `Bearer ${token}`,
-                'Content-Type': 'application/json',
+                'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ bookingId }),
+            body: JSON.stringify({ bookingId })
         });
 
         if (!response.ok) {
@@ -631,21 +593,37 @@ async function handlePayNow(bookingId) {
         console.error('Error initiating payment:', error);
         alert(`${getTranslation('pay_init_failed')}: ${error.message}`);
 
-        if (payNowButton) {
-            payNowButton.disabled = false;
-            payNowButton.textContent = getTranslation('pay_now');
+        if (payButton) {
+            payButton.disabled = false;
+            payButton.textContent = getTranslation('pay_now');
         }
     }
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
-    const hostLink = document.getElementById('host-link');
-    if (hostLink && window.HOST_URL) {
-        hostLink.href = `${window.HOST_URL}/login`;
-    }
+    // Tab switching event bindings
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            e.target.classList.add('active');
+            currentActiveTab = e.target.dataset.tab;
+            filterAndDisplayBookings();
+        });
+    });
 
-    document.getElementById('lang-en')?.addEventListener('click', () => setLanguage('en'));
-    document.getElementById('lang-vi')?.addEventListener('click', () => setLanguage('vi'));
+    // Close QR modal triggers
+    document.getElementById('qr-close-btn')?.addEventListener('click', closeQrCodeModal);
+    document.getElementById('qr-modal')?.addEventListener('click', (e) => {
+        if (e.target.id === 'qr-modal') {
+            closeQrCodeModal();
+        }
+    });
+
+    // Sidebar support alert trigger
+    document.getElementById('sidebar-help')?.addEventListener('click', (e) => {
+        e.preventDefault();
+        alert(currentLang === 'vi' ? 'Hệ thống hỗ trợ 24/7 đang được hoàn thiện. Vui lòng gọi Hotline: 0903.229.906' : '24/7 Support line is currently being updated. Please call Hotline: 0903.229.906');
+    });
 
     applyTranslations();
     await loadBookings();

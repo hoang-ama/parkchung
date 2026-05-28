@@ -7,9 +7,14 @@
  */
 function parseVietnameseDateString(dateString) {
     if (!dateString) return null;
-    const parts = dateString.match(/(\d{2})\/(\d{2})\/(\d{4}) (\d{2}):(\d{2})/);
+    const parts = dateString.match(/(\d{2})[./](\d{2})[./](\d{2,4}) (\d{2}):(\d{2})/);
     if (!parts) return null;
-    const day = parts[1], month = parts[2], year = parts[3], hours = parts[4], minutes = parts[5];
+    const day = parts[1], month = parts[2];
+    let year = parts[3];
+    const hours = parts[4], minutes = parts[5];
+    if (year.length === 2) {
+        year = '20' + year;
+    }
     const isoString = `${year}-${month}-${day}T${hours}:${minutes}:00`;
     return new Date(isoString);
 }

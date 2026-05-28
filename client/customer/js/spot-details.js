@@ -67,15 +67,15 @@ async function initializeSpotBookingPage(spotId) {
     function populateSpotInfo(spot) {
         // Spot Name
         const spotNameEl = document.getElementById('spot-name');
-        if (spotNameEl) spotNameEl.textContent = spot.name || 'Parking Spot';
+        if (spotNameEl) spotNameEl.textContent = spot.name || 'Bãi đỗ xe';
 
         // Address (full display)
         const spotAddressFull = document.getElementById('spot-address-full');
-        if (spotAddressFull) spotAddressFull.innerHTML = `<span class="icon">📍</span> ${spot.address || 'Address not available'}`;
+        if (spotAddressFull) spotAddressFull.innerHTML = `<span class="icon">📍</span> ${spot.address || 'Địa chỉ chưa có'}`;
 
         // Description
         const spotDescEl = document.getElementById('spot-description');
-        if (spotDescEl) spotDescEl.textContent = spot.description || 'No description available for this parking spot.';
+        if (spotDescEl) spotDescEl.textContent = spot.description || 'Chưa có mô tả cho bãi đỗ xe này.';
 
         // Operating Hours (structured operatingHours or legacy openTime fallback)
         const spotOpenTimeEl = document.getElementById('spot-open-time');
@@ -84,8 +84,8 @@ async function initializeSpotBookingPage(spotId) {
             if (spot.operatingHours && spot.operatingHours.schedule && spot.operatingHours.schedule.length > 0) {
                 // Render structured schedule (multi-slot compatible)
                 const dayLabels = {
-                    monday: 'Monday', tuesday: 'Tuesday', wednesday: 'Wednesday',
-                    thursday: 'Thursday', friday: 'Friday', saturday: 'Saturday', sunday: 'Sunday'
+                    monday: 'Thứ 2', tuesday: 'Thứ 3', wednesday: 'Thứ 4',
+                    thursday: 'Thứ 5', friday: 'Thứ 6', saturday: 'Thứ 7', sunday: 'Chủ nhật'
                 };
                 const jsDayMap = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
 
@@ -102,12 +102,12 @@ async function initializeSpotBookingPage(spotId) {
                         }
                         html += `<div class="schedule-row"><span class="schedule-day">${label}</span><span class="schedule-time">${timeStr}</span></div>`;
                     } else {
-                        html += `<div class="schedule-row schedule-closed"><span class="schedule-day">${label}</span><span class="schedule-time closed-label">Closed</span></div>`;
+                        html += `<div class="schedule-row schedule-closed"><span class="schedule-day">${label}</span><span class="schedule-time closed-label">Đóng cửa</span></div>`;
                     }
                 });
                 html += '</div>';
                 if (spot.operatingHours.notes && spot.operatingHours.notes.trim()) {
-                    html += `<div class="schedule-notes"><strong>📝 Notes:</strong> ${spot.operatingHours.notes}</div>`;
+                    html += `<div class="schedule-notes"><strong>📝 Ghi chú:</strong> ${spot.operatingHours.notes}</div>`;
                 }
                 spotOpenTimeEl.innerHTML = html;
 
@@ -131,7 +131,7 @@ async function initializeSpotBookingPage(spotId) {
                         });
                     }
 
-                    statusBadgeEl.textContent = isOpenNow ? '🟢 Open Now' : '🔴 Closed Now';
+                    statusBadgeEl.textContent = isOpenNow ? '🟢 Đang mở' : '🔴 Đóng cửa';
                     statusBadgeEl.className = `schedule-status-badge ${isOpenNow ? 'status-open' : 'status-closed'}`;
                 }
             } else if (spot.openTime && spot.openTime.trim()) {
@@ -142,10 +142,10 @@ async function initializeSpotBookingPage(spotId) {
                     .filter(line => line.length > 0)
                     .map(line => `<p class="hours-line">${line}</p>`)
                     .join('');
-                spotOpenTimeEl.innerHTML = formattedHours || '<p>No operating hours specified.</p>';
+                spotOpenTimeEl.innerHTML = formattedHours || '<p>Chưa có giờ hoạt động.</p>';
                 if (statusBadgeEl) statusBadgeEl.style.display = 'none';
             } else {
-                spotOpenTimeEl.innerHTML = '<p>No operating hours specified.</p>';
+                spotOpenTimeEl.innerHTML = '<p>Chưa có giờ hoạt động.</p>';
                 if (statusBadgeEl) statusBadgeEl.style.display = 'none';
             }
         }
@@ -190,22 +190,22 @@ async function initializeSpotBookingPage(spotId) {
         const hourlyRateEl = document.getElementById('spot-hourly-rate');
         if (hourlyRateEl) {
             hourlyRateEl.textContent = spot.hourlyRate
-                ? `${spot.hourlyRate.toLocaleString('vi-VN')} VND/hour`
-                : 'Call for price';
+                ? `${spot.hourlyRate.toLocaleString('vi-VN')} VND/giờ`
+                : 'Liên hệ để biết giá';
         }
 
         // Monthly Rate
         const monthlyRateEl = document.getElementById('spot-monthly-rate');
         if (monthlyRateEl) {
             monthlyRateEl.textContent = spot.monthlyRate
-                ? `${spot.monthlyRate.toLocaleString('vi-VN')} VND/month`
-                : 'Not available';
+                ? `${spot.monthlyRate.toLocaleString('vi-VN')} VND/tháng`
+                : 'Không có';
         }
 
         // Number of Slots
         const slotsEl = document.getElementById('spot-slots');
         if (slotsEl) {
-            slotsEl.textContent = 'Unknown';
+            slotsEl.textContent = 'Chưa xác định';
         }
 
         // Vehicle Types
@@ -217,9 +217,9 @@ async function initializeSpotBookingPage(spotId) {
                 'truck': '🚚'
             };
             const vehicleLabels = {
-                'car': 'Car',
-                'motorbike': 'Motorbike',
-                'truck': 'Small Truck'
+                'car': 'Ô tô',
+                'motorbike': 'Xe máy',
+                'truck': 'Xe tải nhỏ'
             };
 
             vehicleTypesContainer.innerHTML = spot.vehicleTypes.map(type => `
@@ -234,8 +234,8 @@ async function initializeSpotBookingPage(spotId) {
         const paymentMethodsContainer = document.getElementById('payment-methods-container');
         if (paymentMethodsContainer && spot.paymentMethods) {
             const paymentInfo = {
-                'cash': { icon: '💵', name: 'Cash', desc: 'Pay at the spot' },
-                'paypal': { icon: '💳', name: 'PayPal', desc: 'Online payment' }
+                'cash': { icon: '💵', name: 'Tiền mặt', desc: 'Thanh toán tại bãi' },
+                'paypal': { icon: '💳', name: 'PayPal', desc: 'Thanh toán trực tuyến' }
             };
 
             paymentMethodsContainer.innerHTML = spot.paymentMethods.map(method => {
@@ -341,21 +341,21 @@ async function initializeSpotBookingPage(spotId) {
                         callToBookBtn.href = '#';
                         callToBookBtn.addEventListener('click', (e) => {
                             e.preventDefault();
-                            if (confirm('Please log in to see the full phone number and make a call. Would you like to log in now?')) {
-                                window.location.href = `login.html?redirect=${encodeURIComponent(window.location.href)}`;
+                            if (confirm('Vui lòng đăng nhập để xem số điện thoại đầy đủ. Bạn có muốn đăng nhập ngay?')) {
+                                window.location.href = `/customer/login?redirect=${encodeURIComponent(window.location.href)}`;
                             }
                         });
                     }
                     callToBookBtn.style.display = 'block';
                 } else if (callToBookBtn) {
                     // No phone available - show a placeholder
-                    if (callPhoneDisplay) callPhoneDisplay.textContent = 'Contact for booking';
+                    if (callPhoneDisplay) callPhoneDisplay.textContent = 'Liên hệ để đặt chỗ';
                     callToBookBtn.style.display = 'block';
                     callToBookBtn.href = '#';
                     callToBookBtn.addEventListener('click', (e) => {
-                        e.preventDefault();
-                        alert('Please contact the parking spot owner to make a booking.');
-                    });
+                            e.preventDefault();
+                            alert('Vui lòng liên hệ chủ bãi để đặt chỗ.');
+                        });
                 }
 
                 // Hide booking date pickers and price summary for call-only spots
@@ -391,6 +391,7 @@ async function initializeSpotBookingPage(spotId) {
         const urlParams = new URLSearchParams(window.location.search);
         const arrivalParam = urlParams.get('arrival');
         const leavingParam = urlParams.get('leaving');
+        const isValet = urlParams.get('type') === 'valet';
 
         const params = new URLSearchParams({
             id: spotId
@@ -403,8 +404,13 @@ async function initializeSpotBookingPage(spotId) {
         if (leavingParam) {
             params.set('leaving', leavingParam);
         }
+        if (isValet) {
+            params.set('type', 'valet');
+            params.set('dropoff', urlParams.get('dropoff') || '');
+            params.set('pickup', urlParams.get('pickup') || '');
+        }
 
-        window.location.href = `booking-config.html?${params.toString()}`;
+        window.location.href = `/customer/booking-config?${params.toString()}`;
     });
 
     loadSpotDetails(); // Gọi khi initializeSpotBookingPage được gọi

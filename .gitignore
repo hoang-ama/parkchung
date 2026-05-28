@@ -23,3 +23,18 @@ Thumbs.db
 Parkchung_Resource/
 File_Nginx.txt
 .agent/
+
+# Bypass thư mục test/debug scripts tự động sinh ra
+scratch/
+.chrome-profile/
+awf/
+agent-skills-standard/
+
+# Bypass file test ở root (chỉ dùng để debug local)
+test-*.js
+check-spots.js
+fetch-spots.js
+spots.json
+
+# Bypass AI/editor config
+.gemini/

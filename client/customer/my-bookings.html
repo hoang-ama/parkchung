@@ -1,13 +1,26 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Bookings | Parkchung</title>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <title>Quản lý Vé của tôi | Parkchung</title>
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
     <style>
-        /* Reset & Base */
+        /* Base Reset & Variables */
+        :root {
+            --primary: #2DC989;
+            --primary-dark: #1f9e68;
+            --primary-light: rgba(45, 201, 137, 0.15);
+            --dark-bg: #11222c;
+            --light-bg: #f4f5f8;
+            --card-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            --transition: all 0.3s ease;
+        }
+
         * {
             box-sizing: border-box;
             margin: 0;
@@ -15,10 +28,10 @@
         }
 
         body {
-            font-family: "Montserrat", sans-serif;
-            background: linear-gradient(135deg, #13b47e 0%, #1f6f35 100%);
+            font-family: "Montserrat", "Inter", sans-serif;
+            background-color: var(--light-bg);
+            color: #2d3748;
             min-height: 100vh;
-            color: #333;
             line-height: 1.5;
         }
 
@@ -27,328 +40,807 @@
             color: inherit;
         }
 
-        /* Layout Utilities */
-        .container {
-            max-width: 1140px;
-            margin: 0 auto;
-            padding: 0 20px;
+        button {
+            font-family: inherit;
+            border: none;
+            outline: none;
+            cursor: pointer;
         }
 
-        /* Header */
+        /* ======= HEADER ======= */
         header {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-            padding: 15px 0;
+            background-color: var(--dark-bg);
+            padding: 12px 0;
+            color: #ffffff;
+            position: sticky;
+            top: 0;
+            z-index: 100;
         }
 
-        .header-content {
+        .header-container {
+            max-width: 1440px;
+            margin: 0 auto;
+            padding: 0 40px;
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
 
-        .logo-area {
+        .header-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .header-logo img {
+            height: 32px;
+        }
+
+        .header-logo-text {
             display: flex;
             flex-direction: column;
         }
 
-        .logo-text {
-            font-size: 24px;
-            font-weight: 700;
-            color: #13b47e;
+        .header-brand {
+            font-size: 20px;
+            font-weight: 800;
             letter-spacing: 1px;
-            transition: color 0.3s ease;
-        }
-
-        .logo-text:hover {
-            color: #1f6f35;
-        }
-
-        .logo-slogan {
-            font-size: 12px;
-            color: #777;
-            margin-top: 2px;
-        }
-
-        .nav-menu {
-            display: flex;
-            gap: 30px;
-            align-items: center;
-        }
-
-        .nav-item {
-            font-size: 15px;
-            font-weight: 500;
-            color: #555;
-            transition: all 0.3s ease;
-            padding: 8px 16px;
-            border-radius: 20px;
-        }
-
-        .nav-item:hover {
-            color: #13b47e;
-            background: rgba(19, 180, 126, 0.1);
-        }
-
-        .nav-item.active {
             color: #ffffff;
-            background: linear-gradient(135deg, #13b47e 0%, #1f6f35 100%);
+        }
+
+        .header-tagline {
+            font-size: 10px;
+            color: #8892b0;
+            font-weight: 500;
+        }
+
+        .header-nav {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+        }
+
+        .become-host-link {
+            font-size: 14px;
+            font-weight: 600;
+            color: #e2e8f0;
+            transition: var(--transition);
+        }
+
+        .become-host-link:hover {
+            color: var(--primary);
+        }
+
+        .my-account-btn {
+            background-color: var(--primary);
+            color: #ffffff;
+            font-size: 14px;
             font-weight: 700;
-            box-shadow: 0 4px 15px rgba(19, 180, 126, 0.3);
+            padding: 8px 18px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 10px rgba(45, 201, 137, 0.3);
+            transition: var(--transition);
         }
 
-        /* Page Title Section */
-        .page-title-section {
-            background: rgba(255, 255, 255, 0.15);
-            backdrop-filter: blur(10px);
-            padding: 30px 0;
-            margin-bottom: 40px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        .my-account-btn:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-1px);
         }
 
-        .page-title-content {
+        .logout-link {
+            font-size: 14px;
+            font-weight: 600;
+            color: #cbd5e0;
+            transition: var(--transition);
+        }
+
+        .logout-link:hover {
+            color: #fc8181;
+        }
+
+        /* Language Switcher */
+        .lang-switcher {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 12px;
+            transition: var(--transition);
+        }
+
+        .lang-switcher:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .lang-flag {
+            width: 20px;
+            height: 14px;
+            object-fit: cover;
+            border-radius: 2px;
+        }
+
+        .lang-arrow {
+            font-size: 8px;
+            color: #a0aec0;
+        }
+
+        /* ======= DASHBOARD LAYOUT ======= */
+        .dashboard-container {
+            max-width: 1440px;
+            margin: 40px auto;
+            padding: 0 40px;
+            display: flex;
+            gap: 40px;
+        }
+
+        /* Left Sidebar */
+        aside.sidebar-v3 {
+            width: 260px;
+            background: #ffffff;
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: var(--card-shadow);
+            align-self: flex-start;
+        }
+
+        .sidebar-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 18px;
+            font-size: 15px;
+            font-weight: 600;
+            color: #718096;
+            border-radius: 12px;
+            margin-bottom: 8px;
+            transition: var(--transition);
+        }
+
+        .sidebar-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .sidebar-item i {
+            font-size: 18px;
+        }
+
+        .sidebar-item:hover {
+            color: var(--primary);
+            background: var(--primary-light);
+        }
+
+        .sidebar-item.active {
+            background: var(--primary);
+            color: #ffffff;
+            box-shadow: 0 4px 12px rgba(45, 201, 137, 0.25);
+        }
+
+        /* Right Content Panel */
+        main.main-content-v3 {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Content Title & Tabs Header */
+        .content-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
+            margin-bottom: 24px;
         }
 
         .page-title {
-            font-size: 32px;
+            font-size: 28px;
+            font-weight: 800;
+            color: #1a202c;
+        }
+
+        .page-title::after {
+            content: '.';
+            color: var(--primary);
+        }
+
+        .tabs-container {
+            display: flex;
+            background: #edf2f7;
+            border-radius: 24px;
+            padding: 4px;
+            gap: 4px;
+        }
+
+        .tab-btn {
+            padding: 8px 24px;
+            font-size: 14px;
             font-weight: 700;
-            color: #ffffff;
-            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            color: #718096;
+            background: transparent;
+            border-radius: 20px;
+            transition: var(--transition);
         }
 
-        .back-link {
-            color: #ffffff;
-            font-size: 15px;
-            font-weight: 600;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 10px 24px;
-            background: rgba(255, 255, 255, 0.2);
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            border-radius: 50px;
-            transition: all 0.3s ease;
-            backdrop-filter: blur(10px);
+        .tab-btn:hover {
+            color: #2d3748;
         }
 
-        .back-link:hover {
-            background: rgba(255, 255, 255, 0.3);
-            border-color: rgba(255, 255, 255, 0.5);
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        .tab-btn.active {
+            background: #ffffff;
+            color: var(--primary);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
         }
 
-        /* Booking List */
+        /* ======= BOOKINGS LIST ======= */
         .booking-list {
             display: flex;
             flex-direction: column;
-            gap: 25px;
-            padding-bottom: 60px;
+            gap: 20px;
+            padding-bottom: 40px;
         }
 
-        /* Booking Card */
-        .booking-card {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(20px);
-            border-radius: 20px;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+        /* Loading / Empty / Error State */
+        .status-container {
+            background: #ffffff;
+            border-radius: 16px;
+            box-shadow: var(--card-shadow);
+            padding: 60px 40px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .status-icon {
+            font-size: 48px;
+            color: #cbd5e0;
+            margin-bottom: 20px;
+        }
+
+        .status-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #2d3748;
+            margin-bottom: 10px;
+        }
+
+        .status-desc {
+            font-size: 14.5px;
+            color: #718096;
+            margin-bottom: 24px;
+            max-width: 400px;
+        }
+
+        .status-btn {
+            background-color: var(--primary);
+            color: #ffffff;
+            font-size: 14px;
+            font-weight: 700;
+            padding: 12px 28px;
+            border-radius: 30px;
+            box-shadow: 0 4px 10px rgba(45, 201, 137, 0.2);
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .status-btn:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        /* ======= TICKET CARDS SYSTEM ======= */
+        .ticket-card {
+            background: #ffffff;
+            border-radius: 16px;
+            box-shadow: var(--card-shadow);
             display: flex;
             overflow: hidden;
-            transition: all 0.3s ease;
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            animation: slideUp 0.5s ease-out;
+            transition: var(--transition);
+            border: 1px solid #e2e8f0;
+            box-sizing: border-box;
         }
 
-        @keyframes slideUp {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        .ticket-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
         }
 
-        .booking-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.2);
-        }
-
-        /* Left Column: Icon */
-        .card-icon-col {
+        /* Left Icon Column */
+        .ticket-icon-col {
             width: 100px;
-            background: linear-gradient(135deg, #13b47e 0%, #1f6f35 100%);
             display: flex;
             align-items: center;
             justify-content: center;
             flex-shrink: 0;
             position: relative;
-            overflow: hidden;
         }
 
-        .card-icon-col::before {
-            content: '';
-            position: absolute;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(255, 255, 255, 0.2) 0%, transparent 70%);
-            animation: pulse 3s ease-in-out infinite;
-        }
-
-        @keyframes pulse {
-
-            0%,
-            100% {
-                transform: scale(0.8);
-                opacity: 0.5;
-            }
-
-            50% {
-                transform: scale(1.2);
-                opacity: 0.8;
-            }
-        }
-
-        .parking-icon {
-            color: #fff;
-            font-size: 40px;
-            font-weight: 700;
-            border: 3px solid #fff;
-            width: 60px;
-            height: 60px;
-            border-radius: 12px;
+        .ticket-icon-circle {
+            width: 54px;
+            height: 54px;
+            border-radius: 50%;
+            border: 2px solid #ffffff;
             display: flex;
             align-items: center;
             justify-content: center;
-            background: rgba(255, 255, 255, 0.1);
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-            z-index: 1;
+            color: #ffffff;
+            font-size: 24px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
         }
 
-        /* Right Column: Details */
-        .card-details-col {
+        /* Details Column */
+        .ticket-details-col {
             flex-grow: 1;
-            padding: 30px;
-        }
-
-        .parking-name {
-            font-size: 20px;
-            font-weight: 700;
-            background: linear-gradient(135deg, #13b47e 0%, #1f6f35 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            margin-bottom: 20px;
-        }
-
-        .details-grid {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 12px;
-        }
-
-        .detail-row {
+            padding: 24px 30px;
             display: flex;
-            align-items: baseline;
-            font-size: 14px;
-            padding: 8px 0;
-            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            flex-direction: column;
+            justify-content: center;
         }
 
-        .detail-row:last-child {
-            border-bottom: none;
+        .ticket-top-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
         }
 
-        .detail-label {
+        .ticket-code {
+            font-size: 16px;
+            font-weight: 800;
+            color: #1a202c;
+        }
+
+        .ticket-badge {
+            font-size: 10.5px;
             font-weight: 700;
-            color: #2d3748;
-            width: 140px;
+            padding: 4px 10px;
+            border-radius: 20px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .ticket-info-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13.5px;
+            font-weight: 600;
+            color: #4a5568;
+            margin-bottom: 6px;
+        }
+
+        .ticket-info-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .ticket-info-item i {
+            font-size: 14px;
+            width: 16px;
+            color: #a0aec0;
+        }
+
+        /* Right Actions Column */
+        .ticket-actions-col {
+            width: 220px;
+            padding: 24px 30px;
+            border-left: 1px dashed #e2e8f0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: flex-end;
             flex-shrink: 0;
         }
 
-        .detail-value {
+        .ticket-price-label {
+            font-size: 10px;
+            font-weight: 700;
+            color: #a0aec0;
+            text-transform: uppercase;
+            margin-bottom: 2px;
+        }
+
+        .ticket-price-value {
+            font-size: 18px;
+            font-weight: 800;
+            color: #2d3748;
+            margin-bottom: 16px;
+        }
+
+        .ticket-btn {
+            width: 100%;
+            padding: 10px 16px;
+            font-size: 13px;
+            font-weight: 700;
+            border-radius: 8px;
+            text-align: center;
+            transition: var(--transition);
+        }
+
+        /* ======= CARD STATE STYLES (MATCHING FIGMA) ======= */
+        
+        /* 1. GREEN CARD (ĐANG DÙNG) */
+        .ticket-card.state-active {
+            background: linear-gradient(135deg, #2ec988 0%, #1f9e68 100%);
+            border-color: #2ec988;
+            color: #ffffff;
+        }
+        .ticket-card.state-active .ticket-icon-col {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        .ticket-card.state-active .ticket-icon-circle {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        .ticket-card.state-active .ticket-code {
+            color: #ffffff;
+        }
+        .ticket-card.state-active .ticket-badge {
+            background: #ffffff;
+            color: #1f9e68;
+        }
+        .ticket-card.state-active .ticket-info-item {
+            color: rgba(255, 255, 255, 0.9);
+        }
+        .ticket-card.state-active .ticket-info-item i {
+            color: rgba(255, 255, 255, 0.7);
+        }
+        .ticket-card.state-active .ticket-actions-col {
+            border-left-color: rgba(255, 255, 255, 0.2);
+        }
+        .ticket-card.state-active .ticket-price-label {
+            color: rgba(255, 255, 255, 0.7);
+        }
+        .ticket-card.state-active .ticket-price-value {
+            color: #ffffff;
+        }
+        .ticket-card.state-active .ticket-btn {
+            background: #ffffff;
+            color: #1f9e68;
+        }
+        .ticket-card.state-active .ticket-btn:hover {
+            background: #f7fafc;
+            transform: scale(1.02);
+        }
+
+        /* 2. ORANGE CARD (SẮP HẾT GIỜ ĐỖ) */
+        .ticket-card.state-warning {
+            background: linear-gradient(135deg, #f26419 0%, #d84b05 100%);
+            border-color: #f26419;
+            color: #ffffff;
+        }
+        .ticket-card.state-warning .ticket-icon-col {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        .ticket-card.state-warning .ticket-icon-circle {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        .ticket-card.state-warning .ticket-code {
+            color: #ffffff;
+        }
+        .ticket-card.state-warning .ticket-badge {
+            background: #ffffff;
+            color: #f26419;
+        }
+        .ticket-card.state-warning .ticket-info-item {
+            color: rgba(255, 255, 255, 0.9);
+        }
+        .ticket-card.state-warning .ticket-info-item i {
+            color: rgba(255, 255, 255, 0.7);
+        }
+        .ticket-card.state-warning .ticket-actions-col {
+            border-left-color: rgba(255, 255, 255, 0.2);
+        }
+        .ticket-card.state-warning .ticket-price-label {
+            color: rgba(255, 255, 255, 0.7);
+        }
+        .ticket-card.state-warning .ticket-price-value {
+            color: #ffffff;
+        }
+        .ticket-card.state-warning .ticket-btn {
+            background: #ffffff;
+            color: #f26419;
+        }
+        .ticket-card.state-warning .ticket-btn:hover {
+            background: #f7fafc;
+            transform: scale(1.02);
+        }
+
+        /* 3. RED BORDER CARD (QUÁ GIỜ ĐỖ) */
+        .ticket-card.state-expired {
+            border: 2px solid #e53e3e;
+            box-shadow: 0 4px 20px rgba(229, 62, 62, 0.1);
+        }
+        .ticket-card.state-expired .ticket-icon-col {
+            background: #fff5f5;
+        }
+        .ticket-card.state-expired .ticket-icon-circle {
+            background: #e53e3e;
+            border-color: #e53e3e;
+        }
+        .ticket-card.state-expired .ticket-badge {
+            background: #fed7d7;
+            color: #e53e3e;
+        }
+        .ticket-card.state-expired .ticket-price-value {
+            color: #e53e3e;
+        }
+        .ticket-card.state-expired .ticket-btn {
+            background: #e53e3e;
+            color: #ffffff;
+        }
+        .ticket-card.state-expired .ticket-btn:hover {
+            background: #c53030;
+        }
+
+        /* 4. BLUE CARD (CHỜ THANH TOÁN) */
+        .ticket-card.state-pending-pay {
+            border: 2px solid #3182ce;
+        }
+        .ticket-card.state-pending-pay .ticket-icon-col {
+            background: #ebf8ff;
+        }
+        .ticket-card.state-pending-pay .ticket-icon-circle {
+            background: #3182ce;
+            border-color: #3182ce;
+        }
+        .ticket-card.state-pending-pay .ticket-badge {
+            background: #bee3f8;
+            color: #3182ce;
+        }
+        .ticket-card.state-pending-pay .ticket-btn {
+            background: #3182ce;
+            color: #ffffff;
+        }
+        .ticket-card.state-pending-pay .ticket-btn:hover {
+            background: #2b6cb0;
+        }
+
+        /* 5. YELLOW BORDER CARD (SẮP ĐẾN HẠN) */
+        .ticket-card.state-upcoming-near {
+            border: 2px solid #dd6b20;
+        }
+        .ticket-card.state-upcoming-near .ticket-icon-col {
+            background: #fffaf0;
+        }
+        .ticket-card.state-upcoming-near .ticket-icon-circle {
+            background: #dd6b20;
+            border-color: #dd6b20;
+        }
+        .ticket-card.state-upcoming-near .ticket-badge {
+            background: #feebc8;
+            color: #dd6b20;
+        }
+        .ticket-card.state-upcoming-near .ticket-btn {
+            background: #dd6b20;
+            color: #ffffff;
+        }
+        .ticket-card.state-upcoming-near .ticket-btn:hover {
+            background: #c05621;
+        }
+
+        /* 6. BLUE CARD (VÉ CHƯA DÙNG) */
+        .ticket-card.state-upcoming-far {
+            border: 2px solid #319795;
+        }
+        .ticket-card.state-upcoming-far .ticket-icon-col {
+            background: #e6fffa;
+        }
+        .ticket-card.state-upcoming-far .ticket-icon-circle {
+            background: #319795;
+            border-color: #319795;
+        }
+        .ticket-card.state-upcoming-far .ticket-badge {
+            background: #e6fffa;
+            color: #319795;
+        }
+        .ticket-card.state-upcoming-far .ticket-btn {
+            background: #319795;
+            color: #ffffff;
+        }
+        .ticket-card.state-upcoming-far .ticket-btn:hover {
+            background: #2c7a7b;
+        }
+
+        /* 7. GRAY CARD (VÉ QUÁ HẠN / ĐÃ HỦY) */
+        .ticket-card.state-archived {
+            background: #f7fafc;
+            border-color: #e2e8f0;
+        }
+        .ticket-card.state-archived .ticket-icon-col {
+            background: #edf2f7;
+        }
+        .ticket-card.state-archived .ticket-icon-circle {
+            background: #a0aec0;
+            border-color: #a0aec0;
+        }
+        .ticket-card.state-archived .ticket-badge {
+            background: #e2e8f0;
+            color: #4a5568;
+        }
+        .ticket-card.state-archived .ticket-price-value {
             color: #718096;
+        }
+        .ticket-card.state-archived .ticket-btn {
+            background: #ffffff;
+            border: 1px solid #cbd5e0;
+            color: #4a5568;
+        }
+        .ticket-card.state-archived .ticket-btn:hover {
+            background: #edf2f7;
+        }
+
+        /* 8. WHITE CARD WITH GREEN BORDER (ĐÃ DÙNG) */
+        .ticket-card.state-completed {
+            border: 2px solid #38a169;
+        }
+        .ticket-card.state-completed .ticket-icon-col {
+            background: #f0fff4;
+        }
+        .ticket-card.state-completed .ticket-icon-circle {
+            background: #38a169;
+            border-color: #38a169;
+        }
+        .ticket-card.state-completed .ticket-badge {
+            background: #c6f6d5;
+            color: #38a169;
+        }
+        .ticket-card.state-completed .ticket-btn {
+            background: #ffffff;
+            border: 1px solid #38a169;
+            color: #38a169;
+        }
+        .ticket-card.state-completed .ticket-btn:hover {
+            background: #f0fff4;
+        }
+
+        /* ======= QR CODE MODAL ======= */
+        .qr-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(5px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .qr-modal-overlay.active {
+            display: flex;
+        }
+
+        .qr-modal {
+            background: #ffffff;
+            border-radius: 20px;
+            padding: 30px;
+            width: 90%;
+            max-width: 380px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            text-align: center;
+            position: relative;
+            animation: popIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        @keyframes popIn {
+            from {
+                transform: scale(0.8);
+                opacity: 0;
+            }
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .qr-modal-close {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            font-size: 20px;
+            color: #a0aec0;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .qr-modal-close:hover {
+            color: #4a5568;
+        }
+
+        .qr-modal-title {
+            font-size: 18px;
+            font-weight: 800;
+            color: #1a202c;
+            margin-bottom: 20px;
+        }
+
+        .qr-code-box {
+            background: #f7fafc;
+            border-radius: 12px;
+            padding: 20px;
+            display: inline-block;
+            margin-bottom: 20px;
+            border: 1px dashed #e2e8f0;
+        }
+
+        .qr-code-box svg {
+            width: 160px;
+            height: 160px;
+        }
+
+        .qr-modal-desc {
+            font-size: 13.5px;
+            color: #718096;
+            line-height: 1.5;
             font-weight: 500;
         }
 
-        /* Badges */
-        .badge {
-            display: inline-block;
-            padding: 6px 16px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 600;
-            text-transform: capitalize;
-            color: #fff;
-            box-shadow: 0 4px 12px rgba(19, 180, 126, 0.3);
+        /* ======= RESPONSIVE ======= */
+        @media (max-width: 1024px) {
+            .dashboard-container {
+                flex-direction: column;
+                padding: 0 20px;
+                margin: 20px auto;
+            }
+
+            aside.sidebar-v3 {
+                width: 100%;
+                display: flex;
+                flex-direction: row;
+                justify-content: space-around;
+                padding: 12px;
+            }
+
+            .sidebar-item {
+                margin-bottom: 0;
+            }
         }
 
-        /* Responsive */
         @media (max-width: 768px) {
-            .container {
-                padding: 0 15px;
+            .header-container {
+                padding: 0 20px;
             }
 
-            .header-content {
+            .content-header {
                 flex-direction: column;
-                gap: 15px;
                 align-items: flex-start;
+                gap: 15px;
             }
 
-            .nav-menu {
+            .tabs-container {
                 width: 100%;
                 justify-content: space-between;
-                gap: 10px;
-                flex-wrap: wrap;
             }
 
-            .nav-item {
-                font-size: 13px;
-                padding: 6px 12px;
+            .tab-btn {
+                flex: 1;
+                text-align: center;
+                padding: 8px 12px;
             }
 
-            .page-title {
-                font-size: 24px;
-            }
-
-            .page-title-content {
-                flex-direction: column;
-                gap: 15px;
-                align-items: flex-start;
-            }
-
-            .booking-card {
+            .ticket-card {
                 flex-direction: column;
             }
 
-            .card-icon-col {
+            .ticket-icon-col {
                 width: 100%;
                 height: 80px;
             }
 
-            .card-details-col {
-                padding: 20px;
-            }
-
-            .parking-name {
-                font-size: 18px;
-            }
-
-            .detail-row {
-                flex-direction: column;
-                margin-bottom: 5px;
-                gap: 4px;
-            }
-
-            .detail-label {
+            .ticket-actions-col {
                 width: 100%;
-                margin-bottom: 2px;
+                border-left: none;
+                border-top: 1px dashed #e2e8f0;
+                align-items: stretch;
+            }
+
+            .ticket-price-value {
+                text-align: right;
             }
         }
     </style>
@@ -356,48 +848,77 @@
 
 <body>
 
-    <!-- Header -->
+    <!-- Header Section -->
     <header>
-        <div class="container header-content">
-            <div class="logo-area">
-                <a href="index.html" class="logo-text">PARKCHUNG</a>
-                <span class="logo-slogan" data-i18n="logo_slogan">Seamless Smart Parking, Safe & Easy</span>
+        <div class="header-container">
+            <div class="header-logo">
+                <a href="/customer/index.html">
+                    <img src="/assets/logo/logo.svg" alt="ParkChung" />
+                </a>
+                <div class="header-logo-text">
+                    <span class="header-brand">PARKCHUNG</span>
+                    <span class="header-tagline" data-i18n="logo_slogan">Seamless Smart Parking, Safe & Easy</span>
+                </div>
             </div>
-            <nav class="nav-menu">
-                <a href="#" class="nav-item" id="host-link" data-i18n="becomeHost">Host</a>
-                <a href="#" class="nav-item active" data-i18n="my_bookings">My Bookings</a>
-                <a href="my-profile.html" class="nav-item" data-i18n="my_profile">My Profile</a>
-                <a href="index.html" class="nav-item" id="user-welcome" data-i18n="welcome">Welcome</a>
-                <a href="login.html" class="nav-item" id="logout-link" data-i18n="logout">Logout</a>
-                <span style="margin: 0 10px; color: #ccc;">|</span>
-                <button id="lang-en" class="lang-btn"
-                    style="background:none;border:none;cursor:pointer;font-weight:500;padding:5px 8px;">EN</button>
-                <span style="color:#aaa;">/</span>
-                <button id="lang-vi" class="lang-btn"
-                    style="background:none;border:none;cursor:pointer;font-weight:500;padding:5px 8px;">VI</button>
+            <nav class="header-nav" id="customer-nav">
+                <!-- Loaded dynamically by JS -->
             </nav>
         </div>
     </header>
 
-    <!-- Page Title Section -->
-    <div class="page-title-section">
-        <div class="container page-title-content">
-            <h1 class="page-title" data-i18n="my_bookings">My Bookings</h1>
-            <a href="index.html" class="back-link">
-                <span>&#8592;</span> <span data-i18n="back_home">Back to Home</span>
+    <!-- Dashboard Main Layout -->
+    <div class="dashboard-container">
+        <!-- Left Sidebar Navigation -->
+        <aside class="sidebar-v3">
+            <a href="/customer/my-bookings.html" class="sidebar-item active">
+                <i class="fas fa-home"></i> <span data-i18n="nav_home">Trang chủ</span>
             </a>
+            <a href="#" class="sidebar-item" id="sidebar-help">
+                <i class="fas fa-question-circle"></i> <span data-i18n="nav_help">Hỗ trợ & trợ giúp</span>
+            </a>
+            <a href="/customer/my-profile.html" class="sidebar-item">
+                <i class="fas fa-user"></i> <span data-i18n="my_profile">Tài khoản</span>
+            </a>
+        </aside>
+
+        <!-- Right Main Panel -->
+        <main class="main-content-v3">
+            <!-- Header section of content -->
+            <div class="content-header">
+                <h1 class="page-title" data-i18n="my_bookings">Quản lý Vé của tôi</h1>
+                <div class="tabs-container">
+                    <button class="tab-btn active" id="tab-active" data-tab="active">Đang dùng</button>
+                    <button class="tab-btn" id="tab-upcoming" data-tab="upcoming">Sắp diễn ra</button>
+                    <button class="tab-btn" id="tab-past" data-tab="past">Đã dùng</button>
+                </div>
+            </div>
+
+            <!-- Dynamic Tickets Container -->
+            <div class="booking-list">
+                <!-- Rendered dynamically by JS -->
+            </div>
+        </main>
+    </div>
+
+    <!-- QR Code Modal (Popup) -->
+    <div class="qr-modal-overlay" id="qr-modal">
+        <div class="qr-modal">
+            <span class="qr-modal-close" id="qr-close-btn">&times;</span>
+            <h3 class="qr-modal-title">Mã QR Vé của bạn</h3>
+            <div class="qr-code-box">
+                <!-- QR Code mock using a clean vector path SVG -->
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+                    <path fill="#11222c" d="M0 0h30v10H10v20H0V0zm10 10h10v10H10V10zm60-10h30v30h-10V10H70V0zm10 10h10v10H80V10zM0 70h10v20h20v10H0V70zm10 20h10v-10H10v10zm60 10h30V70H90v20H70v10zm10-20h10v10H80v-10zM35 15h10v10H35v-10zm15 0h10v10H50v-10zm0 15h10v10H50v-10zm15 15h10v10H65v-10zm-30 0h10v10H35v-10zm-15 15h10v10H20v-10zm30 0h10v10H50v-10zm15 0h10v10H65v-10zm-30 15h10v10H35v-10zm15 0h10v10H50v-10z" />
+                    <rect x="40" y="40" width="20" height="20" fill="#2DC989" rx="2" />
+                </svg>
+            </div>
+            <p class="qr-modal-desc">Đưa mã này cho nhân viên bãi đỗ xe quét khi bạn ra/vào để tự động kiểm tra đặt chỗ.</p>
         </div>
     </div>
 
-    <!-- Main Content -->
-    <div class="container">
-        <div class="booking-list">
-            <!-- Bookings will be loaded dynamically by JavaScript -->
-        </div>
-    </div>
-
-    <script src="js/config.js"></script>
-    <script src="js/my-bookings.js"></script>
+    <!-- Configuration and Logic Scripts -->
+    <script src="/customer/js/config.js"></script>
+    <script src="/customer/js/my-bookings.js"></script>
 </body>
 
 </html>

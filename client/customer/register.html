@@ -1,73 +1,657 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title data-i18n="register_title">Create Your Account</title>
+    <title>Đăng ký | ParkChung - Smart Parking Here</title>
+    <meta name="description" content="Tạo tài khoản ParkChung miễn phí để đặt chỗ đỗ xe thông minh, nhanh chóng và tiết kiệm.">
     <link rel="icon" type="image/png" href="/assets/logo/favicon.png" />
-    <link rel="stylesheet" href="css/styles.css" />
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Montserrat+Alternates:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        .auth-container { display: flex; justify-content: center; align-items: center; padding: 50px 20px; }
-        .auth-form { background: white; padding: 40px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); width: 100%; max-width: 450px; }
-        .auth-form h2 { text-align: center; color: #13b47e; margin-bottom: 20px; }
-        .form-group { margin-bottom: 15px; }
-        .form-group label { display: block; margin-bottom: 5px; font-weight: 500; }
-        .form-group input { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; }
-        .auth-form button { width: 100%; padding: 12px; background-color: #13b47e; border: none; color: white; font-size: 16px; border-radius: 4px; cursor: pointer; transition: background-color 0.3s; }
-        .auth-form button:hover { background-color: #1f6f35; }
-        .form-link { text-align: center; margin-top: 15px; }
-        .form-link a { color: #13b47e; text-decoration: none; }
-        .field-error { min-height: 18px; margin-top: 6px; color: #c0392b; font-size: 13px; }
-        .form-error { min-height: 18px; margin-bottom: 15px; color: #c0392b; font-size: 14px; text-align: center; }
-        .input-invalid { border-color: #c0392b !important; }
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        :root {
+            --green-primary: #2DC989;
+            --green-dark: #0FB474;
+            --green-light: #60D4A1;
+            --green-muted: #F0FAF5;
+            --text-dark: #111827;
+            --text-mid: #4B5563;
+            --text-light: #6B7280;
+            --text-placeholder: #9CA3AF;
+            --border: #E5E7EB;
+            --error: #EF4444;
+            --white: #FFFFFF;
+        }
+
+        html, body {
+            font-family: 'Inter', sans-serif;
+            background: var(--white);
+            color: var(--text-dark);
+        }
+
+        /* ── Two-column layout ── */
+        .auth-layout {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* ── Left: Form section ── */
+        .auth-left {
+            flex: 0 0 55%;
+            display: flex;
+            flex-direction: column;
+            padding: 36px 72px 24px;
+        }
+
+        .auth-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            color: inherit;
+            margin-bottom: 0;
+        }
+
+        .auth-logo-icon img {
+            width: 47px;
+            height: 47px;
+            object-fit: contain;
+        }
+
+        .auth-logo-text h1 {
+            font-family: 'Montserrat Alternates', sans-serif;
+            font-size: 21px;
+            font-weight: 700;
+            color: var(--text-dark);
+            letter-spacing: 1px;
+            line-height: 1.2;
+        }
+
+        .auth-logo-text p {
+            font-size: 11px;
+            color: var(--text-light);
+        }
+
+        /* ── Form container ── */
+        .auth-form-wrapper {
+            flex: 1;
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            padding-top: 24px;
+        }
+
+        .auth-form-inner {
+            width: 100%;
+            max-width: 504px;
+        }
+
+        .auth-heading {
+            font-family: 'Inter', sans-serif;
+            font-size: 40px;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 0;
+            line-height: 1.1;
+        }
+
+        /* ── Social buttons ── */
+        .social-buttons {
+            display: flex;
+            gap: 14px;
+            padding-top: 18px;
+            margin-bottom: 0;
+        }
+
+        .social-btn {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 9px;
+            height: 48px;
+            border: 1.5px solid var(--border);
+            border-radius: 7px;
+            background: var(--white);
+            font-family: 'Inter', sans-serif;
+            font-size: 15px;
+            font-weight: 500;
+            color: var(--text-dark);
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+
+        .social-btn:hover {
+            border-color: var(--green-primary);
+            background: var(--green-muted);
+        }
+
+        .social-btn svg {
+            width: 20px;
+            height: 20px;
+            flex-shrink: 0;
+        }
+
+        /* ── Divider ── */
+        .auth-divider {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+            padding: 28px 0 20px;
+        }
+
+        .auth-divider-line {
+            flex: 1;
+            height: 1px;
+            background: var(--border);
+        }
+
+        .auth-divider-text {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-placeholder);
+            letter-spacing: 0.5px;
+        }
+
+        /* ── Form ── */
+        .register-form {
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+
+        /* Name row: two inputs side by side */
+        .form-row {
+            display: flex;
+            gap: 18px;
+        }
+
+        .form-row .form-group {
+            flex: 1;
+        }
+
+        .form-group {
+            position: relative;
+        }
+
+        .form-input {
+            width: 100%;
+            height: 52px;
+            padding: 0 14px;
+            border: 1.5px solid var(--border);
+            border-radius: 7px;
+            background: var(--white);
+            font-family: 'Inter', sans-serif;
+            font-size: 15px;
+            font-weight: 400;
+            color: var(--text-dark);
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .form-input::placeholder {
+            color: var(--text-placeholder);
+        }
+
+        .form-input:focus {
+            border-color: var(--green-primary);
+            box-shadow: 0 0 0 3px rgba(45, 201, 137, 0.15);
+        }
+
+        .form-input.input-error {
+            border-color: var(--error);
+        }
+
+        .form-input.input-error:focus {
+            box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.15);
+        }
+
+        /* Password wrapper */
+        .password-wrapper {
+            position: relative;
+        }
+
+        .password-wrapper .form-input {
+            padding-right: 48px;
+        }
+
+        .password-toggle {
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--text-light);
+            display: flex;
+            align-items: center;
+            padding: 0;
+            transition: color 0.2s;
+        }
+
+        .password-toggle:hover {
+            color: var(--green-primary);
+        }
+
+        /* Password row */
+        .password-row {
+            display: flex;
+            gap: 18px;
+        }
+
+        .password-row .form-group {
+            flex: 1;
+        }
+
+        /* Error messages */
+        .field-error {
+            font-size: 12px;
+            color: var(--error);
+            margin-top: 4px;
+            min-height: 16px;
+        }
+
+        .form-error-banner {
+            background: rgba(239, 68, 68, 0.08);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: var(--error);
+            border-radius: 7px;
+            padding: 12px 14px;
+            font-size: 14px;
+            margin-bottom: 16px;
+            display: none;
+        }
+
+        .form-error-banner.visible {
+            display: block;
+        }
+
+        /* ── Submit button ── */
+        .auth-submit-btn {
+            width: 100%;
+            height: 55px;
+            background: var(--green-primary);
+            color: var(--white);
+            border: none;
+            border-radius: 7px;
+            font-family: 'Inter', sans-serif;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.1s;
+            margin-top: 0;
+        }
+
+        .auth-submit-btn:hover {
+            background: var(--green-dark);
+        }
+
+        .auth-submit-btn:active {
+            transform: scale(0.99);
+        }
+
+        .auth-submit-btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+
+        /* ── Bottom link ── */
+        .auth-bottom {
+            padding: 24px 72px 36px;
+            display: flex;
+            align-items: center;
+        }
+
+        .auth-bottom-text {
+            font-family: 'Montserrat Alternates', sans-serif;
+            font-size: 16px;
+            font-weight: 400;
+            color: var(--text-mid);
+            margin-right: 4px;
+        }
+
+        .auth-bottom-link {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            height: 43px;
+            padding: 0 27px;
+            border: 1.5px solid var(--border);
+            border-radius: 7px;
+            font-family: 'Montserrat Alternates', sans-serif;
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text-dark);
+            text-decoration: none;
+            transition: all 0.2s;
+            margin-left: 10px;
+        }
+
+        .auth-bottom-link:hover {
+            border-color: var(--green-primary);
+            color: var(--green-primary);
+            background: var(--green-muted);
+        }
+
+        /* ── Right: Brand section ── */
+        .auth-right {
+            flex: 0 0 45%;
+            background: var(--green-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .auth-right-content {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            padding: 40px;
+        }
+
+        .auth-brand-watermark {
+            font-family: 'Montserrat Alternates', sans-serif;
+            font-size: 52px;
+            font-weight: 700;
+            color: var(--green-light);
+            letter-spacing: 4px;
+            line-height: 1;
+            margin-bottom: 40px;
+            opacity: 0.8;
+        }
+
+        .auth-parking-badge {
+            width: 200px;
+            height: 200px;
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: float 4s ease-in-out infinite;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+            margin: 0 auto;
+        }
+
+        .auth-parking-badge span {
+            font-family: 'Montserrat Alternates', sans-serif;
+            font-size: 100px;
+            font-weight: 700;
+            color: rgba(255, 255, 255, 0.9);
+            line-height: 1;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-15px); }
+        }
+
+        .auth-right::before {
+            content: '';
+            position: absolute;
+            width: 400px;
+            height: 400px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.08);
+            top: -100px;
+            right: -100px;
+        }
+
+        .auth-right::after {
+            content: '';
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.06);
+            bottom: -80px;
+            left: -80px;
+        }
+
+        .auth-benefits {
+            margin-top: 40px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .auth-benefit-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 12px;
+            padding: 14px 18px;
+            text-align: left;
+        }
+
+        .auth-benefit-icon {
+            font-size: 22px;
+            flex-shrink: 0;
+        }
+
+        .auth-benefit-text {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 14px;
+            font-weight: 500;
+            line-height: 1.4;
+        }
+
+        /* ── Responsive ── */
+        @media (max-width: 900px) {
+            .auth-right { display: none; }
+            .auth-left { flex: 1; padding: 24px 32px; }
+            .auth-bottom { padding: 20px 32px 24px; }
+            .auth-heading { font-size: 30px; }
+        }
+
+        @media (max-width: 600px) {
+            .form-row, .password-row { flex-direction: column; gap: 18px; }
+            .auth-left { padding: 20px; }
+            .auth-bottom { padding: 16px 20px; flex-wrap: wrap; }
+            .auth-heading { font-size: 26px; }
+            .social-buttons { flex-direction: column; }
+        }
     </style>
 </head>
+
 <body>
-    <header>
-        <div class="logo">
-             <a href="index.html" style="display: flex; align-items: center; text-decoration: none; color: inherit;">
-                <img src="../assets/logo/logo.svg" alt="Parkchung Logo" />
-                <div>
+    <div class="auth-layout">
+        <!-- Left: Form -->
+        <div class="auth-left">
+            <!-- Logo -->
+            <a href="/customer/index.html" class="auth-logo">
+                <div class="auth-logo-icon">
+                    <img src="/assets/logo/logo.svg" alt="ParkChung Logo">
+                </div>
+                <div class="auth-logo-text">
                     <h1>PARKCHUNG</h1>
-                    <p class="tagline" data-i18n="tagline">Save time. Save money. Save Earth</p>
+                    <p>Smart Parking Here</p>
                 </div>
             </a>
-        </div>
-        <nav>
-            </nav>
-    </header>
 
-    <main class="auth-container">
-        <form id="register-form" class="auth-form">
-            <h2 data-i18n="register_title">Create Your Account</h2>
-            <p id="register-form-error" class="form-error" aria-live="polite"></p>
-            <div class="form-group">
-                <label for="fullName" data-i18n="full_name">Full Name</label>
-                <input type="text" id="fullName" name="fullName" autocomplete="name" required>
+            <!-- Form -->
+            <div class="auth-form-wrapper">
+                <div class="auth-form-inner">
+                    <h2 class="auth-heading">Đăng ký.</h2>
+
+                    <!-- Error banner -->
+                    <div id="register-error" class="form-error-banner"></div>
+
+                    <!-- Social sign-up -->
+                    <div class="social-buttons">
+                        <button type="button" class="social-btn" id="google-signup-btn">
+                            <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M19.6 10.227c0-.709-.064-1.39-.182-2.045H10v3.868h5.382a4.6 4.6 0 0 1-1.996 3.018v2.51h3.232c1.891-1.742 2.982-4.305 2.982-7.35Z" fill="#4285F4"/>
+                                <path d="M10 20c2.7 0 4.964-.895 6.618-2.423l-3.232-2.509c-.895.6-2.04.955-3.386.955-2.605 0-4.81-1.76-5.595-4.123H1.064v2.59A9.996 9.996 0 0 0 10 20Z" fill="#34A853"/>
+                                <path d="M4.405 11.9A6.01 6.01 0 0 1 4.09 10c0-.663.114-1.305.314-1.9V5.51H1.064A9.996 9.996 0 0 0 0 10c0 1.614.386 3.14 1.064 4.49L4.405 11.9Z" fill="#FBBC05"/>
+                                <path d="M10 3.977c1.468 0 2.786.505 3.822 1.496l2.868-2.868C14.959.992 12.695 0 10 0A9.996 9.996 0 0 0 1.064 5.51l3.34 2.59C5.192 5.736 7.396 3.977 10 3.977Z" fill="#EA4335"/>
+                            </svg>
+                            Google
+                        </button>
+                        <button type="button" class="social-btn" id="facebook-signup-btn">
+                            <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M20 10C20 4.477 15.523 0 10 0S0 4.477 0 10c0 4.991 3.657 9.128 8.438 9.879V12.89h-2.54V10h2.54V7.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V10h2.773l-.443 2.89h-2.33v6.989C16.343 19.129 20 14.99 20 10Z" fill="#1877F2"/>
+                                <path d="m13.893 12.89.443-2.89h-2.773V8.124c0-.791.387-1.562 1.63-1.562h1.26v-2.46s-1.144-.196-2.238-.196c-2.285 0-3.777 1.385-3.777 3.89V10H5.898v2.89h2.54v6.989a10.06 10.06 0 0 0 3.124 0V12.89h2.33Z" fill="white"/>
+                            </svg>
+                            Facebook
+                        </button>
+                    </div>
+
+                    <!-- Divider -->
+                    <div class="auth-divider">
+                        <div class="auth-divider-line"></div>
+                        <span class="auth-divider-text">HOẶC</span>
+                        <div class="auth-divider-line"></div>
+                    </div>
+
+                    <!-- Register form -->
+                    <form id="register-form" class="register-form">
+                        <!-- Name row: Họ | Tên -->
+                        <div class="form-row">
+                            <div class="form-group">
+                                <input type="text" id="firstName" name="firstName" class="form-input"
+                                    placeholder="Họ" autocomplete="given-name">
+                            </div>
+                            <div class="form-group">
+                                <input type="text" id="lastName" name="lastName" class="form-input"
+                                    placeholder="Tên" autocomplete="family-name">
+                            </div>
+                        </div>
+
+                        <!-- Email -->
+                        <div class="form-group">
+                            <input type="email" id="email" name="email" class="form-input"
+                                placeholder="Địa chỉ Email" autocomplete="email" maxlength="254"
+                                aria-describedby="email-error" required>
+                            <p id="email-error" class="field-error" aria-live="polite"></p>
+                        </div>
+
+                        <!-- Phone -->
+                        <div class="form-group">
+                            <input type="tel" id="phone" name="phone" class="form-input"
+                                placeholder="Số điện thoại" autocomplete="tel" inputmode="tel" maxlength="16"
+                                aria-describedby="phone-error">
+                            <p id="phone-error" class="field-error" aria-live="polite"></p>
+                        </div>
+
+                        <!-- Password row -->
+                        <div class="password-row">
+                            <div class="form-group">
+                                <div class="password-wrapper">
+                                    <input type="password" id="password" name="password" class="form-input"
+                                        placeholder="Mật khẩu" autocomplete="new-password" required>
+                                    <button type="button" class="password-toggle" id="toggle-password" aria-label="Hiện mật khẩu">
+                                        <svg id="eye-show-1" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                                            <circle cx="12" cy="12" r="3"/>
+                                        </svg>
+                                        <svg id="eye-hide-1" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none">
+                                            <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/>
+                                            <line x1="1" y1="1" x2="23" y2="23"/>
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="password-wrapper">
+                                    <input type="password" id="confirmPassword" name="confirmPassword" class="form-input"
+                                        placeholder="Xác nhận mật khẩu" autocomplete="new-password">
+                                    <button type="button" class="password-toggle" id="toggle-confirm-password" aria-label="Hiện mật khẩu xác nhận">
+                                        <svg id="eye-show-2" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                                            <circle cx="12" cy="12" r="3"/>
+                                        </svg>
+                                        <svg id="eye-hide-2" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none">
+                                            <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/>
+                                            <line x1="1" y1="1" x2="23" y2="23"/>
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <p id="password-error" class="field-error" aria-live="polite" style="margin-top:-12px;"></p>
+
+                        <button type="submit" class="auth-submit-btn" id="register-submit-btn">
+                            Tạo tài khoản
+                        </button>
+                    </form>
+                </div>
             </div>
-            <div class="form-group">
-                <label for="email" data-i18n="email">Email</label>
-                <input type="email" id="email" name="email" autocomplete="email" inputmode="email" maxlength="254" aria-describedby="email-error" required>
-                <p id="email-error" class="field-error" aria-live="polite"></p>
+
+            <!-- Bottom login link -->
+            <div class="auth-bottom">
+                <span class="auth-bottom-text">Bạn đã có tài khoản?</span>
+                <a href="/customer/login.html" class="auth-bottom-link">Đăng nhập</a>
             </div>
-            <div class="form-group">
-                <label for="phone" data-i18n="phone">Phone</label>
-                <input type="tel" id="phone" name="phone" autocomplete="tel" inputmode="tel" maxlength="16" aria-describedby="phone-error">
-                <p id="phone-error" class="field-error" aria-live="polite"></p>
+        </div>
+
+        <!-- Right: Brand section -->
+        <div class="auth-right">
+            <div class="auth-right-content">
+                <div class="auth-brand-watermark">PARKCHUNG</div>
+                <div>
+                    <div class="auth-parking-badge">
+                        <span>P</span>
+                    </div>
+                </div>
+                <div class="auth-benefits">
+                    <div class="auth-benefit-item">
+                        <span class="auth-benefit-icon">🚗</span>
+                        <span class="auth-benefit-text">Đặt chỗ đỗ xe trong vài giây</span>
+                    </div>
+                    <div class="auth-benefit-item">
+                        <span class="auth-benefit-icon">💰</span>
+                        <span class="auth-benefit-text">Giá minh bạch, không phát sinh phụ phí</span>
+                    </div>
+                    <div class="auth-benefit-item">
+                        <span class="auth-benefit-icon">🔒</span>
+                        <span class="auth-benefit-text">Bãi đỗ an toàn, được xác minh</span>
+                    </div>
+                </div>
             </div>
-            <div class="form-group">
-                <label for="password" data-i18n="password">Password</label>
-                <input type="password" id="password" name="password" autocomplete="new-password" required>
-            </div>
-            <button type="submit" data-i18n="register">Register</button>
-            <p class="form-link"><span data-i18n="have_account">Already have an account?</span> <a href="login.html" data-i18n="login_here">Login here</a></p>
-        </form>
-    </main>
+        </div>
+    </div>
+
     <script src="/customer/js/custom-modal.js"></script>
-  <script src="/customer/js/config.js"></script>
-    <script src="/customer/js/results.js"></script>  
-    <script type="module" src="/customer/js/app.js"></script>
-    <script type="module" src="/customer/js/auth.js"></script>
+    <script src="/customer/js/config.js"></script>
+    <script type="module" src="/customer/js/auth-register.js"></script>
+    <script>
+        // Password toggles
+        function setupToggle(toggleId, inputId, showId, hideId) {
+            const btn = document.getElementById(toggleId);
+            const inp = document.getElementById(inputId);
+            const show = document.getElementById(showId);
+            const hide = document.getElementById(hideId);
+            if (!btn || !inp) return;
+            btn.addEventListener('click', () => {
+                const isPassword = inp.type === 'password';
+                inp.type = isPassword ? 'text' : 'password';
+                show.style.display = isPassword ? 'none' : 'block';
+                hide.style.display = isPassword ? 'block' : 'none';
+            });
+        }
+        setupToggle('toggle-password', 'password', 'eye-show-1', 'eye-hide-1');
+        setupToggle('toggle-confirm-password', 'confirmPassword', 'eye-show-2', 'eye-hide-2');
+
+        // Social buttons
+        document.getElementById('google-signup-btn')?.addEventListener('click', () => {
+            alert('Tính năng đăng ký bằng Google sẽ sớm được cập nhật.');
+        });
+        document.getElementById('facebook-signup-btn')?.addEventListener('click', () => {
+            alert('Tính năng đăng ký bằng Facebook sẽ sớm được cập nhật.');
+        });
+    </script>
 </body>
+
 </html>

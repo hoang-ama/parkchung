@@ -10,6 +10,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const endInput = document.getElementById('end-datetime');
     let debounceTimer;
     let startPicker, endPicker;
+    let lastPreviewQuery = '';
+    
+    // Default dates initialization
+    const now = new Date();
+    const defaultStart = roundTimeToNext30Minutes(now);
+    const defaultEnd = new Date(defaultStart.getTime() + 30 * 60 * 1000); // 30 mins later
 
     // --- CÁC HÀM XỬ LÝ ---
 
@@ -76,7 +82,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     // Redirect directly to spot details page with the spot ID
                     // This allows users to select arrival/departure times on the details page
                     // Note: spot-details.js expects the parameter to be named 'id'
-                    window.location.href = `spot-details.html?id=${item.id}`;
+                    window.location.href = `/customer/spot-details?id=${item.id}`;
                 };
                 suggestionsBox.appendChild(div);
             });
@@ -166,96 +172,131 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    searchForm.addEventListener('submit', (event) => {
+    searchForm.addEventListener('submit', async (event) => {
         event.preventDefault();
-        const locationText = locationInput.value.trim();
-        const startVal = startInput.value;
-        const endVal = endInput.value;
+        const mode = searchForm.getAttribute('data-mode') || 'pre';
 
-        if (!locationText || !startVal || !endVal) {
-            return alert('Please fill in all search fields.');
+        if (mode === 'valet') {
+            const valetDropoff = document.getElementById('valet-dropoff');
+            const valetPickup = document.getElementById('valet-pickup');
+            const valetStart = document.getElementById('valet-start');
+            const valetEnd = document.getElementById('valet-end');
+
+            const dropoffText = valetDropoff?.value.trim() || '';
+            // Nếu isDifferentReturn = false thì pickup = dropoff (cùng địa điểm)
+            const pickupText = isDifferentReturn
+                ? (valetPickup?.value.trim() || '')
+                : dropoffText;
+            const startVal = valetStart?.value || '';
+            const endVal = valetEnd?.value || '';
+
+            if (!dropoffText) {
+                return alert('Vui lòng nhập địa điểm giao xe.');
+            }
+            if (isDifferentReturn && !pickupText) {
+                return alert('Vui lòng nhập địa điểm trả xe.');
+            }
+            if (!startVal || !endVal) {
+                return alert('Vui lòng chọn thời gian giao xe và trả xe.');
+            }
+
+            const startDate = parseVietnameseDateString(startVal);
+            const endDate = parseVietnameseDateString(endVal);
+            const now = new Date();
+
+            if (!startDate || !endDate) {
+                return alert('Định dạng ngày giờ không hợp lệ. Vui lòng dùng bộ chọn ngày.');
+            }
+
+            if (startDate < new Date(now.getTime() - 60000)) {
+                alert('Thời gian giao xe phải là hiện tại hoặc trong tương lai.');
+                return;
+            }
+
+            if (startDate >= endDate) {
+                return alert('Thời gian kết thúc phải sau thời gian bắt đầu.');
+            }
+
+            const currentQuery = `${dropoffText}|${pickupText}|${startVal}|${endVal}`;
+            const previewCardVisible = valetPricePreview && valetPricePreview.style.display === 'block';
+
+            if (previewCardVisible && lastPreviewQuery === currentQuery) {
+                const queryParams = new URLSearchParams({
+                    id: valetDropoff?.dataset.spotId || '',
+                    type: 'valet',
+                    dropoff: dropoffText,
+                    pickup: pickupText,
+                    arrival: startDate.toISOString(),
+                    leaving: endDate.toISOString()
+                });
+                window.location.href = `/customer/valet-offer?${queryParams.toString()}`;
+            } else {
+                await updateValetPricePreview();
+                lastPreviewQuery = currentQuery;
+            }
+        } else {
+            const locationText = locationInput.value.trim();
+            const startVal = startInput.value;
+            const endVal = endInput.value;
+
+            if (!locationText || !startVal || !endVal) {
+                return alert('Vui lòng điền đầy đủ địa điểm và thời gian.');
+            }
+
+            const startDate = parseVietnameseDateString(startVal);
+            const endDate = parseVietnameseDateString(endVal);
+            const now = new Date();
+
+            if (!startDate || !endDate) {
+                return alert('Định dạng ngày giờ không hợp lệ. Vui lòng dùng bộ chọn ngày.');
+            }
+
+            if (startDate < new Date(now.getTime() - 60000)) { // Trừ 1 phút để tránh lỗi do độ trễ
+                alert('Thời gian đến phải là hiện tại hoặc trong tương lai.');
+                startPicker.setDate(now, true);
+                return;
+            }
+
+            if (startDate >= endDate) {
+                return alert('Thời gian kết thúc phải sau thời gian bắt đầu.');
+            }
+
+            const queryParams = new URLSearchParams({
+                startTime: startDate.toISOString(),
+                endTime: endDate.toISOString(),
+                q: locationText
+            });
+            window.location.href = `/customer/results?${queryParams.toString()}`;
         }
-
-        const startDate = parseVietnameseDateString(startVal);
-        const endDate = parseVietnameseDateString(endVal);
-        const now = new Date();
-
-        if (!startDate || !endDate) {
-            return alert('The date and time format is invalid. Please use the date picker.');
-        }
-
-        if (startDate < new Date(now.getTime() - 60000)) { // Trừ 1 phút để tránh lỗi do độ trễ
-            alert('Arrival time must be in the present or future.');
-            startPicker.setDate(now, true);
-            return;
-        }
-
-        if (startDate >= endDate) {
-            return alert('End time must be after the start time.');
-        }
-
-        const queryParams = new URLSearchParams({
-            startTime: startDate.toISOString(),
-            endTime: endDate.toISOString(),
-            q: locationText
-        });
-        window.location.href = `results.html?${queryParams.toString()}`;
     });
 
     // Cấu hình Flatpickr
 
-    // Helper function to add Confirm/Cancel buttons to Flatpickr
+    // Helper function to add Confirm button to Flatpickr (matching Figma style)
     function addConfirmCancelButtons(fp) {
-        let previousValue = fp.input.value;
-
-        // Create button container
-        const buttonContainer = document.createElement('div');
-        buttonContainer.className = 'flatpickr-button-container';
-
         // Create Confirm button
         const confirmBtn = document.createElement('button');
         confirmBtn.type = 'button';
         confirmBtn.className = 'flatpickr-confirm-btn';
-        confirmBtn.textContent = 'Confirm';
+        confirmBtn.textContent = 'XÁC NHẬN';
         confirmBtn.addEventListener('click', () => {
-            previousValue = fp.input.value;
             fp.close();
-        });
-
-        // Create Cancel button
-        const cancelBtn = document.createElement('button');
-        cancelBtn.type = 'button';
-        cancelBtn.className = 'flatpickr-cancel-btn';
-        cancelBtn.textContent = 'Cancel';
-        cancelBtn.addEventListener('click', () => {
-            if (previousValue) {
-                fp.input.value = previousValue;
-                const parsedDate = parseVietnameseDateString(previousValue);
-                if (parsedDate) {
-                    fp.setDate(parsedDate, false);
-                }
+            // Trigger price preview calculation if applicable
+            if (fp.element.id === 'valet-start' || fp.element.id === 'valet-end') {
+                updateValetPricePreview();
             }
-            fp.close();
         });
 
-        // Append buttons to container
-        buttonContainer.appendChild(confirmBtn);
-        buttonContainer.appendChild(cancelBtn);
-
-        // Append container to calendar
-        fp.calendarContainer.appendChild(buttonContainer);
-
-        // Store previous value when picker opens
-        fp.config.onOpen.push(() => {
-            previousValue = fp.input.value;
-        });
+        // Append button to calendar
+        fp.calendarContainer.appendChild(confirmBtn);
     }
 
     startPicker = flatpickr("#start-datetime", {
         enableTime: true,
-        dateFormat: "d/m/Y H:i",
+        dateFormat: "d.m.y H:i",
         time_24hr: true,
         minDate: "today",
+        defaultDate: defaultStart,
         onChange: function (selectedDates) {
             if (selectedDates[0]) {
                 endPicker.set('minDate', selectedDates[0]);
@@ -269,12 +310,330 @@ document.addEventListener('DOMContentLoaded', () => {
 
     endPicker = flatpickr("#end-datetime", {
         enableTime: true,
-        dateFormat: "d/m/Y H:i",
+        dateFormat: "d.m.y H:i",
         time_24hr: true,
         minDate: "today",
+        defaultDate: defaultEnd,
         onReady: function (selectedDates, dateStr, instance) {
             addConfirmCancelButtons(instance);
         },
         onOpen: []
     });
+
+    // ============ V3: BOOKING TAB TOGGLE ============
+    const tabPre = document.getElementById('tab-pre');
+    const tabValet = document.getElementById('tab-valet');
+    const preFields = document.getElementById('pre-fields');
+    const valetFields = document.getElementById('valet-fields');
+    const heroBg = document.getElementById('hero-bg');
+    const bookingForm = document.getElementById('searchForm');
+
+    function switchBookingTab(mode) {
+        if (mode === 'valet') {
+            tabPre?.classList.remove('active');
+            tabValet?.classList.add('active');
+            if (preFields) preFields.style.display = 'none';
+            if (valetFields) valetFields.style.display = 'flex';
+            heroBg?.classList.add('valet-mode');
+            if (bookingForm) bookingForm.setAttribute('data-mode', 'valet');
+            // Load default autocomplete valet data
+            loadValetDropdownData();
+        } else {
+            tabValet?.classList.remove('active');
+            tabPre?.classList.add('active');
+            if (valetFields) valetFields.style.display = 'none';
+            if (preFields) preFields.style.display = 'flex';
+            heroBg?.classList.remove('valet-mode');
+            if (bookingForm) bookingForm.setAttribute('data-mode', 'pre');
+        }
+    }
+
+    tabPre?.addEventListener('click', () => switchBookingTab('pre'));
+    tabValet?.addEventListener('click', () => switchBookingTab('valet'));
+
+    // ============ V3: VALET DROPDOWN 2 CỘT & ĐIỂM TRẢ XE TOGGLE ============
+    const valetDropoff = document.getElementById('valet-dropoff');
+    const valetPickup = document.getElementById('valet-pickup');
+    const valetDropoffContainer = document.getElementById('valet-dropoff-container');
+    const valetPickupContainer = document.getElementById('valet-pickup-container');
+    const toggleReturnLink = document.getElementById('toggle-return-link');
+    const valetDropdown = document.getElementById('valet-dropdown');
+    
+    let isDifferentReturn = false;
+    
+    if (toggleReturnLink && valetPickupContainer && valetDropoffContainer) {
+        toggleReturnLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            isDifferentReturn = !isDifferentReturn;
+            
+            const pickupDivider = document.getElementById('pickup-divider');
+            
+            if (isDifferentReturn) {
+                toggleReturnLink.textContent = '- Tôi muốn trả xe ở cùng địa điểm';
+                valetPickupContainer.style.display = 'flex';
+                valetDropoffContainer.classList.remove('full-width-v3');
+                if (pickupDivider) pickupDivider.style.display = 'block';
+            } else {
+                toggleReturnLink.textContent = '+ Địa điểm trả xe khác';
+                valetPickupContainer.style.display = 'none';
+                valetDropoffContainer.classList.add('full-width-v3');
+                if (pickupDivider) pickupDivider.style.display = 'none';
+                if (valetDropoff && valetPickup) {
+                    valetPickup.value = valetDropoff.value;
+                    valetPickup.dataset.spotId = valetDropoff.dataset.spotId;
+                }
+            }
+            updateValetPricePreview();
+        });
+    }
+
+    let activeValetCategory = 'airport';
+    let valetSearchQuery = '';
+
+    async function loadValetDropdownData() {
+        if (!valetDropdown) return;
+        const contentBox = valetDropdown.querySelector('.valet-dropdown-content');
+        if (!contentBox) return;
+
+        contentBox.innerHTML = '<div class="valet-dropdown-no-data"><i class="fas fa-spinner fa-spin"></i> Đang tải dữ liệu...</div>';
+
+        try {
+            let url = `${API_URL}/spots/autocomplete?category=${activeValetCategory}`;
+            if (valetSearchQuery.trim()) {
+                url += `&q=${encodeURIComponent(valetSearchQuery)}`;
+            }
+
+            const response = await fetch(url);
+            const data = await response.json();
+
+            contentBox.innerHTML = '';
+            if (!data || data.length === 0) {
+                contentBox.innerHTML = '<div class="valet-dropdown-no-data">Không tìm thấy bãi đỗ xe phù hợp.</div>';
+                return;
+            }
+
+            data.forEach(spot => {
+                const item = document.createElement('div');
+                item.className = 'valet-dropdown-item';
+                
+                const nameOrAddress = spot.name || spot.address || '';
+                const isAirport = /Sân bay|Airport/i.test(nameOrAddress);
+                const isStation = /Ga |Nhà ga|Station/i.test(nameOrAddress);
+                const isHospital = /Bệnh viện|Hospital/i.test(nameOrAddress);
+                
+                let iconHtml = '<i class="fas fa-car suggestion-item-icon"></i>';
+                if (isAirport) iconHtml = '<i class="fas fa-plane suggestion-item-icon"></i>';
+                else if (isStation) iconHtml = '<i class="fas fa-train suggestion-item-icon"></i>';
+                else if (isHospital) iconHtml = '<i class="fas fa-hospital suggestion-item-icon"></i>';
+
+                item.innerHTML = `
+                    ${iconHtml}
+                    <div class="valet-item-details">
+                        <span class="valet-item-title">${spot.name || spot.address}</span>
+                        <span class="valet-item-address">${spot.address}</span>
+                    </div>
+                `;
+                
+                item.onmousedown = (e) => {
+                    e.preventDefault();
+                    
+                    const activeInput = document.activeElement;
+                    if (activeInput && (activeInput.id === 'valet-dropoff' || activeInput.id === 'valet-pickup')) {
+                        activeInput.value = spot.name;
+                        activeInput.dataset.spotId = spot.id;
+                        activeInput.dataset.hourlyRate = spot.hourlyRate || 20000;
+                        
+                        if (activeInput.id === 'valet-dropoff' && !isDifferentReturn) {
+                            if (valetPickup) {
+                                valetPickup.value = spot.name;
+                                valetPickup.dataset.spotId = spot.id;
+                            }
+                        }
+                    }
+                    valetDropdown.classList.remove('show');
+                    updateValetPricePreview();
+                };
+
+                contentBox.appendChild(item);
+            });
+
+        } catch (error) {
+            console.error('Error fetching valet suggestions:', error);
+            contentBox.innerHTML = '<div class="valet-dropdown-no-data">Đã xảy ra lỗi khi tải dữ liệu.</div>';
+        }
+    }
+
+    if (valetDropdown) {
+        const tabItems = valetDropdown.querySelectorAll('.valet-tab-item');
+        tabItems.forEach(tab => {
+            tab.addEventListener('mousedown', (e) => {
+                e.preventDefault();
+                tabItems.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                activeValetCategory = tab.dataset.category;
+                loadValetDropdownData();
+            });
+        });
+    }
+
+    function setupValetInputEvents(inputEl) {
+        if (!inputEl) return;
+        
+        inputEl.addEventListener('focus', () => {
+            if (valetDropdown) {
+                inputEl.parentElement.appendChild(valetDropdown);
+                valetDropdown.classList.add('show');
+                valetSearchQuery = inputEl.value;
+                loadValetDropdownData();
+            }
+        });
+
+        inputEl.addEventListener('blur', () => {
+            if (valetDropdown) {
+                setTimeout(() => valetDropdown.classList.remove('show'), 200);
+            }
+        });
+
+        let valetDebounce;
+        inputEl.addEventListener('input', () => {
+            clearTimeout(valetDebounce);
+            valetSearchQuery = inputEl.value;
+            valetDebounce = setTimeout(() => {
+                loadValetDropdownData();
+            }, 300);
+        });
+    }
+
+    setupValetInputEvents(valetDropoff);
+    setupValetInputEvents(valetPickup);
+
+    // ============ V3: BÁO GIÁ XEM TRƯỚC (VALET PRICE PREVIEW) ============
+    const valetPricePreview = document.getElementById('valet-price-preview');
+    const valetStart = document.getElementById('valet-start');
+    const valetEnd = document.getElementById('valet-end');
+
+    async function updateValetPricePreview() {
+        if (!valetPricePreview) return;
+        
+        const spotId = valetDropoff?.dataset.spotId;
+        const startTimeStr = valetStart?.value;
+        const endTimeStr = valetEnd?.value;
+        
+        console.log('[DEBUG] updateValetPricePreview called with: spotId=' + spotId + ', start=' + startTimeStr + ', end=' + endTimeStr);
+
+        if (!spotId || !startTimeStr || !endTimeStr) {
+            console.log('[DEBUG] Missing parameters, hiding preview');
+            valetPricePreview.style.display = 'none';
+            return;
+        }
+
+        const startDate = parseVietnameseDateString(startTimeStr);
+        const endDate = parseVietnameseDateString(endTimeStr);
+        
+        console.log('[DEBUG] Parsed dates:', { startDate, endDate });
+
+        if (!startDate || !endDate || startDate >= endDate) {
+            console.log('[DEBUG] Invalid dates or start >= end, hiding preview');
+            valetPricePreview.style.display = 'none';
+            return;
+        }
+
+        try {
+            const url = `${API_URL}/spots/valet-price?spotId=${spotId}&startTime=${encodeURIComponent(startDate.toISOString())}&endTime=${encodeURIComponent(endDate.toISOString())}`;
+            console.log('[DEBUG] Fetching price from URL:', url);
+            const response = await fetch(url);
+            console.log('[DEBUG] Response status:', response.status);
+            const result = await response.json();
+            console.log('[DEBUG] Response result:', result);
+
+            if (result && result.status === 'success') {
+                valetPricePreview.style.display = 'block';
+                
+                const days = result.days || 1;
+                const totalPrice = result.totalPrice;
+                const formattedPrice = totalPrice.toLocaleString('vi-VN') + ' đ';
+
+                valetPricePreview.innerHTML = `
+                    <div class="valet-price-preview-card">
+                        <span class="preview-title">${days} ngày đỗ xe + đỗ xe hộ</span>
+                        <span class="preview-amount">${formattedPrice}</span>
+                        <span class="preview-average">trung bình 30.000 đ/ngày</span>
+                    </div>
+                `;
+            } else {
+                valetPricePreview.style.display = 'none';
+            }
+        } catch (error) {
+            console.error('Error fetching price preview:', error);
+            valetPricePreview.style.display = 'none';
+        }
+    }
+
+    // ============ V3: VALET DATE PICKERS ============
+    let valetStartPicker, valetEndPicker;
+    if (valetStart) {
+        valetStartPicker = flatpickr(valetStart, {
+            enableTime: true,
+            dateFormat: "d.m.y H:i",
+            time_24hr: true,
+            minDate: "today",
+            defaultDate: defaultStart,
+            onChange: function (selectedDates) {
+                if (selectedDates[0]) {
+                    valetEndPicker.set('minDate', selectedDates[0]);
+                }
+                updateValetPricePreview();
+            },
+            onReady: function (selectedDates, dateStr, instance) {
+                addConfirmCancelButtons(instance);
+            },
+            onOpen: []
+        });
+    }
+
+    if (valetEnd) {
+        valetEndPicker = flatpickr(valetEnd, {
+            enableTime: true,
+            dateFormat: "d.m.y H:i",
+            time_24hr: true,
+            minDate: "today",
+            defaultDate: defaultEnd,
+            onChange: function (selectedDates) {
+                updateValetPricePreview();
+            },
+            onReady: function (selectedDates, dateStr, instance) {
+                addConfirmCancelButtons(instance);
+            },
+            onOpen: []
+        });
+    }
+
+    // ============ V3: ECOSYSTEM SLIDER ============
+    const slides = document.querySelectorAll('.eco-slide');
+    const dots = document.querySelectorAll('.eco-dot');
+    let currentSlide = 0;
+    let slideInterval;
+
+    function goToSlide(index) {
+        slides.forEach(s => s.classList.remove('active'));
+        dots.forEach(d => d.classList.remove('active'));
+        if (slides[index]) slides[index].classList.add('active');
+        if (dots[index]) dots[index].classList.add('active');
+        currentSlide = index;
+    }
+
+    function nextSlide() {
+        goToSlide((currentSlide + 1) % slides.length);
+    }
+
+    if (slides.length > 0) {
+        dots.forEach(dot => {
+            dot.addEventListener('click', () => {
+                clearInterval(slideInterval);
+                goToSlide(parseInt(dot.dataset.index));
+                slideInterval = setInterval(nextSlide, 4000);
+            });
+        });
+        slideInterval = setInterval(nextSlide, 4000);
+    }
 });

@@ -203,9 +203,9 @@ const markPaymentAndBooking = async ({ payment, booking, paymentStatus, bookingS
         const bookingData = prepareBookingData(booking);
 
         if (bookingStatus === 'confirmed') {
-            await brevoService.sendBookingEmail(bookingData, 'bookingConfirm');
+            brevoService.sendBookingEmail(bookingData, 'bookingConfirm').catch(err => console.error('Failed to send booking email:', err.message));
             if (bookingData.partnerEmail) {
-                await brevoService.sendEmailPartner(bookingData, 'partnerConfirm');
+                brevoService.sendEmailPartner(bookingData, 'partnerConfirm').catch(err => console.error('Failed to send partner email:', err.message));
             } else {
                 console.warn(`Skipping partner email for booking ${booking._id}: Partner email not found.`);
             }
@@ -217,30 +217,26 @@ const markPaymentAndBooking = async ({ payment, booking, paymentStatus, bookingS
 
             // Only schedule if endTime is in the future
             if (delayMs > 0) {
-                setTimeout(async () => {
-                    try {
-                        console.log(`Sending scheduled review email for booking ${booking._id} after parking duration ended...`);
-                        await brevoService.sendReviewEmail(bookingData);
-                    } catch (reviewError) {
-                        console.error(`Failed to send scheduled review email for booking ${booking._id}:`, reviewError);
-                    }
+                setTimeout(() => {
+                    console.log(`Sending scheduled review email for booking ${booking._id} after parking duration ended...`);
+                    brevoService.sendReviewEmail(bookingData).catch(reviewError => {
+                        console.error(`Failed to send scheduled review email for booking ${booking._id}:`, reviewError.message);
+                    });
                 }, delayMs);
 
                 console.log(`Review email scheduled for booking ${booking._id} at ${endTime.toISOString()} (in ${Math.round(delayMs / 1000 / 60)} minutes)`);
             } else {
                 console.log(`Booking ${booking._id} has already ended. Sending review email immediately.`);
                 // If the booking has already ended, send review email immediately
-                try {
-                    await brevoService.sendReviewEmail(bookingData);
-                } catch (reviewError) {
-                    console.error(`Failed to send immediate review email for booking ${booking._id}:`, reviewError);
-                }
+                brevoService.sendReviewEmail(bookingData).catch(reviewError => {
+                    console.error(`Failed to send immediate review email for booking ${booking._id}:`, reviewError.message);
+                });
             }
 
         } else if (bookingStatus === 'cancelled') {
-            await brevoService.sendBookingEmail(bookingData, 'bookingCancel');
+            brevoService.sendBookingEmail(bookingData, 'bookingCancel').catch(err => console.error('Failed to send cancel email:', err.message));
             if (bookingData.partnerEmail) {
-                await brevoService.sendEmailPartner(bookingData, 'partnerCancel');
+                brevoService.sendEmailPartner(bookingData, 'partnerCancel').catch(err => console.error('Failed to send partner cancel email:', err.message));
             }
         }
     } catch (emailError) {

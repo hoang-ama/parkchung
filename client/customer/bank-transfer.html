@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hướng dẫn chuyển khoản - ParkChung</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="/customer/css/styles.css">
+    <link rel="icon" type="image/png" href="/assets/logo/favicon.png" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+
+    <style>
+        .bank-transfer-main {
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 0 16px;
+        }
+
+        .transfer-card {
+            background: #ffffff;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            border: 1px solid #f1f5f9;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .transfer-header h1 {
+            font-size: 20px;
+            font-weight: 800;
+            color: #1e293b;
+            margin-bottom: 8px;
+            letter-spacing: -0.5px;
+        }
+
+        .transfer-header p {
+            color: #64748b;
+            font-size: 13.5px;
+            margin-bottom: 24px;
+        }
+
+        .qr-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 24px;
+        }
+
+        .qr-card {
+            background: #f8fafc;
+            border: 1.5px dashed #e2e8f0;
+            border-radius: 12px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            transition: all 0.2s;
+        }
+
+        .qr-card:hover {
+            border-color: #13b47e;
+            background: #f0fdf8;
+        }
+
+        .qr-badge {
+            font-size: 11px;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 20px;
+            margin-bottom: 12px;
+        }
+
+        .qr-badge.momo {
+            background: #ffe4e6;
+            color: #e11d48;
+        }
+
+        .qr-badge.techcombank {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+
+        .qr-image-container {
+            width: 180px;
+            height: 180px;
+            background: #ffffff;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            padding: 8px;
+            margin-bottom: 12px;
+        }
+
+        .qr-image-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .qr-label {
+            font-size: 12px;
+            font-weight: 700;
+            color: #334155;
+        }
+
+        .qr-sublabel {
+            font-size: 11px;
+            color: #64748b;
+            margin-top: 2px;
+        }
+
+        .info-details-box {
+            background: #ffffff;
+            border: 1.5px solid #f1f5f9;
+            border-radius: 12px;
+            margin-bottom: 24px;
+            text-align: left;
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px 20px;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .detail-row:last-child {
+            border-bottom: none;
+        }
+
+        .detail-label {
+            font-size: 13px;
+            font-weight: 600;
+            color: #64748b;
+        }
+
+        .detail-value-container {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .detail-value {
+            font-size: 14px;
+            font-weight: 700;
+            color: #1e293b;
+        }
+
+        .detail-value.highlight {
+            color: #13b47e;
+            font-size: 16px;
+        }
+
+        .btn-copy-small {
+            background: #f1f5f9;
+            color: #475569;
+            border: none;
+            border-radius: 6px;
+            padding: 4px 10px;
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .btn-copy-small:hover {
+            background: #e2e8f0;
+            color: #0f172a;
+        }
+
+        .warning-banner {
+            background: #fef3c7;
+            border: 1px solid #fde68a;
+            border-radius: 12px;
+            padding: 14px 18px;
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+            text-align: left;
+            margin-bottom: 24px;
+        }
+
+        .warning-icon {
+            color: #d97706;
+            margin-top: 2px;
+        }
+
+        .warning-text {
+            color: #92400e;
+            font-size: 12px;
+            line-height: 1.5;
+            font-weight: 600;
+        }
+
+        .btn-complete-transfer {
+            width: 100%;
+            padding: 14px;
+            background: #13b47e;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.2s;
+        }
+
+        .btn-complete-transfer:hover {
+            background: #0ea36b;
+            transform: translateY(-1px);
+        }
+
+        @media (max-width: 640px) {
+            .qr-section {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* ===== RECEIPT UPLOAD BOX - FIGMA ALIGNED ===== */
+        .receipt-upload-box {
+            border: 2px dashed #13b47e;
+            background: #f0fdf4;
+            border-radius: 12px;
+            padding: 24px;
+            text-align: center;
+            margin-bottom: 24px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .receipt-upload-box:hover {
+            border-color: #0ea36b;
+            background: #e6fbf0;
+        }
+
+        .receipt-upload-box i {
+            font-size: 2.5rem;
+            color: #13b47e;
+            margin-bottom: 12px;
+        }
+
+        .receipt-upload-box p {
+            font-size: 14px;
+            color: #374151;
+            font-weight: 600;
+            margin: 0 0 12px 0;
+        }
+
+        .btn-select-file {
+            background: #13b47e;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 8px 20px;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .btn-select-file:hover {
+            background: #0ea36b;
+        }
+
+        /* ===== HEADER REDESIGN ===== */
+        .header-v3 {
+            background: #0b1a17 !important; /* Dark teal background matching Figma */
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.15);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .header-logo-text .header-brand {
+            color: #ffffff !important;
+            font-size: 18px !important;
+            font-weight: 700 !important;
+        }
+        
+        .header-logo-text .header-tagline {
+            color: #13b47e !important;
+            font-size: 10px !important;
+            font-weight: 500 !important;
+        }
+        
+        .header-nav {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        
+        .header-nav .nav-link {
+            color: #ffffff !important;
+            font-size: 13px !important;
+            font-weight: 500;
+            text-decoration: none;
+        }
+        
+        .btn-nav-figma {
+            background: #13b47e;
+            color: #ffffff !important;
+            font-size: 13px !important;
+            font-weight: 600;
+            padding: 8px 16px;
+            border-radius: 6px;
+            text-decoration: none;
+            transition: background 0.2s;
+        }
+        
+        .btn-nav-figma:hover {
+            background: #0ea36b;
+        }
+        
+        .lang-selector-figma {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            cursor: pointer;
+        }
+        
+        .flag-icon-figma {
+            width: 20px;
+            height: 14px;
+            border-radius: 2px;
+            object-fit: cover;
+        }
+    </style>
+</head>
+
+<body>
+    <header class="header-v3">
+        <div class="header-inner">
+            <a href="/customer/index.html" class="header-logo">
+                <img src="/assets/logo/logo.svg" alt="ParkChung Logo" />
+                <div class="header-logo-text">
+                    <span class="header-brand">PARKCHUNG</span>
+                    <span class="header-tagline">Smart Parking Here</span>
+                </div>
+            </a>
+            <nav class="header-nav" id="main-nav">
+                <a href="/customer/register.html" class="nav-link">Trở thành chủ bãi đậu xe <i class="fas fa-chevron-down" style="font-size: 10px; margin-left: 4px;"></i></a>
+                <a href="/customer/login.html" class="btn-nav-figma">Đăng nhập</a>
+                <a href="/customer/register.html" class="btn-nav-figma">Đăng ký</a>
+                <div class="lang-selector-figma">
+                    <img src="https://flagcdn.com/w20/vn.png" alt="VN" class="flag-icon-figma">
+                    <i class="fas fa-chevron-down" style="font-size: 9px; color: #fff; margin-left: 2px;"></i>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <main class="bank-transfer-main">
+        <div class="transfer-card">
+            <div class="transfer-header">
+                <h1>HƯỚNG DẪN CHUYỂN KHOẢN NGÂN HÀNG</h1>
+                <p>Vui lòng chọn quét một trong các mã QR dưới đây hoặc chuyển khoản thủ công để hoàn tất</p>
+            </div>
+
+            <div class="qr-section">
+                <!-- Momo -->
+                <div class="qr-card">
+                    <span class="qr-badge momo"><i class="fas fa-wallet"></i> Ví MoMo</span>
+                    <div class="qr-image-container">
+                        <img id="momo-qr" src="https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=2.Momo%200924609766" alt="QR MoMo">
+                    </div>
+                    <span class="qr-label">NGUYEN THANH NAM</span>
+                    <span class="qr-sublabel">SĐT: 0924609766</span>
+                </div>
+
+                <!-- Techcombank -->
+                <div class="qr-card">
+                    <span class="qr-badge techcombank"><i class="fas fa-university"></i> Techcombank</span>
+                    <div class="qr-image-container">
+                        <img id="techcombank-qr" src="" alt="QR Techcombank">
+                    </div>
+                    <span class="qr-label">CÔNG TY CỔ PHẦN PARKCHUNG</span>
+                    <span class="qr-sublabel">STK: 4001153599999</span>
+                </div>
+            </div>
+
+            <!-- Light blue guide box matching Figma exactly -->
+            <div class="transfer-guide-container" style="background: #f0f9ff; border: 1.5px solid #bae6fd; border-radius: 12px; padding: 20px; margin-bottom: 24px; text-align: center;">
+                <div style="font-size: 13px; font-weight: 600; color: #0369a1; text-transform: uppercase; margin-bottom: 8px; letter-spacing: 0.5px;">Nội dung chuyển khoản</div>
+                <div class="guide-memo-highlight" id="guide-memo-highlight" style="font-size: 16px; font-weight: 700; color: #0284c7; padding: 10px; background: #e0f2fe; border-radius: 8px; display: inline-block; min-width: 250px; margin-bottom: 8px; font-family: monospace;">[Tên] [Số đt] [ngày đi] [ngày về]</div>
+                <div style="margin-top: 4px; margin-bottom: 12px;">
+                    <span style="font-size: 13px; color: #0369a1; font-weight: 600;">Cú pháp thực tế: </span>
+                    <span id="bank-message-val-figma" style="font-size: 14px; font-weight: 700; color: #13b47e; background: #ffffff; padding: 4px 8px; border: 1px solid #13b47e; border-radius: 6px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;" onclick="copyText(this.textContent.trim())">-- <i class="far fa-copy"></i></span>
+                </div>
+                <div style="font-size: 12px; color: #0369a1; font-weight: 500;">Mọi trường hợp chuyển sai, vui lòng chụp màn hình và liên hệ</div>
+            </div>
+
+            <div class="info-details-box" style="display: none;">
+                <div class="detail-row">
+                    <span class="detail-label">Ngân hàng</span>
+                    <span class="detail-value">Techcombank (TCB)</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Số tài khoản</span>
+                    <div class="detail-value-container">
+                        <span class="detail-value" id="bank-account-val">4001153599999</span>
+                        <button class="btn-copy-small" onclick="copyText('4001153599999')">Copy</button>
+                    </div>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Chủ tài khoản</span>
+                    <span class="detail-value">CONG TY CO PHAN PARKCHUNG</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Số tiền</span>
+                    <div class="detail-value-container">
+                        <span class="detail-value highlight" id="bank-amount-val">0đ</span>
+                        <button class="btn-copy-small" id="copy-amount-btn">Copy</button>
+                    </div>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Nội dung chuyển khoản</span>
+                    <div class="detail-value-container">
+                        <span class="detail-value highlight" id="bank-message-val">--</span>
+                        <button class="btn-copy-small" id="copy-message-btn">Copy</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="receipt-upload-box" id="upload-box" style="display: none;">
+                <i class="fas fa-cloud-upload-alt"></i>
+                <p>Upload Hóa Đơn hoặc Biên lai (Ngoại trừ)</p>
+                <input type="file" id="receipt-file-input" style="display:none;" accept="image/*,application/pdf" />
+                <button type="button" class="btn-select-file">Chọn file...</button>
+                <p class="uploaded-filename" id="upload-filename" style="display:none; font-size:13px; color:#13b47e; font-weight:700; margin-top:8px;"></p>
+            </div>
+
+            <div class="warning-banner" style="display: none;">
+                <i class="fas fa-exclamation-triangle warning-icon"></i>
+                <div class="warning-text">
+                    LƯU Ý QUAN TRỌNG: Quý khách vui lòng nhập chính xác nội dung chuyển khoản ở trên để hệ thống tự động nhận diện giao dịch. 
+                    Mọi sai sót về nội dung chuyển khoản có thể dẫn đến việc đơn hàng bị chậm xử lý hoặc bị hủy.
+                </div>
+            </div>
+
+            <button id="btn-complete" class="btn-complete-transfer">
+                Hoàn tất
+            </button>
+        </div>
+    </main>
+
+    <footer class="footer" style="margin-top: 80px; padding: 40px 0; background: #0f172a; color: #94a3b8; font-size: 13px; border-top: 1px solid #1e293b;">
+        <div class="container" style="max-width: 1200px; margin: 0 auto; padding: 0 16px; text-align: center;">
+            <p>&copy; 2026 ParkChung. Tất cả quyền lợi được bảo lưu.</p>
+        </div>
+    </footer>
+
+    <script src="/customer/js/config.js"></script>
+    <script src="/customer/js/utils.js"></script>
+    <script type="module" src="/customer/js/app.js"></script>
+    <script src="/customer/js/bank-transfer.js"></script>
+</body>
+
+</html>

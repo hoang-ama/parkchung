@@ -76,6 +76,17 @@ exports.registerUser = async (req, res) => {
         });
 
         if (user) {
+            // Link existing guest bookings with this email
+            try {
+                const Booking = require('../models/booking.model');
+                await Booking.updateMany(
+                    { guestEmail: normalizedEmail, $or: [{ user: { $exists: false } }, { user: null }] },
+                    { $set: { user: user._id } }
+                );
+            } catch (linkErr) {
+                console.error('Failed to link guest bookings on registration:', linkErr);
+            }
+
             // Send registration confirmation email (non-blocking)
             brevoService.sendRegistrationEmail({
                 fullName: user.fullName,
@@ -129,6 +140,17 @@ exports.loginUser = async (req, res) => {
         const isMatch = await user.comparePassword(password);
 
         if (isMatch) {
+            // Link existing guest bookings with this email just in case they booked as guest while logged out
+            try {
+                const Booking = require('../models/booking.model');
+                await Booking.updateMany(
+                    { guestEmail: user.email, $or: [{ user: { $exists: false } }, { user: null }] },
+                    { $set: { user: user._id } }
+                );
+            } catch (linkErr) {
+                console.error('Failed to link guest bookings on login:', linkErr);
+            }
+
             res.json({
                 _id: user._id,
                 fullName: user.fullName,

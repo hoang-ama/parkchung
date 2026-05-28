@@ -1,0 +1,969 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đánh giá bãi đỗ xe | Parkchung</title>
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+    <style>
+        /* Base styles */
+        :root {
+            --primary: #2DC989;
+            --primary-dark: #1f9e68;
+            --primary-light: rgba(45, 201, 137, 0.1);
+            --dark-bg: #11222c;
+            --light-bg: #f4f5f8;
+            --card-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: "Montserrat", "Inter", sans-serif;
+            background-color: var(--light-bg);
+            color: #2d3748;
+            min-height: 100vh;
+            line-height: 1.5;
+            padding-bottom: 60px;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        button {
+            font-family: inherit;
+            border: none;
+            outline: none;
+            cursor: pointer;
+        }
+
+        /* ======= HEADER ======= */
+        header {
+            background-color: var(--dark-bg);
+            padding: 12px 0;
+            color: #ffffff;
+            position: relative;
+            z-index: 100;
+        }
+
+        .header-container {
+            max-width: 1440px;
+            margin: 0 auto;
+            padding: 0 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .header-logo img {
+            height: 32px;
+        }
+
+        .header-brand {
+            font-size: 20px;
+            font-weight: 800;
+            letter-spacing: 1px;
+            color: #ffffff;
+        }
+
+        .header-tagline {
+            font-size: 10px;
+            color: #8892b0;
+        }
+
+        .header-nav {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+        }
+
+        .become-host-link {
+            font-size: 14px;
+            font-weight: 600;
+            color: #e2e8f0;
+        }
+
+        .my-account-btn {
+            background-color: var(--primary);
+            color: #ffffff;
+            font-size: 14px;
+            font-weight: 700;
+            padding: 8px 18px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .logout-link {
+            font-size: 14px;
+            font-weight: 600;
+            color: #cbd5e0;
+        }
+
+        .lang-switcher {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .lang-flag {
+            width: 20px;
+            height: 14px;
+            object-fit: cover;
+            border-radius: 2px;
+        }
+
+        /* ======= MAIN CONTAINER ======= */
+        .review-container {
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        /* ======= VIEW 1: WRITE REVIEW FORM ======= */
+        .review-form-card {
+            background: #ffffff;
+            border-radius: 16px;
+            box-shadow: var(--card-shadow);
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+
+        .spot-header-block {
+            text-align: center;
+            border-bottom: 1px solid #edf2f7;
+            padding-bottom: 20px;
+        }
+
+        .spot-title {
+            font-size: 24px;
+            font-weight: 800;
+            color: #1a202c;
+            margin-bottom: 6px;
+        }
+
+        .spot-address {
+            font-size: 14px;
+            color: #718096;
+            font-weight: 500;
+        }
+
+        .review-section-title {
+            font-size: 14px;
+            font-weight: 800;
+            color: #4a5568;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 15px;
+        }
+
+        /* General Star selector */
+        .general-star-box {
+            text-align: center;
+            background: #f7fafc;
+            border-radius: 12px;
+            padding: 24px;
+            border: 1px solid #edf2f7;
+        }
+
+        .general-star-title {
+            font-size: 15px;
+            font-weight: 700;
+            color: #2d3748;
+            margin-bottom: 12px;
+        }
+
+        .stars-row {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            font-size: 32px;
+            color: #cbd5e0;
+            cursor: pointer;
+            margin-bottom: 10px;
+        }
+
+        .stars-row i {
+            transition: var(--transition);
+        }
+
+        .stars-row i.hover,
+        .stars-row i.selected {
+            color: var(--primary);
+        }
+
+        .general-star-label {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--primary);
+            height: 22px;
+        }
+
+        /* Highlights multiselect badges */
+        .highlights-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .highlight-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 18px;
+            font-size: 13.5px;
+            font-weight: 600;
+            background: #f7fafc;
+            color: #4a5568;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 24px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .highlight-badge:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .highlight-badge.active {
+            background: var(--primary-light);
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        /* Detailed ratings (three aspects) */
+        .detailed-rating-box {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            background: #f7fafc;
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid #edf2f7;
+        }
+
+        .detailed-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .detailed-label {
+            font-size: 14px;
+            font-weight: 600;
+            color: #4a5568;
+        }
+
+        .detailed-stars {
+            display: flex;
+            gap: 4px;
+            font-size: 18px;
+            color: #cbd5e0;
+            cursor: pointer;
+        }
+
+        .detailed-stars i.selected {
+            color: var(--primary);
+        }
+
+        /* Photo Uploader with preview list */
+        .photos-section-content {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .photo-upload-box {
+            width: 100px;
+            height: 100px;
+            background: #f7fafc;
+            border: 2px dashed #cbd5e0;
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .photo-upload-box:hover {
+            border-color: var(--primary);
+            background: var(--primary-light);
+        }
+
+        .photo-upload-box i {
+            font-size: 24px;
+            color: #a0aec0;
+            margin-bottom: 6px;
+        }
+
+        .photo-upload-box span {
+            font-size: 11px;
+            font-weight: 700;
+            color: #a0aec0;
+            text-transform: uppercase;
+        }
+
+        .uploaded-photo-wrapper {
+            width: 100px;
+            height: 100px;
+            border-radius: 12px;
+            overflow: hidden;
+            position: relative;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .uploaded-photo-wrapper img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .photo-delete-btn {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            width: 20px;
+            height: 20px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 50%;
+            color: #e53e3e;
+            font-weight: bold;
+            font-size: 12px;
+            line-height: 18px;
+            text-align: center;
+            cursor: pointer;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+            transition: var(--transition);
+        }
+
+        .photo-delete-btn:hover {
+            background: #e53e3e;
+            color: #ffffff;
+        }
+
+        /* Review textarea */
+        .review-textarea {
+            width: 100%;
+            height: 120px;
+            padding: 15px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-family: inherit;
+            font-size: 14px;
+            outline: none;
+            resize: none;
+            transition: var(--transition);
+        }
+
+        .review-textarea:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px var(--primary-light);
+        }
+
+        /* Submit Button */
+        .submit-btn {
+            background-color: var(--primary);
+            color: #ffffff;
+            font-size: 15px;
+            font-weight: 700;
+            padding: 16px;
+            border-radius: 12px;
+            box-shadow: 0 4px 14px rgba(45, 201, 137, 0.3);
+            transition: var(--transition);
+            width: 100%;
+            text-align: center;
+        }
+
+        .submit-btn:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-1px);
+        }
+
+        .submit-btn:disabled {
+            background-color: #cbd5e0;
+            box-shadow: none;
+            cursor: not-allowed;
+        }
+
+        /* ======= VIEW 2: SUCCESS COMPLETED ======= */
+        .success-card {
+            background: #ffffff;
+            border-radius: 16px;
+            box-shadow: var(--card-shadow);
+            padding: 40px;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            animation: slideUp 0.4s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .success-icon-circle {
+            width: 68px;
+            height: 68px;
+            border-radius: 50%;
+            background: var(--primary-light);
+            color: var(--primary);
+            font-size: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .success-title {
+            font-size: 24px;
+            font-weight: 800;
+            color: #1a202c;
+            margin-bottom: 8px;
+        }
+
+        .success-desc {
+            font-size: 14.5px;
+            color: #718096;
+            margin-bottom: 30px;
+            max-width: 500px;
+        }
+
+        .success-spot-name {
+            font-weight: 700;
+            color: #2d3748;
+        }
+
+        /* "Đánh giá của bạn" Card wrapper */
+        .your-review-section {
+            width: 100%;
+            text-align: left;
+            margin-bottom: 40px;
+        }
+
+        .section-label-v3 {
+            font-size: 14px;
+            font-weight: 800;
+            color: #4a5568;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 15px;
+        }
+
+        .your-review-card {
+            border: 2px solid var(--primary);
+            background: #fafdfb;
+            border-radius: 16px;
+            padding: 24px;
+            display: flex;
+            gap: 24px;
+        }
+
+        .review-details-side {
+            flex-grow: 1;
+        }
+
+        .review-header-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .review-stars-show {
+            color: var(--primary);
+            font-size: 16px;
+            display: flex;
+            gap: 2px;
+        }
+
+        .review-date-label {
+            font-size: 12px;
+            color: #a0aec0;
+            font-weight: 600;
+        }
+
+        .verified-badge {
+            font-size: 9px;
+            font-weight: 700;
+            color: var(--primary);
+            background: var(--primary-light);
+            padding: 2px 8px;
+            border-radius: 10px;
+            text-transform: uppercase;
+        }
+
+        .review-badge-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-bottom: 12px;
+        }
+
+        .review-badge-item {
+            font-size: 11px;
+            font-weight: 600;
+            background: #e2e8f0;
+            color: #4a5568;
+            padding: 4px 10px;
+            border-radius: 12px;
+        }
+
+        .review-comment-text {
+            font-size: 14px;
+            color: #4a5568;
+            font-style: italic;
+            line-height: 1.5;
+            margin-bottom: 15px;
+        }
+
+        .review-photos-flex {
+            display: flex;
+            gap: 10px;
+        }
+
+        .review-photo-thumb {
+            width: 60px;
+            height: 60px;
+            border-radius: 8px;
+            object-fit: cover;
+        }
+
+        /* Info right block inside the card */
+        .spot-info-block {
+            width: 200px;
+            border-left: 1px solid #e2e8f0;
+            padding-left: 24px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .info-block-title {
+            font-size: 10px;
+            font-weight: 800;
+            color: #a0aec0;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+            letter-spacing: 0.5px;
+        }
+
+        .info-spot-name {
+            font-size: 13.5px;
+            font-weight: 700;
+            color: #2d3748;
+            margin-bottom: 4px;
+        }
+
+        .info-spot-address {
+            font-size: 11.5px;
+            color: #718096;
+            margin-bottom: 15px;
+        }
+
+        .info-view-btn {
+            background: transparent;
+            border: 1.5px solid var(--primary);
+            color: var(--primary);
+            font-size: 11.5px;
+            font-weight: 700;
+            padding: 6px 12px;
+            border-radius: 6px;
+            text-align: center;
+            transition: var(--transition);
+        }
+
+        .info-view-btn:hover {
+            background: var(--primary);
+            color: #ffffff;
+        }
+
+        /* "Đánh giá từ cộng đồng" section */
+        .community-reviews-section {
+            width: 100%;
+            text-align: left;
+            margin-bottom: 40px;
+        }
+
+        .community-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            margin-bottom: 15px;
+        }
+
+        .community-header-link {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .community-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .community-review-item {
+            background: #f7fafc;
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid #edf2f7;
+        }
+
+        .item-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 8px;
+        }
+
+        .item-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            object-fit: cover;
+            background: #cbd5e0;
+        }
+
+        .item-name {
+            font-size: 13.5px;
+            font-weight: 700;
+            color: #2d3748;
+        }
+
+        .item-time {
+            font-size: 11px;
+            color: #a0aec0;
+            margin-left: auto;
+            font-weight: 500;
+        }
+
+        .item-rating-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+
+        .item-stars {
+            color: #ecc94b;
+            font-size: 13px;
+            display: flex;
+            gap: 2px;
+        }
+
+        .item-badges {
+            display: flex;
+            gap: 6px;
+        }
+
+        .item-badge-val {
+            font-size: 9px;
+            font-weight: 700;
+            background: rgba(236, 201, 75, 0.15);
+            color: #b7791f;
+            padding: 2px 6px;
+            border-radius: 8px;
+            text-transform: uppercase;
+        }
+
+        .item-comment {
+            font-size: 13.5px;
+            color: #4a5568;
+            line-height: 1.5;
+        }
+
+        /* Success Footer Navigation Links */
+        .success-navigation-row {
+            display: flex;
+            gap: 15px;
+            width: 100%;
+        }
+
+        .success-nav-btn {
+            flex: 1;
+            padding: 14px;
+            font-size: 14px;
+            font-weight: 700;
+            border-radius: 10px;
+            text-align: center;
+            transition: var(--transition);
+        }
+
+        .success-nav-btn.primary {
+            background-color: var(--primary);
+            color: #ffffff;
+            box-shadow: 0 4px 10px rgba(45, 201, 137, 0.2);
+        }
+
+        .success-nav-btn.primary:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-1px);
+        }
+
+        .success-nav-btn.secondary {
+            background-color: #ffffff;
+            border: 1.5px solid #cbd5e0;
+            color: #4a5568;
+        }
+
+        .success-nav-btn.secondary:hover {
+            background-color: #f7fafc;
+        }
+
+        /* ======= RESPONSIVE ======= */
+        @media (max-width: 768px) {
+            .review-form-card,
+            .success-card {
+                padding: 20px;
+            }
+
+            .your-review-card {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .spot-info-block {
+                width: 100%;
+                border-left: none;
+                border-top: 1px solid #e2e8f0;
+                padding-left: 0;
+                padding-top: 15px;
+                align-items: stretch;
+            }
+
+            .success-navigation-row {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Header -->
+    <header>
+        <div class="header-container">
+            <div class="header-logo">
+                <a href="/customer/index.html">
+                    <img src="/assets/logo/logo.svg" alt="ParkChung" />
+                </a>
+                <div style="display: flex; flex-direction: column;">
+                    <span class="header-brand">PARKCHUNG</span>
+                    <span class="header-tagline" data-i18n="logo_slogan">Seamless Smart Parking, Safe & Easy</span>
+                </div>
+            </div>
+            <nav class="header-nav" id="customer-nav">
+                <!-- Loaded dynamically by JS -->
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <div class="review-container">
+
+        <!-- VIEW 1: Form viết đánh giá -->
+        <div class="review-form-card" id="review-form-view">
+            <div class="spot-header-block">
+                <h1 class="spot-title" id="spot-name">Đang tải...</h1>
+                <p class="spot-address" id="spot-address">Đang tải địa chỉ bãi đỗ xe...</p>
+            </div>
+
+            <!-- Tổng quan -->
+            <div class="general-star-box">
+                <h3 class="general-star-title">Trải nghiệm của bạn như thế nào?</h3>
+                <div class="stars-row" id="general-stars-container">
+                    <i class="far fa-star" data-index="1"></i>
+                    <i class="far fa-star" data-index="2"></i>
+                    <i class="far fa-star" data-index="3"></i>
+                    <i class="far fa-star" data-index="4"></i>
+                    <i class="far fa-star" data-index="5"></i>
+                </div>
+                <div class="general-star-label" id="general-star-desc"></div>
+            </div>
+
+            <!-- Đặc điểm nổi bật -->
+            <div>
+                <h3 class="review-section-title">Đặc điểm nổi bật</h3>
+                <div class="highlights-grid" id="highlights-container">
+                    <div class="highlight-badge" data-value="Dễ tìm chỗ">
+                        <i class="fas fa-search"></i> Dễ tìm chỗ
+                    </div>
+                    <div class="highlight-badge" data-value="An ninh tốt">
+                        <i class="fas fa-shield-alt"></i> An ninh tốt
+                    </div>
+                    <div class="highlight-badge" data-value="Giá hợp lý">
+                        <i class="fas fa-wallet"></i> Giá hợp lý
+                    </div>
+                    <div class="highlight-badge" data-value="Lối vào hẹp">
+                        <i class="fas fa-exclamation-triangle"></i> Lối vào hẹp
+                    </div>
+                    <div class="highlight-badge" data-value="Ánh sáng yếu">
+                        <i class="fas fa-moon"></i> Ánh sáng yếu
+                    </div>
+                </div>
+            </div>
+
+            <!-- Đánh giá chi tiết -->
+            <div>
+                <h3 class="review-section-title">Đánh giá chi tiết</h3>
+                <div class="detailed-rating-box">
+                    <div class="detailed-row" data-aspect="security">
+                        <span class="detailed-label">An ninh</span>
+                        <div class="detailed-stars">
+                            <i class="far fa-star" data-index="1"></i>
+                            <i class="far fa-star" data-index="2"></i>
+                            <i class="far fa-star" data-index="3"></i>
+                            <i class="far fa-star" data-index="4"></i>
+                            <i class="far fa-star" data-index="5"></i>
+                        </div>
+                    </div>
+                    <div class="detailed-row" data-aspect="convenience">
+                        <span class="detailed-label">Tiện lợi</span>
+                        <div class="detailed-stars">
+                            <i class="far fa-star" data-index="1"></i>
+                            <i class="far fa-star" data-index="2"></i>
+                            <i class="far fa-star" data-index="3"></i>
+                            <i class="far fa-star" data-index="4"></i>
+                            <i class="far fa-star" data-index="5"></i>
+                        </div>
+                    </div>
+                    <div class="detailed-row" data-aspect="price">
+                        <span class="detailed-label">Giá cả</span>
+                        <div class="detailed-stars">
+                            <i class="far fa-star" data-index="1"></i>
+                            <i class="far fa-star" data-index="2"></i>
+                            <i class="far fa-star" data-index="3"></i>
+                            <i class="far fa-star" data-index="4"></i>
+                            <i class="far fa-star" data-index="5"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Hình ảnh thực tế -->
+            <div>
+                <h3 class="review-section-title">Hình ảnh thực tế</h3>
+                <div class="photos-section-content">
+                    <div class="photo-upload-box" id="upload-trigger-btn">
+                        <i class="fas fa-camera"></i>
+                        <span>Thêm ảnh</span>
+                    </div>
+                    <!-- Hidden File Input -->
+                    <input type="file" id="photo-file-input" style="display: none;" accept="image/*" multiple>
+                    <!-- Preview Container -->
+                    <div style="display: flex; gap: 10px; flex-wrap: wrap;" id="photo-previews-container"></div>
+                </div>
+            </div>
+
+            <!-- Nhận xét chi tiết -->
+            <div>
+                <h3 class="review-section-title">Nhận xét chi tiết</h3>
+                <textarea class="review-textarea" id="comment-input" placeholder="Hãy chia sẻ thêm về trải nghiệm của bạn..."></textarea>
+            </div>
+
+            <!-- Submit button -->
+            <button class="submit-btn" id="submit-review-btn" disabled>Gửi đánh giá</button>
+        </div>
+
+        <!-- VIEW 2: Màn hình cảm ơn & xem đánh giá cộng đồng -->
+        <div class="success-card" id="review-success-view">
+            <div class="success-icon-circle">
+                <i class="fas fa-check"></i>
+            </div>
+            <h1 class="success-title">Cảm ơn bạn đã đánh giá!</h1>
+            <p class="success-desc">Bãi đỗ xe <span class="success-spot-name" id="success-spot-name-label">Vincom Đồng Khởi</span> đã nhận được phản hồi của bạn.</p>
+
+            <!-- Đánh giá của bạn -->
+            <div class="your-review-section">
+                <h3 class="section-label-v3">Đánh giá của bạn</h3>
+                <div class="your-review-card">
+                    <div class="review-details-side">
+                        <div class="review-header-row">
+                            <div class="review-stars-show" id="your-review-stars">
+                                <!-- Rendered dynamically -->
+                            </div>
+                            <span class="review-date-label">Hôm nay</span>
+                            <span class="verified-badge">Verified Review</span>
+                        </div>
+                        <div class="review-badge-list" id="your-review-badges">
+                            <!-- Rendered dynamically -->
+                        </div>
+                        <p class="review-comment-text" id="your-review-comment">
+                            "Bãi đỗ rất sạch sẽ và an ninh. Nhân viên hướng dẫn nhiệt tình."
+                        </p>
+                        <div class="review-photos-flex" id="your-review-photos">
+                            <!-- Rendered dynamically -->
+                        </div>
+                    </div>
+                    <!-- Right Sidebar Spot Block -->
+                    <div class="spot-info-block">
+                        <span class="info-block-title">Thông tin bãi đỗ</span>
+                        <h4 class="info-spot-name" id="info-spot-name">Vincom Đồng Khởi</h4>
+                        <p class="info-spot-address" id="info-spot-address">72 Lê Thánh Tôn, Quận 1</p>
+                        <button class="info-view-btn" id="view-spot-details-btn">Xem thông tin bãi</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Đánh giá từ cộng đồng -->
+            <div class="community-reviews-section">
+                <div class="community-header">
+                    <h3 class="section-label-v3" style="margin-bottom: 0;">Đánh giá từ cộng đồng</h3>
+                    <span class="community-header-link" style="cursor: pointer;">Xem tất cả &gt;</span>
+                </div>
+                <div style="font-size: 13.5px; color: #718096; font-weight: 600; margin-bottom: 15px;" id="community-reviews-summary">
+                    2.431 lượt đánh giá cho địa điểm này
+                </div>
+                <div class="community-list" id="community-reviews-list">
+                    <!-- Standard reviews will be loaded here -->
+                </div>
+            </div>
+
+            <!-- Success buttons -->
+            <div class="success-navigation-row">
+                <a href="/customer/index.html" class="success-nav-btn primary">Quay lại trang chủ</a>
+                <a href="/customer/index.html" class="success-nav-btn secondary">Xem bãi đỗ xe khác</a>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Logic scripts -->
+    <script src="/customer/js/config.js"></script>
+    <script src="/customer/js/review.js"></script>
+</body>
+
+</html>

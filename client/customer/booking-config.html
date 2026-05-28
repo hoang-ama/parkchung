@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Booking Configuration</title>
+    <title>Đặt chỗ - ParkChung</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap"
@@ -16,323 +16,1020 @@
     <link rel="icon" type="image/png" href="/assets/logo/favicon.png" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/material_blue.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+
+    <style>
+        body {
+            padding-top: 104px;
+        }
+        /* ===== SERVICE CARD - ĐÚNG DESIGN FIGMA ===== */
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            margin-top: 12px;
+        }
+
+        .service-item-card {
+            background: #fff;
+            border: 1.5px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 14px 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .service-item-card:hover {
+            border-color: #13b47e;
+            box-shadow: 0 2px 12px rgba(19, 180, 126, 0.12);
+        }
+
+        .service-item-card.selected {
+            border-color: #13b47e;
+            background: #f0fdf8;
+        }
+
+        /* Green circle icon - đúng design */
+        .service-card-icon {
+            width: 56px;
+            height: 56px;
+            background: #13b47e;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .service-card-icon svg {
+            width: 28px;
+            height: 28px;
+        }
+
+        .service-card-info {
+            flex: 1;
+        }
+
+        .service-name {
+            font-size: 12px;
+            font-weight: 600;
+            color: #1a1a2e;
+            margin: 0 0 4px 0;
+            line-height: 1.3;
+        }
+
+        .service-view-more {
+            font-size: 11px;
+            color: #13b47e;
+            text-decoration: none;
+        }
+
+        .service-card-bottom {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            gap: 6px;
+        }
+
+        .service-price {
+            font-size: 13px;
+            font-weight: 700;
+            color: #13b47e;
+        }
+
+        /* Nút + đơn giản (trước khi chọn) */
+        .service-add-btn {
+            width: 28px;
+            height: 28px;
+            background: #13b47e;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            font-size: 18px;
+            line-height: 1;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 300;
+            transition: background 0.2s;
+        }
+
+        .service-add-btn:hover {
+            background: #0ea36b;
+        }
+
+        /* Quantity +/- control (sau khi chọn) - đúng design Figma */
+        .service-qty-control {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .qty-btn {
+            width: 26px;
+            height: 26px;
+            background: #fff;
+            border: 1.5px solid #13b47e;
+            border-radius: 50%;
+            color: #13b47e;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+            transition: background 0.15s;
+        }
+
+        .qty-btn:hover {
+            background: #13b47e;
+            color: white;
+        }
+
+        .qty-value {
+            font-size: 14px;
+            font-weight: 700;
+            color: #1a1a2e;
+            min-width: 18px;
+            text-align: center;
+        }
+
+        /* ===== RIGHT PANEL ===== */
+        .summary-section-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: #1a1a2e;
+            margin-bottom: 10px;
+        }
+
+        /* Nút Tiếp ngay */
+        .btn-tiep-ngay {
+            width: 100%;
+            padding: 14px;
+            background: #13b47e;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: background 0.2s, transform 0.1s;
+            margin-top: 8px;
+        }
+
+        .btn-tiep-ngay:hover:not(:disabled) {
+            background: #0ea36b;
+            transform: translateY(-1px);
+        }
+
+        .btn-tiep-ngay:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+        }
+
+        /* Payment section - đúng design ảnh 5 */
+        .payment-section-vi .payment-option-group {
+            border: 1.5px solid #e5e7eb;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+
+        .payment-section-vi .payment-radio-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 14px;
+            cursor: pointer;
+            background: #fff;
+        }
+
+        .payment-section-vi .payment-radio-row:hover {
+            background: #f0fdf8;
+        }
+
+        .payment-section-vi .payment-radio-row input[type="radio"] {
+            accent-color: #13b47e;
+            width: 18px;
+            height: 18px;
+        }
+
+        .payment-section-vi .payment-radio-row label {
+            font-size: 14px;
+            font-weight: 600;
+            color: #1a1a2e;
+            cursor: pointer;
+            flex: 1;
+        }
+
+        .payment-sub-options {
+            display: none;
+            padding: 0 14px 12px 42px;
+            gap: 8px;
+            flex-direction: column;
+        }
+
+        .payment-sub-options.show {
+            display: flex;
+        }
+
+        .payment-sub-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .payment-sub-row input[type="checkbox"],
+        .payment-sub-row input[type="radio"] {
+            accent-color: #13b47e;
+        }
+
+        .payment-sub-row label {
+            font-size: 13px;
+            color: #4b5563;
+            cursor: pointer;
+        }
+
+        .pay-later-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 14px;
+            border: 1.5px solid #e5e7eb;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+
+        .pay-later-row label {
+            font-size: 14px;
+            font-weight: 600;
+            color: #1a1a2e;
+            cursor: pointer;
+        }
+
+        /* ===== HEADER & STATUS BAR REDESIGN ===== */
+        .header-v3 {
+            background: #0b1a17 !important; /* Dark teal background matching Figma */
+        }
+        
+        .header-logo-text .header-brand {
+            color: #ffffff !important;
+            font-size: 18px !important;
+            font-weight: 700 !important;
+        }
+        
+        .header-logo-text .header-tagline {
+            color: #13b47e !important;
+            font-size: 10px !important;
+            font-weight: 500 !important;
+        }
+        
+        .header-nav {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        
+        .header-nav .nav-link {
+            color: #ffffff !important;
+            font-size: 13px !important;
+            font-weight: 500;
+            text-decoration: none;
+        }
+        
+        .btn-nav-figma {
+            background: #13b47e;
+            color: #ffffff !important;
+            font-size: 13px !important;
+            font-weight: 600;
+            padding: 8px 16px;
+            border-radius: 6px;
+            text-decoration: none;
+            transition: background 0.2s;
+        }
+        
+        .btn-nav-figma:hover {
+            background: #0ea36b;
+        }
+        
+        .lang-selector-figma {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            cursor: pointer;
+        }
+        
+        .flag-icon-figma {
+            width: 20px;
+            height: 14px;
+            border-radius: 2px;
+            object-fit: cover;
+        }
+
+        .top-status-bar-section {
+            background: #eaeaea; /* Light gray background matching Figma */
+            padding: 12px 0;
+            border-bottom: 1px solid #dcdcdc;
+        }
+
+        .top-bar-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 16px;
+        }
+
+        .top-status-bar {
+            display: flex;
+            background: transparent;
+            padding: 0;
+            box-shadow: none;
+            gap: 12px;
+            align-items: center;
+            width: 100%;
+        }
+
+        .top-bar-field {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            background: #ffffff;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            padding: 8px 12px;
+            position: relative;
+            gap: 10px;
+            flex: 1;
+            min-height: 50px;
+        }
+
+        .top-bar-field.flex-grow-2 {
+            flex: 2;
+        }
+
+        .top-bar-field.flex-grow-1 {
+            flex: 1;
+        }
+
+        .top-bar-field::after {
+            display: none !important;
+        }
+
+        .top-bar-icon {
+            color: #13b47e;
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+
+        .top-bar-content {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+        }
+
+        .top-bar-label {
+            font-size: 10px;
+            font-weight: 600;
+            color: #9ca3af;
+            margin-bottom: 2px;
+            text-transform: none;
+            display: block;
+        }
+
+        .top-bar-input-container {
+            display: flex;
+            align-items: center;
+            width: 100%;
+        }
+
+        .top-bar-input-container input {
+            border: none !important;
+            outline: none !important;
+            font-size: 12px !important;
+            font-weight: 700 !important;
+            color: #1f2937 !important;
+            width: 100% !important;
+            background: transparent !important;
+            padding: 0 !important;
+        }
+
+        .top-bar-chevron {
+            color: #9ca3af;
+            font-size: 11px;
+            margin-left: auto;
+            flex-shrink: 0;
+        }
+
+        .autocomplete-suggestions {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            width: 100%;
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            max-height: 220px;
+            overflow-y: auto;
+            margin-top: 8px;
+        }
+
+        .autocomplete-suggestion {
+            padding: 10px 14px;
+            font-size: 13px;
+            color: #374151;
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+
+        .autocomplete-suggestion:hover {
+            background: #f0fdf8;
+            color: #13b47e;
+        }
+
+        /* ===== SERVICE CHECK BUTTON ===== */
+        .service-check-btn {
+            width: 28px;
+            height: 28px;
+            background: #13b47e;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: transform 0.1s;
+        }
+
+        .service-check-btn:hover {
+            transform: scale(1.05);
+        }
+
+        /* ===== PAYMENT METHODS ===== */
+        .payment-group-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .payment-option-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 14px;
+            border: 1.5px solid #e5e7eb;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background 0.2s, border-color 0.2s;
+        }
+
+        .payment-option-row:hover {
+            background: #f0fdf8;
+            border-color: #13b47e;
+        }
+
+        .payment-option-row.selected {
+            background: #f0fdf8;
+            border-color: #13b47e;
+        }
+
+        .payment-option-row input[type="radio"] {
+            accent-color: #13b47e;
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .payment-option-row label {
+            font-size: 13.5px;
+            font-weight: 600;
+            color: #1a1a2e;
+            cursor: pointer;
+            flex: 1;
+            display: flex;
+            align-items: center;
+        }
+
+        @media (max-width: 768px) {
+            .top-status-bar {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 14px;
+                padding: 16px;
+            }
+
+            .top-bar-field:not(:last-child)::after {
+                display: none;
+            }
+            
+            .top-bar-field {
+                width: 100%;
+            }
+        }
+    </style>
 </head>
 
 <body>
-    <header class="main-header">
-        <div class="container header-container">
-            <div class="logo">
-                <a href="index.html">ParkChung</a>
-            </div>
-            <nav class="main-nav">
-                <ul class="nav-list">
-                    <li class="nav-item"><a href="index.html" data-i18n="nav_home">Home</a></li>
-                    <li class="nav-item"><a href="results.html" data-i18n="nav_available">Available Spots</a></li>
-                    <li class="nav-item"><a href="#" id="logout-link" data-i18n="logout">Logout</a></li>
-                    <li class="nav-item"><a href="login.html" id="login-link" data-i18n="login">Login</a></li>
-                    <li class="nav-item"><a href="register.html" id="register-link"
-                            data-i18n="becomeHostRegister">Become a Host / Register</a></li>
-                </ul>
+    <header class="header-v3">
+        <div class="header-inner">
+            <a href="/customer/index.html" class="header-logo">
+                <img src="/assets/logo/logo.svg" alt="ParkChung Logo" />
+                <div class="header-logo-text">
+                    <span class="header-brand">PARKCHUNG</span>
+                    <span class="header-tagline">Smart Parking Here</span>
+                </div>
+            </a>
+            <nav class="header-nav" id="main-nav">
+                <a href="/customer/register.html" class="nav-link">Trở thành chủ bãi đậu xe <i class="fas fa-chevron-down" style="font-size: 10px; margin-left: 4px;"></i></a>
+                <a href="/customer/login.html" class="btn-nav-figma">Đăng nhập</a>
+                <a href="/customer/register.html" class="btn-nav-figma">Đăng ký</a>
+                <div class="lang-selector-figma">
+                    <img src="https://flagcdn.com/w20/vn.png" alt="VN" class="flag-icon-figma">
+                    <i class="fas fa-chevron-down" style="font-size: 9px; color: #fff; margin-left: 2px;"></i>
+                </div>
             </nav>
         </div>
     </header>
-    <div class="page-banner">
-        <div class="container banner-container">
-            <h1 class="banner-title" data-i18n="config_title">Complete Your Booking</h1>
-            <p class="banner-subtitle" data-i18n="config_subtitle">Just a few more details to confirm your reservation.
-            </p>
-        </div>
-        <main class="booking-page-main container">
-            <div class="booking-grid">
-                <div class="booking-details-column">
-                    <!-- Spot Summary (Read-only) -->
-                    <div class="info-card spot-summary-card">
-                        <div class="spot-summary-header">
-                            <img id="spot-thumbnail" src="" alt="Parking Spot" class="spot-thumbnail">
-                            <div class="spot-summary-info">
-                                <h3 id="spot-name">Loading...</h3>
-                                <p id="spot-address-display" class="spot-address-text">Loading address...</p>
-                                <div class="rating">
-                                    <span class="stars" id="config-rating-stars">★★★★★</span>
-                                    <span class="rating-value" id="config-rating-value">0</span>
-                                </div>
-                                <span class="rating-source">By GoogleRating</span>
-                            </div>
+
+    <!-- Top search status bar section -->
+    <section class="top-status-bar-section">
+        <div class="container top-bar-container">
+            <div class="top-status-bar">
+                <!-- Dropoff Location -->
+                <div class="top-bar-field flex-grow-2">
+                    <i class="fas fa-map-marker-alt top-bar-icon"></i>
+                    <div class="top-bar-content">
+                        <span class="top-bar-label">Đỗ tại</span>
+                        <div class="top-bar-input-container">
+                            <input type="text" id="top-dropoff-input" placeholder="Nhập điểm giao xe..." />
+                            <div class="autocomplete-suggestions" id="top-dropoff-suggestions"></div>
                         </div>
                     </div>
-
-                    <!-- Booking Details -->
-                    <div class="info-card booking-info-card">
-                        <h2 data-i18n="details_section_title">Booking Details</h2>
-                        <div class="booking-info-item">
-                            <span class="icon">📅</span>
-                            <span class="label" data-i18n="arriving_on">Arriving on</span>
-                            <input type="text" id="booking-arrival-date-input" class="flatpickr-input"
-                                placeholder="Select Date/Time" data-i18n-placeholder="ph_select_datetime">
-                        </div>
-                        <div class="booking-info-item">
-                            <span class="icon">📅</span>
-                            <span class="label" data-i18n="leaving_on">Leaving on</span>
-                            <input type="text" id="booking-leaving-date-input" class="flatpickr-input"
-                                placeholder="Select Date/Time" data-i18n-placeholder="ph_select_datetime">
-                        </div>
-                        <div class="booking-info-item">
-                            <span class="icon">⏱️</span>
-                            <span class="label" data-i18n="duration">Duration</span>
-                            <div class="value-wrapper">
-                                <span id="booking-duration" class="highlight-text">--</span>
-                            </div>
-                        </div>
-                        <div class="booking-info-item">
-                            <span class="icon">💳</span>
-                            <span class="label" data-i18n="billed_as">Billed as</span>
-                            <div class="value-wrapper">
-                                <span id="booking-billed-hours" class="highlight-text">-- hours</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Contact Information -->
-                    <div class="info-card user-contact-card">
-                        <h2 data-i18n="contact_title">Contact Information</h2>
-                        <p class="help-text" data-i18n="contact_hint">We'll use this to contact you about your booking
-                        </p>
-
-                        <!-- Full Name (All Users) -->
-                        <div class="form-group">
-                            <label for="guest-fullname-input" class="form-label" data-i18n="contact_fullname_label">Full
-                                Name</label>
-                            <input type="text" id="guest-fullname-input" placeholder="Enter your full name"
-                                data-i18n-placeholder="ph_fullname" class="text-input">
-                        </div>
-
-                        <!-- Email (All Users) -->
-                        <div class="form-group">
-                            <label for="guest-email-input" class="form-label" data-i18n="contact_email_label">Email
-                                Address</label>
-                            <input type="email" id="guest-email-input" placeholder="Enter your email address"
-                                data-i18n-placeholder="ph_email" class="text-input">
-                        </div>
-
-                        <div class="form-group">
-                            <label for="phone-number-input" class="form-label" data-i18n="contact_phone_label">Phone
-                                Number</label>
-                            <input type="tel" id="phone-number-input" placeholder="Enter your phone number"
-                                class="text-input" required>
-                        </div>
-                    </div>
-
-                    <!-- Vehicle Information -->
-                    <div class="info-card vehicle-info-card">
-                        <h2 data-i18n="vehicle_title">Vehicle Information</h2>
-                        <p class="help-text" data-i18n="vehicle_desc">Your vehicle registration will be shared with the
-                            parking operator</p>
-                        <div class="form-group">
-                            <label for="vehicle-reg-input" class="form-label" data-i18n="vehicle_reg_label">Vehicle
-                                Registration</label>
-                            <input type="text" id="vehicle-reg-input" placeholder="Enter your vehicle registration"
-                                data-i18n-placeholder="ph_vehicle_reg" class="text-input" required>
-                        </div>
-                    </div>
+                    <i class="fas fa-chevron-down top-bar-chevron"></i>
                 </div>
 
-                <div class="booking-summary-column">
-                    <div class="booking-summary-card">
-                        <h3 id="spot-address" data-i18n="spot_loading">Loading Address...</h3>
-                        <div class="price-breakdown">
-                            <div class="price-item">
-                                <span data-i18n="unit_price">Unit Price</span>
-                                <span id="summary-unit-price" class="price-value">-- VND / hour</span>
-                            </div>
-                            <div class="price-item">
-                                <span data-i18n="parking_duration">Parking Duration</span>
-                                <span id="summary-duration" class="price-value">-- hours</span>
-                            </div>
-                            <div class="price-item total-price">
-                                <span data-i18n="total_price">Total Price</span>
-                                <span id="summary-final-price" class="price-value">0 VND</span>
-                            </div>
-                        </div>
-
-                        <p class="billing-info-text" data-i18n="billing_info">Bookings are charged in 1-hour blocks
-                            (minimum 1 hour).</p>
-
-                        <p class="rechecked-info" data-i18n="rechecked">Availability rechecked in <span
-                                id="rechecked-time">--:--</span></p>
-
-                        <!-- Countdown Timer -->
-                        <div class="countdown-timer">
-                            <div class="countdown-header">
-                                <span class="countdown-icon">⏰</span>
-                                <p data-i18n="time_to_complete">Time to complete booking:</p>
-                            </div>
-                            <span id="timer-display" class="timer-value">15:00</span>
-                            <div class="countdown-progress">
-                                <div class="progress-bar"></div>
-                            </div>
-                        </div>
-
-                        <!-- Payment Method Selection Card -->
-                        <div class="payment-method-selection-card">
-                            <h3 class="payment-selection-title" data-i18n="payment_method_title">Payment Method</h3>
-                            <div class="payment-methods">
-                                <div class="payment-option" data-method="paypal">
-                                    <input type="radio" id="payment-paypal" name="paymentMethod" value="paypal" checked>
-                                    <label for="payment-paypal" class="payment-label">
-                                        <div class="payment-icon paypal-icon">
-                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="32"
-                                                height="32">
-                                                <path fill="#003087"
-                                                    d="M20.905 9.5c.21-1.342.09-2.254-.43-3.082C19.65 5.255 18.086 4.5 15.816 4.5H8.87c-.54 0-1.003.393-1.087.93L5.5 18.737c-.064.392.236.763.636.763h4.636l-.327 2.076c-.056.343.206.666.556.666h3.875c.472 0 .876-.343.95-.81l.984-6.232h1.905c3.894 0 6.285-1.88 6.285-5.7 0-.86-.203-1.588-.595-2z" />
-                                                <path fill="#0070E0"
-                                                    d="M8.87 4.5c-.54 0-1.003.393-1.087.93L5.5 18.737c-.064.392.236.763.636.763h4.636l1.164-7.379-.036.228c.084-.537.547-.93 1.087-.93h2.262c4.444 0 7.924-1.806 8.94-7.026.03-.154.055-.303.076-.448C23.37 2.417 21.686 1.5 19.09 1.5H8.87z" />
-                                            </svg>
-                                        </div>
-                                        <div class="payment-details">
-                                            <span class="payment-name">PayPal</span>
-                                            <span class="payment-desc" data-i18n="pay_securely_online">Pay securely
-                                                online</span>
-                                        </div>
-                                        <span class="payment-badge" data-i18n="badge_instant">Instant</span>
-                                    </label>
-                                </div>
-
-                                <div class="payment-option" data-method="cash">
-                                    <input type="radio" id="payment-cash" name="paymentMethod" value="cash">
-                                    <label for="payment-cash" class="payment-label">
-                                        <div class="payment-icon cash-icon">
-                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="32"
-                                                height="32" fill="none" stroke="#13b47e" stroke-width="2"
-                                                stroke-linecap="round" stroke-linejoin="round">
-                                                <rect x="2" y="5" width="20" height="14" rx="2" />
-                                                <circle cx="12" cy="12" r="3" />
-                                                <path d="M18.5 9.5v5M5.5 9.5v5" />
-                                            </svg>
-                                        </div>
-                                        <div class="payment-details">
-                                            <span class="payment-name" data-i18n="cash_pay_later">Cash / Pay
-                                                Later</span>
-                                            <span class="payment-desc" data-i18n="pay_at_spot">Pay at parking
-                                                spot</span>
-                                        </div>
-                                        <span class="payment-badge" data-i18n="badge_flexible">Flexible</span>
-                                    </label>
-                                </div>
-                            </div>
-                        </div>
-
-                        <p class="terms-text">
-                            <span data-i18n="terms_prefix">Clicking below indicates that you have read and accept the</span>
-                            <a href="#" data-i18n="terms_link">Terms & Conditions</a>
-                        </p>
-                        <div class="trust-item">
-                            <span class="icon">💰</span> <span data-i18n="trust_transparent_pricing">Transparent pricing
-                                shown before you confirm</span>
-                        </div>
-                        <div class="trust-item">
-                            <span class="icon">✅</span> <span data-i18n="trust_verified_hosts">Verified hosts & clear
-                                listing rules</span>
-                        </div>
-                        <div class="trust-item">
-                            <span class="icon">💳</span> <span data-i18n="trust_flexible_payment">Flexible payment
-                                options: online (eligible listings) or cash on arrival</span>
-                        </div>
-                        <div class="trust-item">
-                            <span class="icon">⏰</span> <span data-i18n="trust_free_cancel">Free cancellation on
-                                eligible bookings — see the listing</span>
-                        </div>
-                        <div class="trust-item">
-                            <span class="icon">🏆</span> <span data-i18n="trust_support">Fast, reliable customer support
-                                when you need help</span>
-                        </div>
-                        <div class="trust-item trustpilot">
-                            <span id="trustpilot-rating-value">0</span> <span id="trustpilot-rating-stars"
-                                class="stars">★★★★★</span>
-                        </div>
-                        <button id="pay-and-reserve-btn" class="btn btn-action" disabled data-i18n="btn_pay_reserve">Pay
-                            now and reserve</button>
-                    </div>
-                </div>
-            </div>
-        </main>
-        <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-        <script src="/customer/js/custom-modal.js"></script>
-        <script src="/customer/js/config.js"></script>
-        <script src="/customer/js/utils.js"></script>
-        <script type="module" src="/customer/js/app.js"></script>
-        <script src="/customer/js/booking-config.js"></script>
-
-        <!-- Guest Booking Modal -->
-        <div id="leadModal" class="guest-modal">
-            <div class="guest-modal__overlay"></div>
-            <div class="guest-modal__container">
-                <div class="guest-modal__header">
-                    <h2 class="guest-modal__title" data-i18n="popup_title">Complete Your Booking</h2>
-                    <button id="guest-cancel" class="guest-modal__close" aria-label="Close">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                            stroke-width="2">
-                            <line x1="18" y1="6" x2="6" y2="18"></line>
-                            <line x1="6" y1="6" x2="18" y2="18"></line>
-                        </svg>
-                    </button>
-                </div>
-
-                <div class="guest-modal__content">
-                    <div class="booking-summary">
-                        <div class="booking-summary__title" data-i18n="popup_booking_summary">Booking Summary</div>
-                        <div class="booking-summary__times">
-                            <div class="time-item">
-                                <div class="time-label" data-i18n="popup_from">From</div>
-                                <div class="time-value" id="pc-time-from">--</div>
-                            </div>
-                            <div class="time-separator">→</div>
-                            <div class="time-item">
-                                <div class="time-label" data-i18n="popup_to">To</div>
-                                <div class="time-value" id="pc-time-to">--</div>
-                            </div>
+                <!-- Pickup Location -->
+                <div class="top-bar-field flex-grow-2">
+                    <i class="fas fa-map-marker-alt top-bar-icon"></i>
+                    <div class="top-bar-content">
+                        <span class="top-bar-label">Đỗ tại</span>
+                        <div class="top-bar-input-container">
+                            <input type="text" id="top-pickup-input" placeholder="Nhập điểm trả xe..." />
+                            <div class="autocomplete-suggestions" id="top-pickup-suggestions"></div>
                         </div>
                     </div>
-
-                    <div class="guest-form">
-                        <div class="form-section">
-                            <h3 class="form-section__title" data-i18n="popup_contact_info">Contact Information</h3>
-                            <p class="form-section__description" data-i18n="popup_contact_desc">We'll use this
-                                information to confirm your booking</p>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="guest-fullname" class="form-label" data-i18n="popup_fullname">Full Name</label>
-                            <input id="guest-fullname" class="form-input" type="text" placeholder="Enter your full name"
-                                required>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="guest-email" class="form-label" data-i18n="popup_email">Email Address</label>
-                            <input id="guest-email" class="form-input" type="email"
-                                placeholder="Enter your email address" required>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="guest-phone" class="form-label" data-i18n="popup_phone">Phone Number</label>
-                            <input id="guest-phone" class="form-input" type="tel" placeholder="Enter your phone number"
-                                required>
-                        </div>
-                    </div>
+                    <i class="fas fa-chevron-down top-bar-chevron"></i>
                 </div>
 
-                <div class="guest-modal__footer">
-                    <button id="guest-cancel-secondary" class="btn btn-secondary"
-                        data-i18n="popup_cancel">Cancel</button>
-                    <button id="guest-submit" class="btn btn-primary" data-i18n="popup_send">
-                        <span class="btn-text">Complete Booking</span>
-                        <svg class="btn-icon" width="20" height="20" viewBox="0 0 24 24" fill="none"
-                            stroke="currentColor" stroke-width="2">
-                            <path d="M5 12h14M12 5l7 7-7 7" />
-                        </svg>
-                    </button>
+                <!-- Arrival Time -->
+                <div class="top-bar-field flex-grow-1">
+                    <i class="far fa-clock top-bar-icon"></i>
+                    <div class="top-bar-content">
+                        <span class="top-bar-label">Đỗ từ</span>
+                        <div class="top-bar-input-container">
+                            <input type="text" id="booking-arrival-date-input" class="flatpickr-input" placeholder="Chọn ngày/giờ giao" readonly />
+                        </div>
+                    </div>
+                    <i class="fas fa-chevron-down top-bar-chevron"></i>
+                </div>
+
+                <!-- Leaving Time -->
+                <div class="top-bar-field flex-grow-1">
+                    <i class="far fa-clock top-bar-icon"></i>
+                    <div class="top-bar-content">
+                        <span class="top-bar-label">Lấy xe</span>
+                        <div class="top-bar-input-container">
+                            <input type="text" id="booking-leaving-date-input" class="flatpickr-input" placeholder="Chọn ngày/giờ trả" readonly />
+                        </div>
+                    </div>
+                    <i class="fas fa-chevron-down top-bar-chevron"></i>
                 </div>
             </div>
         </div>
+    </section>
+
+    <main class="booking-page-main container">
+        <div class="booking-grid">
+            <!-- LEFT COLUMN: Services + Contact + Vehicle + Payment -->
+            <div class="booking-details-column">
+
+                <!-- ===== DỊCH VỤ ĐI KÈM ===== -->
+                <div class="info-card services-card">
+                    <h2 class="services-card-title">Dịch vụ đi kèm</h2>
+                    <p class="help-text">Chọn thêm các dịch vụ chăm sóc xe tiện lợi trong thời gian gửi xe của bạn</p>
+                    <div class="services-grid">
+
+                        <!-- 1: Rửa xe và hút bụi -->
+                        <div class="service-item-card" data-service-id="rua-xe" data-service-name="Rửa xe và hút bụi" data-service-price="20000">
+                            <div class="service-card-icon">
+                                <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M8 26l3-10h18l3 10H8z" stroke="white" stroke-width="2" stroke-linejoin="round"/>
+                                    <path d="M6 26h28v3a2 2 0 01-2 2H8a2 2 0 01-2-2v-3z" stroke="white" stroke-width="2"/>
+                                    <circle cx="13" cy="31" r="2.5" stroke="white" stroke-width="1.5"/>
+                                    <circle cx="27" cy="31" r="2.5" stroke="white" stroke-width="1.5"/>
+                                    <path d="M12 8v4M20 7v4M28 8v4" stroke="white" stroke-width="2" stroke-linecap="round"/>
+                                    <path d="M9 12c3-4 11-5 15-1" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
+                                </svg>
+                            </div>
+                            <div class="service-card-info">
+                                <h4 class="service-name">Rửa xe và hút bụi</h4>
+                                <a href="#" class="service-view-more">Xem thêm &gt;</a>
+                            </div>
+                            <div class="service-card-bottom">
+                                <span class="service-price">20.000đ</span>
+                                <button type="button" class="service-add-btn">+</button>
+                                <button type="button" class="service-check-btn" style="display:none;"><i class="fas fa-check"></i></button>
+                            </div>
+                        </div>
+
+                        <!-- 2: Kiểm tra áp suất lốp -->
+                        <div class="service-item-card" data-service-id="ap-suat-lop" data-service-name="Kiểm tra áp suất lốp và châm nước rửa kính" data-service-price="20000">
+                            <div class="service-card-icon">
+                                <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <circle cx="20" cy="22" r="11" stroke="white" stroke-width="2"/>
+                                    <circle cx="20" cy="22" r="5" stroke="white" stroke-width="2"/>
+                                    <path d="M20 11v3M20 30v3M9 22H6M31 22h3" stroke="white" stroke-width="2" stroke-linecap="round"/>
+                                    <path d="M13 15l2 2M25 29l2 2M13 29l2-2M25 15l2-2" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
+                                    <path d="M18 8h4" stroke="white" stroke-width="2" stroke-linecap="round"/>
+                                    <path d="M20 6v5" stroke="white" stroke-width="2" stroke-linecap="round"/>
+                                </svg>
+                            </div>
+                            <div class="service-card-info">
+                                <h4 class="service-name">Kiểm tra áp suất lốp & nước kính</h4>
+                                <a href="#" class="service-view-more">Xem thêm &gt;</a>
+                            </div>
+                            <div class="service-card-bottom">
+                                <span class="service-price">20.000đ</span>
+                                <button type="button" class="service-add-btn">+</button>
+                                <button type="button" class="service-check-btn" style="display:none;"><i class="fas fa-check"></i></button>
+                            </div>
+                        </div>
+
+                        <!-- 3: Tiếp nhiên liệu -->
+                        <div class="service-item-card" data-service-id="tiep-nhien-lieu" data-service-name="Tiếp nhiên liệu" data-service-price="20000">
+                            <div class="service-card-icon">
+                                <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <rect x="8" y="10" width="16" height="22" rx="2" stroke="white" stroke-width="2"/>
+                                    <path d="M8 18h16" stroke="white" stroke-width="1.5"/>
+                                    <path d="M24 16l4-4 2 2v10a2 2 0 01-2 2" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <path d="M28 22v4" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
+                                    <path d="M14 10V7a1 1 0 011-1h2a1 1 0 011 1v3" stroke="white" stroke-width="1.5"/>
+                                    <path d="M13 22h6" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
+                                </svg>
+                            </div>
+                            <div class="service-card-info">
+                                <h4 class="service-name">Tiếp nhiên liệu</h4>
+                                <a href="#" class="service-view-more">Xem thêm &gt;</a>
+                            </div>
+                            <div class="service-card-bottom">
+                                <span class="service-price">20.000đ</span>
+                                <button type="button" class="service-add-btn">+</button>
+                                <button type="button" class="service-check-btn" style="display:none;"><i class="fas fa-check"></i></button>
+                            </div>
+                        </div>
+
+                        <!-- 4: Sạc xe điện -->
+                        <div class="service-item-card" data-service-id="sac-dien" data-service-name="Sạc xe điện" data-service-price="20000">
+                            <div class="service-card-icon">
+                                <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <rect x="10" y="8" width="20" height="24" rx="3" stroke="white" stroke-width="2"/>
+                                    <path d="M15 8V6M25 8V6" stroke="white" stroke-width="2" stroke-linecap="round"/>
+                                    <path d="M22 17l-5 8h6l-5 8" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <path d="M14 32v2M26 32v2" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
+                                </svg>
+                            </div>
+                            <div class="service-card-info">
+                                <h4 class="service-name">Sạc xe điện</h4>
+                                <a href="#" class="service-view-more">Xem thêm &gt;</a>
+                            </div>
+                            <div class="service-card-bottom">
+                                <span class="service-price">20.000đ</span>
+                                <button type="button" class="service-add-btn">+</button>
+                                <button type="button" class="service-check-btn" style="display:none;"><i class="fas fa-check"></i></button>
+                            </div>
+                        </div>
+
+                        <!-- 5: Thay dầu/nhớt -->
+                        <div class="service-item-card" data-service-id="thay-dau" data-service-name="Thay dầu/nhớt" data-service-price="20000">
+                            <div class="service-card-icon">
+                                <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M20 8c0 0-8 9-8 15a8 8 0 0016 0C28 17 20 8 20 8z" stroke="white" stroke-width="2" stroke-linejoin="round"/>
+                                    <path d="M14 24c0 3.3 2.7 6 6 6" stroke="white" stroke-width="2" stroke-linecap="round"/>
+                                    <path d="M27 12l4-4" stroke="white" stroke-width="2" stroke-linecap="round"/>
+                                    <rect x="29" y="5" width="6" height="3" rx="1" transform="rotate(45 29 5)" stroke="white" stroke-width="1.5"/>
+                                </svg>
+                            </div>
+                            <div class="service-card-info">
+                                <h4 class="service-name">Thay dầu/nhớt</h4>
+                                <a href="#" class="service-view-more">Xem thêm &gt;</a>
+                            </div>
+                            <div class="service-card-bottom">
+                                <span class="service-price">20.000đ</span>
+                                <button type="button" class="service-add-btn">+</button>
+                                <button type="button" class="service-check-btn" style="display:none;"><i class="fas fa-check"></i></button>
+                            </div>
+                        </div>
+
+                        <!-- 6: Vệ sinh nội thất -->
+                        <div class="service-item-card" data-service-id="ve-sinh-sau" data-service-name="Vệ sinh nội thất chuyên sâu" data-service-price="20000">
+                            <div class="service-card-icon">
+                                <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M20 8v16" stroke="white" stroke-width="2" stroke-linecap="round"/>
+                                    <path d="M14 14c0-3.3 2.7-6 6-6s6 2.7 6 6" stroke="white" stroke-width="2"/>
+                                    <path d="M12 24l8 8 8-8" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <ellipse cx="20" cy="32" rx="8" ry="2" stroke="white" stroke-width="1.5"/>
+                                    <path d="M8 22h24" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
+                                </svg>
+                            </div>
+                            <div class="service-card-info">
+                                <h4 class="service-name">Vệ sinh nội thất chuyên sâu</h4>
+                                <a href="#" class="service-view-more">Xem thêm &gt;</a>
+                            </div>
+                            <div class="service-card-bottom">
+                                <span class="service-price">20.000đ</span>
+                                <button type="button" class="service-add-btn">+</button>
+                                <button type="button" class="service-check-btn" style="display:none;"><i class="fas fa-check"></i></button>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- ===== THÔNG TIN LIÊN HỆ ===== -->
+                <div class="info-card user-contact-card">
+                    <h2>Thông tin cá nhân</h2>
+                    <p class="help-text">Chúng tôi sẽ liên hệ với bạn qua thông tin này</p>
+
+                    <div class="form-group">
+                        <label for="guest-fullname-input" class="form-label" style="text-transform:none; font-weight:600;">Họ và tên</label>
+                        <input type="text" id="guest-fullname-input" placeholder="Điền vào đây" class="text-input">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="phone-number-input" class="form-label" style="text-transform:none; font-weight:600;">Số điện thoại</label>
+                        <input type="tel" id="phone-number-input" placeholder="Điền vào đây" class="text-input">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="guest-email-input" class="form-label" style="text-transform:none; font-weight:600;">E-mail</label>
+                        <input type="email" id="guest-email-input" placeholder="Điền vào đây" class="text-input">
+                    </div>
+                </div>
+
+                <!-- ===== THÔNG TIN PHƯƠNG TIỆN ===== -->
+                <div class="info-card vehicle-info-card">
+                    <h2>Thông tin phương tiện</h2>
+                    <p class="help-text">Biển số xe của bạn sẽ được chia sẻ với đơn vị vận hành bãi đỗ</p>
+                    <div class="form-group">
+                        <label for="vehicle-reg-input" class="form-label" style="text-transform:none; font-weight:600;">Biển số xe</label>
+                        <input type="text" id="vehicle-reg-input" placeholder="Điền vào đây" class="text-input" required>
+                    </div>
+                </div>
+
+                <!-- ===== PHƯƠNG THỨC THANH TOÁN ===== -->
+                <div class="info-card payment-section-vi">
+                    <h2 style="font-size:18px;font-weight:700;margin-bottom:4px;">Thanh toán</h2>
+                    <p class="help-text" style="margin-bottom:14px;">Phương thức thanh toán của bạn</p>
+
+                    <!-- Trả trước -->
+                    <div class="payment-group">
+                        <div class="payment-group-header" style="margin-bottom: 12px;">
+                            <input type="checkbox" id="pay-before-checkbox" checked disabled style="accent-color:#13b47e;">
+                            <label for="pay-before-checkbox" style="font-weight:700; color:#1a1a2e; font-size:14px;">Trả trước</label>
+                        </div>
+                        <div class="payment-options-list" style="margin-left: 20px; display: flex; flex-direction: column; gap: 8px;">
+                            <div class="payment-option-row selected" onclick="selectPaymentRadio('pay-bank-transfer')">
+                                <input type="radio" id="pay-bank-transfer" name="paymentMethod" value="bank_transfer" checked>
+                                <label for="pay-bank-transfer"><i class="fas fa-university" style="color:#13b47e; margin-right:8px; width:16px;"></i> Chuyển khoản</label>
+                            </div>
+                            <div class="payment-option-row" onclick="selectPaymentRadio('pay-domestic-card')">
+                                <input type="radio" id="pay-domestic-card" name="paymentMethod" value="domestic_card">
+                                <label for="pay-domestic-card"><i class="far fa-credit-card" style="color:#13b47e; margin-right:8px; width:16px;"></i> Thẻ ATM nội địa</label>
+                            </div>
+                            <div class="payment-option-row" onclick="selectPaymentRadio('pay-paypal')">
+                                <input type="radio" id="pay-paypal" name="paymentMethod" value="paypal">
+                                <label for="pay-paypal"><i class="fab fa-cc-visa" style="color:#13b47e; margin-right:8px; width:16px;"></i> VISA Master Card (Thủ tục Visa tại Việt Nam)</label>
+                            </div>
+                            <div class="payment-option-row" onclick="selectPaymentRadio('pay-vnpay')">
+                                <input type="radio" id="pay-vnpay" name="paymentMethod" value="vnpay">
+                                <label for="pay-vnpay"><i class="fas fa-qrcode" style="color:#13b47e; margin-right:8px; width:16px;"></i> VNPAY</label>
+                            </div>
+                            <div class="payment-option-row" onclick="selectPaymentRadio('pay-momo')">
+                                <input type="radio" id="pay-momo" name="paymentMethod" value="momo">
+                                <label for="pay-momo"><i class="fas fa-wallet" style="color:#13b47e; margin-right:8px; width:16px;"></i> Momo</label>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Trả sau -->
+                    <div class="payment-group" style="margin-top: 16px; padding-top: 12px; border-top: 1px solid #f1f5f9;">
+                        <div class="payment-group-header" style="display: flex; align-items: center; justify-content: space-between; cursor:pointer;" onclick="togglePayLaterCheckbox()">
+                            <div style="display:flex; align-items:center; gap:8px;">
+                                <input type="checkbox" id="pay-later" name="payLater" value="pay_later" style="accent-color:#13b47e;">
+                                <label for="pay-later" style="font-weight:700; color:#1a1a2e; font-size:14px; cursor:pointer;">Trả sau</label>
+                            </div>
+                            <span style="font-size:11px;color:#9ca3af;">Nợ ghi sổ</span>
+                        </div>
+                    </div>
+                    <!-- Mã giảm giá -->
+                    <div class="payment-group" style="margin-top: 16px; padding-top: 12px; border-top: 1px solid #f1f5f9;">
+                        <div class="payment-group-header" style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+                            <input type="checkbox" id="use-promo-code" style="accent-color:#13b47e;">
+                            <label for="use-promo-code" style="font-weight:700; color:#1a1a2e; font-size:14px; cursor:pointer;">Mã giảm giá</label>
+                        </div>
+                        <div class="form-group" style="margin-left: 22px;">
+                            <input type="text" id="promo-code-input" placeholder="Điền vào đây" class="text-input" style="width: 100%; border: 1.5px solid #e5e7eb; padding: 10px 14px; border-radius: 10px; outline: none; font-size: 13.5px; font-weight: 500;">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- RIGHT COLUMN: Trip summary -->
+            <div class="booking-summary-column">
+
+                <!-- Đơn hàng của bạn -->
+                <div class="summary-section">
+                    <h3 class="summary-section-title">Đơn hàng của bạn</h3>
+                    <div class="summary-white-card">
+                        <div class="timeline-spot-header">
+                            <h4 id="spot-name" style="font-size:15px;font-weight:700;color:#1a1a2e;margin-bottom:4px;">Đang tải...</h4>
+                            <div class="rating-display-small">
+                                <span class="stars" id="config-rating-stars">★★★★★</span>
+                                <span class="rating-value" id="config-rating-value">0</span>
+                                <span class="rating-source" style="font-size:11px;color:#9ca3af;">By GoogleRating</span>
+                            </div>
+                        </div>
+
+                        <!-- Timeline dọc -->
+                        <div class="trip-timeline" style="margin-top:14px;">
+                            <div class="timeline-item">
+                                <div class="timeline-icon dropoff" style="background:#13b47e;">
+                                    <i class="fas fa-map-marker-alt" style="color:white;font-size:12px;"></i>
+                                </div>
+                                <div class="timeline-content">
+                                    <span class="timeline-address" id="summary-dropoff-addr" style="font-size:13px;font-weight:600;color:#1a1a2e;">--</span>
+                                    <span class="timeline-time" id="summary-dropoff-time" style="font-size:11px;color:#6b7280;display:block;">--</span>
+                                </div>
+                            </div>
+                            <div class="timeline-connector" style="width:2px;height:20px;background:#e5e7eb;margin-left:11px;"></div>
+                            <div class="timeline-item">
+                                <div class="timeline-icon pickup" style="background:#3b82f6;">
+                                    <i class="fas fa-flag-checkered" style="color:white;font-size:11px;"></i>
+                                </div>
+                                <div class="timeline-content">
+                                    <span class="timeline-address" id="summary-pickup-addr" style="font-size:13px;font-weight:600;color:#1a1a2e;">--</span>
+                                    <span class="timeline-time" id="summary-pickup-time" style="font-size:11px;color:#6b7280;display:block;">--</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Phí đỗ -->
+                        <div class="timeline-price-row" style="margin-top:14px;padding-top:12px;border-top:1px solid #e5e7eb;display:flex;justify-content:space-between;align-items:center;">
+                            <span style="font-size:13px;color:#6b7280;">Phí đỗ xe + valet (<span id="summary-valet-days">--</span> ngày)</span>
+                            <span id="summary-valet-price" class="valet-price-value" style="font-size:15px;font-weight:700;color:#13b47e;">0đ</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Hidden compatibility elements -->
+                <div style="display:none;">
+                    <img id="spot-thumbnail" src="" alt="Spot">
+                    <span id="spot-address"></span>
+                    <span id="booking-duration"></span>
+                    <span id="booking-billed-hours"></span>
+                    <span id="summary-unit-price"></span>
+                    <span id="summary-duration"></span>
+                    <span id="spot-address-display"></span>
+                    <span id="rechecked-time"></span>
+                </div>
+
+                <!-- Dịch vụ đã chọn (hiện khi có dịch vụ) -->
+                <div class="summary-section" id="summary-services-section" style="display:none;">
+                    <h3 class="summary-section-title">Dịch vụ đi kèm</h3>
+                    <div class="summary-white-card">
+                        <ul class="selected-services-list" id="summary-selected-services-list">
+                            <li class="no-services-placeholder">Chưa chọn dịch vụ nào</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Tổng tiền -->
+                <div class="summary-section">
+                    <h3 class="summary-section-title">Tổng tiền</h3>
+                    <div class="summary-white-card total-summary-card">
+                        <div class="total-price-row" style="display:flex;justify-content:space-between;align-items:flex-start;">
+                            <div class="total-breakdown-col">
+                                <span id="summary-breakdown-text" class="breakdown-text" style="font-size:13px;color:#4b5563;display:block;">Bãi đỗ + đỗ xe hộ</span>
+                                <span class="breakdown-subtitle" style="font-size:11px;color:#9ca3af;">Kiểm tra lại lúc <span id="rechecked-time-visible">--:--</span></span>
+                            </div>
+                            <span id="summary-final-price" class="final-price-value" style="font-size:22px;font-weight:800;color:#13b47e;">0đ</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Nút Tiếp ngay -->
+                <div class="summary-submit-section">
+                    <p class="terms-text" style="font-size:12px;color:#9ca3af;margin-bottom:8px;text-align:center;">
+                        Bấm nút bên dưới là bạn đồng ý với <a href="#" style="color:#13b47e;">Điều khoản &amp; Điều kiện</a>
+                    </p>
+                    <button id="pay-and-reserve-btn" class="btn-tiep-ngay" disabled>
+                        Đặt ngay
+                    </button>
+                    <button id="btn-back-to-offer" type="button" style="display:none; width:100%; margin-top:12px; padding:12px; border-radius:10px; font-weight:700; font-size:14px; background:#f3f4f6; color:#4b5563; border:1px solid #e5e7eb; cursor:pointer; align-items:center; justify-content:center; gap:8px;">
+                        Quay lại
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="/customer/js/custom-modal.js"></script>
+    <script src="/customer/js/config.js"></script>
+    <script src="/customer/js/utils.js"></script>
+    <script type="module" src="/customer/js/app.js"></script>
+    <script src="/customer/js/booking-config.js"></script>
+
+
+
+    <!-- Guest Booking Modal -->
+    <div id="leadModal" class="guest-modal">
+        <div class="guest-modal__overlay"></div>
+        <div class="guest-modal__container">
+            <div class="guest-modal__header">
+                <h2 class="guest-modal__title">Hoàn tất đặt chỗ</h2>
+                <button id="guest-cancel" class="guest-modal__close" aria-label="Đóng">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+
+            <div class="guest-modal__content">
+                <div class="booking-summary">
+                    <div class="booking-summary__title">Tóm tắt đặt chỗ</div>
+                    <div class="booking-summary__times">
+                        <div class="time-item">
+                            <div class="time-label">Từ</div>
+                            <div class="time-value" id="pc-time-from">--</div>
+                        </div>
+                        <div class="time-separator">→</div>
+                        <div class="time-item">
+                            <div class="time-label">Đến</div>
+                            <div class="time-value" id="pc-time-to">--</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="guest-form">
+                    <div class="form-section">
+                        <h3 class="form-section__title">Thông tin liên hệ</h3>
+                        <p class="form-section__description">Thông tin này dùng để xác nhận đặt chỗ của bạn</p>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="guest-fullname" class="form-label">Họ và tên</label>
+                        <input id="guest-fullname" class="form-input" type="text" placeholder="Nhập họ và tên" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="guest-email" class="form-label">Địa chỉ Email</label>
+                        <input id="guest-email" class="form-input" type="email" placeholder="Nhập địa chỉ email" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="guest-phone" class="form-label">Số điện thoại</label>
+                        <input id="guest-phone" class="form-input" type="tel" placeholder="Nhập số điện thoại" required>
+                    </div>
+                </div>
+            </div>
+
+            <div class="guest-modal__footer">
+                <button id="guest-cancel-secondary" class="btn btn-secondary">Hủy</button>
+                <button id="guest-submit" class="btn btn-primary">
+                    <span class="btn-text">Hoàn tất đặt chỗ</span>
+                    <svg class="btn-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M5 12h14M12 5l7 7-7 7" />
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </div>
 
 </body>
 

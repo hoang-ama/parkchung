@@ -39,6 +39,19 @@ const bookingSchema = new mongoose.Schema({
         ref: 'Payment',
         required: false,
     },
+    bookingType: {
+        type: String,
+        enum: ['standard', 'valet'],
+        default: 'standard'
+    },
+    valetDetails: {
+        dropoffAddress: { type: String },
+        pickupAddress: { type: String }
+    },
+    services: [{
+        name: { type: String },
+        price: { type: Number }
+    }]
 }, { timestamps: true });
 
 const Booking = mongoose.model('Booking', bookingSchema);

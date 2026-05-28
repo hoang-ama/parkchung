@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chọn dịch vụ đi kèm - ParkChung</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="/customer/css/spot-details.css">
+    <link rel="stylesheet" href="/customer/css/styles.css">
+    <link rel="icon" type="image/png" href="/assets/logo/favicon.png" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+    <style>
+        body {
+            padding-top: 104px;
+        }
+        /* CSS specific to valet-offer page */
+        .service-item-card {
+            background: #ffffff;
+            border: 1.5px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 14px 12px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: relative;
+            cursor: pointer;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            height: 100%;
+            min-height: 150px;
+        }
+
+        .service-item-card:hover {
+            border-color: #13b47e;
+            box-shadow: 0 2px 12px rgba(19, 180, 126, 0.12);
+        }
+
+        .service-item-card.selected {
+            border-color: #13b47e;
+            background: #ffffff; /* Keep white background as Figma */
+        }
+
+        /* Green circle icon - đúng design */
+        .service-card-icon {
+            width: 56px;
+            height: 56px;
+            background: #13b47e;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 12px;
+            flex-shrink: 0;
+        }
+
+        .service-card-icon svg {
+            width: 28px;
+            height: 28px;
+        }
+
+        .service-card-info {
+            flex: 1;
+        }
+
+        .service-card-info h4 {
+            font-size: 12px;
+            font-weight: 600;
+            color: #1a1a2e;
+            margin: 0 0 4px 0;
+            line-height: 1.3;
+        }
+
+        .service-view-more {
+            font-size: 11px;
+            color: #13b47e;
+            text-decoration: none;
+        }
+
+        .service-view-more:hover {
+            text-decoration: underline;
+        }
+
+        .service-card-bottom {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            margin-top: 14px;
+        }
+
+        .service-price {
+            font-size: 13px;
+            font-weight: 700;
+            color: #13b47e;
+        }
+
+        /* Hide price when service is selected - đúng Figma */
+        .service-item-card.selected .service-price {
+            display: none;
+        }
+
+        .selected-badge {
+            display: none;
+            background: #e2f5ee;
+            color: #13b47e;
+            font-size: 11px;
+            font-weight: 600;
+            padding: 4px 8px;
+            border-radius: 4px;
+            line-height: 1.2;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .service-item-card.selected .selected-badge {
+            display: inline-flex;
+        }
+
+        /* Nút + đơn giản (trước khi chọn) - đúng design */
+        .service-add-btn {
+            width: 28px;
+            height: 28px;
+            background: #ffffff;
+            border: 1.5px solid #13b47e;
+            color: #13b47e;
+            border-radius: 6px;
+            font-size: 16px;
+            line-height: 1;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            transition: background 0.2s, color 0.2s;
+        }
+
+        .service-add-btn:hover {
+            background: #13b47e;
+            color: white;
+        }
+
+        /* Nút tích chọn (sau khi chọn) - đúng design */
+        .service-check-btn {
+            width: 28px;
+            height: 28px;
+            background: #13b47e;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            margin-top: 12px;
+        }
+
+        @media (max-width: 992px) {
+            .services-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 576px) {
+            .services-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* ----- HEADER & STATUS BAR REDESIGN ----- */
+        .header-v3 {
+            background: #0b1a17 !important; /* Dark teal background matching Figma */
+        }
+        
+        .header-logo-text .header-brand {
+            color: #ffffff !important;
+            font-size: 18px !important;
+            font-weight: 700 !important;
+        }
+        
+        .header-logo-text .header-tagline {
+            color: #13b47e !important;
+            font-size: 10px !important;
+            font-weight: 500 !important;
+        }
+        
+        .header-nav {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        
+        .header-nav .nav-link {
+            color: #ffffff !important;
+            font-size: 13px !important;
+            font-weight: 500;
+            text-decoration: none;
+        }
+        
+        .btn-nav-figma {
+            background: #13b47e;
+            color: #ffffff !important;
+            font-size: 13px !important;
+            font-weight: 600;
+            padding: 8px 16px;
+            border-radius: 6px;
+            text-decoration: none;
+            transition: background 0.2s;
+        }
+        
+        .btn-nav-figma:hover {
+            background: #0ea36b;
+        }
+        
+        .lang-selector-figma {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            cursor: pointer;
+        }
+        
+        .flag-icon-figma {
+            width: 20px;
+            height: 14px;
+            border-radius: 2px;
+            object-fit: cover;
+        }
+
+        .top-status-bar-section {
+            background: #eaeaea; /* Light gray background matching Figma */
+            padding: 12px 0;
+            border-bottom: 1px solid #dcdcdc;
+        }
+
+        .top-bar-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 16px;
+        }
+
+        .top-status-bar {
+            display: flex;
+            background: transparent;
+            padding: 0;
+            box-shadow: none;
+            gap: 12px;
+            align-items: center;
+            width: 100%;
+        }
+
+        .top-bar-field {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            background: #ffffff;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            padding: 8px 12px;
+            position: relative;
+            gap: 10px;
+            flex: 1;
+            min-height: 50px;
+        }
+
+        .top-bar-field.flex-grow-2 {
+            flex: 2;
+        }
+
+        .top-bar-field.flex-grow-1 {
+            flex: 1;
+        }
+
+        .top-bar-field::after {
+            display: none !important;
+        }
+
+        .top-bar-icon {
+            color: #13b47e;
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+
+        .top-bar-content {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+        }
+
+        .top-bar-label {
+            font-size: 10px;
+            font-weight: 600;
+            color: #9ca3af;
+            margin-bottom: 2px;
+            text-transform: none;
+            display: block;
+        }
+
+        .top-bar-input-container {
+            display: flex;
+            align-items: center;
+            width: 100%;
+        }
+
+        .top-bar-input-container input {
+            border: none !important;
+            outline: none !important;
+            font-size: 12px !important;
+            font-weight: 700 !important;
+            color: #1f2937 !important;
+            width: 100% !important;
+            background: transparent !important;
+            padding: 0 !important;
+        }
+
+        .top-bar-chevron {
+            color: #9ca3af;
+            font-size: 11px;
+            margin-left: auto;
+            flex-shrink: 0;
+        }
+
+        .autocomplete-suggestions {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            width: 100%;
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            max-height: 220px;
+            overflow-y: auto;
+            margin-top: 8px;
+        }
+
+        .autocomplete-suggestion {
+            padding: 10px 14px;
+            font-size: 13px;
+            color: #374151;
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+
+        .autocomplete-suggestion:hover {
+            background: #f0fdf8;
+            color: #13b47e;
+        }
+
+        /* ----- SIDEBAR FIGMA CARD ----- */
+        .summary-white-card {
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 16px;
+            background: #fff;
+            box-shadow: none;
+        }
+
+        .summary-section-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: #6b7280;
+            margin-bottom: 10px;
+            text-transform: none;
+        }
+    </style>
+</head>
+
+<body>
+    <header class="header-v3">
+        <div class="header-inner">
+            <a href="/customer/index.html" class="header-logo">
+                <img src="/assets/logo/logo.svg" alt="ParkChung Logo" />
+                <div class="header-logo-text">
+                    <span class="header-brand">PARKCHUNG</span>
+                    <span class="header-tagline">Smart Parking Here</span>
+                </div>
+            </a>
+            <nav class="header-nav" id="main-nav">
+                <a href="/customer/register.html" class="nav-link">Trở thành chủ bãi đậu xe <i class="fas fa-chevron-down" style="font-size: 10px; margin-left: 4px;"></i></a>
+                <a href="/customer/login.html" class="btn-nav-figma">Đăng nhập</a>
+                <a href="/customer/register.html" class="btn-nav-figma">Đăng ký</a>
+                <div class="lang-selector-figma">
+                    <img src="https://flagcdn.com/w20/vn.png" alt="VN" class="flag-icon-figma">
+                    <i class="fas fa-chevron-down" style="font-size: 9px; color: #fff; margin-left: 2px;"></i>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Top search status bar section -->
+    <section class="top-status-bar-section">
+        <div class="container top-bar-container">
+            <div class="top-status-bar">
+                <!-- Dropoff Location -->
+                <div class="top-bar-field flex-grow-2">
+                    <i class="fas fa-map-marker-alt top-bar-icon"></i>
+                    <div class="top-bar-content">
+                        <span class="top-bar-label">Đỗ tại</span>
+                        <div class="top-bar-input-container">
+                            <input type="text" id="top-dropoff-input" placeholder="Nhập điểm giao xe..." />
+                            <div class="autocomplete-suggestions" id="top-dropoff-suggestions"></div>
+                        </div>
+                    </div>
+                    <i class="fas fa-chevron-down top-bar-chevron"></i>
+                </div>
+
+                <!-- Pickup Location -->
+                <div class="top-bar-field flex-grow-2">
+                    <i class="fas fa-map-marker-alt top-bar-icon"></i>
+                    <div class="top-bar-content">
+                        <span class="top-bar-label">Đỗ tại</span>
+                        <div class="top-bar-input-container">
+                            <input type="text" id="top-pickup-input" placeholder="Nhập điểm trả xe..." />
+                            <div class="autocomplete-suggestions" id="top-pickup-suggestions"></div>
+                        </div>
+                    </div>
+                    <i class="fas fa-chevron-down top-bar-chevron"></i>
+                </div>
+
+                <!-- Arrival Time -->
+                <div class="top-bar-field flex-grow-1">
+                    <i class="far fa-clock top-bar-icon"></i>
+                    <div class="top-bar-content">
+                        <span class="top-bar-label">Đỗ từ</span>
+                        <div class="top-bar-input-container">
+                            <input type="text" id="booking-arrival-date-input" class="flatpickr-input" placeholder="Chọn ngày/giờ giao" readonly />
+                        </div>
+                    </div>
+                    <i class="fas fa-chevron-down top-bar-chevron"></i>
+                </div>
+
+                <!-- Leaving Time -->
+                <div class="top-bar-field flex-grow-1">
+                    <i class="far fa-clock top-bar-icon"></i>
+                    <div class="top-bar-content">
+                        <span class="top-bar-label">Lấy xe</span>
+                        <div class="top-bar-input-container">
+                            <input type="text" id="booking-leaving-date-input" class="flatpickr-input" placeholder="Chọn ngày/giờ trả" readonly />
+                        </div>
+                    </div>
+                    <i class="fas fa-chevron-down top-bar-chevron"></i>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <main class="booking-page-main container">
+        <div class="booking-grid">
+            <!-- LEFT COLUMN: Services list -->
+            <div class="booking-details-column">
+                <div class="info-card services-card">
+                    <h2 class="services-card-title" style="font-size:18px;font-weight:700;margin-bottom:4px;">Dịch vụ đi kèm</h2>
+                    <p class="help-text">Chọn thêm các dịch vụ chăm sóc xe tiện lợi trong thời gian gửi xe của bạn</p>
+                    
+                    <div class="services-grid">
+                        <!-- 1: Rửa xe và hút bụi -->
+                        <div class="service-item-card" data-service-id="rua-xe" data-service-name="Rửa xe và hút bụi" data-service-price="20000">
+                            <div>
+                                <div class="service-card-icon">
+                                    <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M8 26l3-10h18l3 10H8z" stroke="white" stroke-width="2" stroke-linejoin="round"/>
+                                        <path d="M6 26h28v3a2 2 0 01-2 2H8a2 2 0 01-2-2v-3z" stroke="white" stroke-width="2"/>
+                                        <circle cx="13" cy="31" r="2.5" stroke="white" stroke-width="1.5"/>
+                                        <circle cx="27" cy="31" r="2.5" stroke="white" stroke-width="1.5"/>
+                                        <path d="M12 8v4M20 7v4M28 8v4" stroke="white" stroke-width="2" stroke-linecap="round"/>
+                                        <path d="M9 12c3-4 11-5 15-1" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
+                                    </svg>
+                                </div>
+                                <div class="service-card-info">
+                                    <h4>Rửa xe và hút bụi</h4>
+                                    <a href="#" class="service-view-more">Xem thêm &gt;</a>
+                                </div>
+                            </div>
+                            <div class="service-card-bottom">
+                                <div style="display: flex; align-items: center; gap: 8px;">
+                                    <span class="service-price">20.000đ</span>
+                                    <span class="selected-badge">Đã thêm</span>
+                                </div>
+                                <button type="button" class="service-add-btn">+</button>
+                                <button type="button" class="service-check-btn" style="display:none;"><i class="fas fa-check"></i></button>
+                            </div>
+                        </div>
+
+                        <!-- 2: Kiểm tra áp suất lốp -->
+                        <div class="service-item-card" data-service-id="ap-suat-lop" data-service-name="Kiểm tra áp suất lốp và châm nước rửa kính" data-service-price="20000">
+                            <div>
+                                <div class="service-card-icon">
+                                    <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <circle cx="20" cy="22" r="11" stroke="white" stroke-width="2"/>
+                                        <circle cx="20" cy="22" r="5" stroke="white" stroke-width="2"/>
+                                        <path d="M20 11v3M20 30v3M9 22H6M31 22h3" stroke="white" stroke-width="2" stroke-linecap="round"/>
+                                        <path d="M13 15l2 2M25 29l2 2M13 29l2-2M25 15l2-2" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
+                                        <path d="M18 8h4" stroke="white" stroke-width="2" stroke-linecap="round"/>
+                                        <path d="M20 6v5" stroke="white" stroke-width="2" stroke-linecap="round"/>
+                                    </svg>
+                                </div>
+                                <div class="service-card-info">
+                                    <h4>Kiểm tra áp suất lốp và châm nước rửa kính</h4>
+                                    <a href="#" class="service-view-more">Xem thêm &gt;</a>
+                                </div>
+                            </div>
+                            <div class="service-card-bottom">
+                                <div style="display: flex; align-items: center; gap: 8px;">
+                                    <span class="service-price">20.000đ</span>
+                                    <span class="selected-badge">Đã thêm</span>
+                                </div>
+                                <button type="button" class="service-add-btn">+</button>
+                                <button type="button" class="service-check-btn" style="display:none;"><i class="fas fa-check"></i></button>
+                            </div>
+                        </div>
+
+                        <!-- 3: Tiếp nhiên liệu -->
+                        <div class="service-item-card" data-service-id="tiep-nhien-lieu" data-service-name="Tiếp nhiên liệu" data-service-price="20000">
+                            <div>
+                                <div class="service-card-icon">
+                                    <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <rect x="8" y="10" width="16" height="22" rx="2" stroke="white" stroke-width="2"/>
+                                        <path d="M8 18h16" stroke="white" stroke-width="1.5"/>
+                                        <path d="M24 16l4-4 2 2v10a2 2 0 01-2 2" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                        <path d="M28 22v4" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
+                                        <path d="M14 10V7a1 1 0 011-1h2a1 1 0 011 1v3" stroke="white" stroke-width="1.5"/>
+                                        <path d="M13 22h6" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
+                                    </svg>
+                                </div>
+                                <div class="service-card-info">
+                                    <h4>Tiếp nhiên liệu</h4>
+                                    <a href="#" class="service-view-more">Xem thêm &gt;</a>
+                                </div>
+                            </div>
+                            <div class="service-card-bottom">
+                                <div style="display: flex; align-items: center; gap: 8px;">
+                                    <span class="service-price">20.000đ</span>
+                                    <span class="selected-badge">Đã thêm</span>
+                                </div>
+                                <button type="button" class="service-add-btn">+</button>
+                                <button type="button" class="service-check-btn" style="display:none;"><i class="fas fa-check"></i></button>
+                            </div>
+                        </div>
+
+                        <!-- 4: Sạc xe điện -->
+                        <div class="service-item-card" data-service-id="sac-dien" data-service-name="Sạc xe điện" data-service-price="20000">
+                            <div>
+                                <div class="service-card-icon">
+                                    <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <rect x="10" y="8" width="20" height="24" rx="3" stroke="white" stroke-width="2"/>
+                                        <path d="M15 8V6M25 8V6" stroke="white" stroke-width="2" stroke-linecap="round"/>
+                                        <path d="M22 17l-5 8h6l-5 8" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                        <path d="M14 32v2M26 32v2" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
+                                    </svg>
+                                </div>
+                                <div class="service-card-info">
+                                    <h4>Sạc xe điện</h4>
+                                    <a href="#" class="service-view-more">Xem thêm &gt;</a>
+                                </div>
+                            </div>
+                            <div class="service-card-bottom">
+                                <div style="display: flex; align-items: center; gap: 8px;">
+                                    <span class="service-price">20.000đ</span>
+                                    <span class="selected-badge">Đã thêm</span>
+                                </div>
+                                <button type="button" class="service-add-btn">+</button>
+                                <button type="button" class="service-check-btn" style="display:none;"><i class="fas fa-check"></i></button>
+                            </div>
+                        </div>
+
+                        <!-- 5: Thay dầu/nhớt -->
+                        <div class="service-item-card" data-service-id="thay-dau" data-service-name="Thay dầu/nhớt" data-service-price="20000">
+                            <div>
+                                <div class="service-card-icon">
+                                    <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M20 8c0 0-8 9-8 15a8 8 0 0016 0C28 17 20 8 20 8z" stroke="white" stroke-width="2" stroke-linejoin="round"/>
+                                        <path d="M14 24c0 3.3 2.7 6 6 6" stroke="white" stroke-width="2" stroke-linecap="round"/>
+                                        <path d="M27 12l4-4" stroke="white" stroke-width="2" stroke-linecap="round"/>
+                                        <rect x="29" y="5" width="6" height="3" rx="1" transform="rotate(45 29 5)" stroke="white" stroke-width="1.5"/>
+                                    </svg>
+                                </div>
+                                <div class="service-card-info">
+                                    <h4>Thay dầu/nhớt</h4>
+                                    <a href="#" class="service-view-more">Xem thêm &gt;</a>
+                                </div>
+                            </div>
+                            <div class="service-card-bottom">
+                                <div style="display: flex; align-items: center; gap: 8px;">
+                                    <span class="service-price">20.000đ</span>
+                                    <span class="selected-badge">Đã thêm</span>
+                                </div>
+                                <button type="button" class="service-add-btn">+</button>
+                                <button type="button" class="service-check-btn" style="display:none;"><i class="fas fa-check"></i></button>
+                            </div>
+                        </div>
+
+                        <!-- 6: Vệ sinh nội thất -->
+                        <div class="service-item-card" data-service-id="ve-sinh-sau" data-service-name="Vệ sinh nội thất chuyên sâu" data-service-price="20000">
+                            <div>
+                                <div class="service-card-icon">
+                                    <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M20 8v16" stroke="white" stroke-width="2" stroke-linecap="round"/>
+                                        <path d="M14 14c0-3.3 2.7-6 6-6s6 2.7 6 6" stroke="white" stroke-width="2"/>
+                                        <path d="M12 24l8 8 8-8" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                        <ellipse cx="20" cy="32" rx="8" ry="2" stroke="white" stroke-width="1.5"/>
+                                        <path d="M8 22h24" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
+                                    </svg>
+                                </div>
+                                <div class="service-card-info">
+                                    <h4>Vệ sinh nội thất chuyên sâu</h4>
+                                    <a href="#" class="service-view-more">Xem thêm &gt;</a>
+                                </div>
+                            </div>
+                            <div class="service-card-bottom">
+                                <div style="display: flex; align-items: center; gap: 8px;">
+                                    <span class="service-price">20.000đ</span>
+                                    <span class="selected-badge">Đã thêm</span>
+                                </div>
+                                <button type="button" class="service-add-btn">+</button>
+                                <button type="button" class="service-check-btn" style="display:none;"><i class="fas fa-check"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- RIGHT COLUMN: Summary & Confirmation -->
+            <div class="booking-summary-column">
+                <!-- Chuyến đi của bạn -->
+                <div class="summary-section">
+                    <h3 class="summary-section-title">Chuyến đi của bạn</h3>
+                    <div class="summary-white-card" style="position: relative;">
+                        <h4 style="font-size: 14px; font-weight: 700; color: #1a1a2e; margin: 0 0 12px 0;">Bãi đỗ + đỗ xe hộ</h4>
+
+                        <!-- Timeline dọc -->
+                        <div class="trip-timeline-figma" style="display: flex; flex-direction: column; gap: 12px; position: relative; padding-left: 20px;">
+                            <!-- Vertical Green Line -->
+                            <div style="position: absolute; left: 6px; top: 8px; bottom: 8px; width: 2px; background: #13b47e;"></div>
+                            
+                            <!-- Start Point -->
+                            <div style="position: relative;">
+                                <!-- Dot -->
+                                <div style="position: absolute; left: -20px; top: 4px; width: 14px; height: 14px; border-radius: 50%; background: #13b47e; border: 3px solid #e2f5ee; box-sizing: border-box;"></div>
+                                <div id="summary-dropoff-addr" style="font-size: 12px; font-weight: 700; color: #1a1a2e; line-height: 1.3;">--</div>
+                                <div id="summary-dropoff-time" style="font-size: 11px; color: #6b7280; margin-top: 2px;">--</div>
+                            </div>
+                            
+                            <!-- End Point -->
+                            <div style="position: relative;">
+                                <!-- Dot -->
+                                <div style="position: absolute; left: -20px; top: 4px; width: 14px; height: 14px; border-radius: 50%; background: #13b47e; border: 3px solid #e2f5ee; box-sizing: border-box;"></div>
+                                <div id="summary-pickup-addr" style="font-size: 12px; font-weight: 700; color: #1a1a2e; line-height: 1.3;">--</div>
+                                <div id="summary-pickup-time" style="font-size: 11px; color: #6b7280; margin-top: 2px;">--</div>
+                            </div>
+                        </div>
+
+                        <div style="display: flex; justify-content: flex-end; margin-top: 14px; border-top: 1px solid #f3f4f6; padding-top: 10px;">
+                            <span id="summary-parking-cost" style="font-size: 15px; font-weight: 700; color: #13b47e;">--</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Dịch vụ đi kèm summary list -->
+                <div class="summary-section" id="summary-services-section" style="display:none; margin-top: 16px;">
+                    <h3 class="summary-section-title">Dịch vụ đi kèm</h3>
+                    <div class="summary-white-card" id="summary-selected-services-list" style="display: flex; flex-direction: column; gap: 8px;">
+                        <!-- Dynamically populated -->
+                    </div>
+                </div>
+
+                <!-- Tổng tiền -->
+                <div class="summary-section" style="margin-top: 16px;">
+                    <h3 class="summary-section-title">Tổng tiền</h3>
+                    <div class="summary-white-card" style="display: flex; justify-content: space-between; align-items: flex-start;">
+                        <div style="display: flex; flex-direction: column; gap: 4px; max-width: 70%;">
+                            <span id="summary-breakdown-text" style="font-size: 12px; font-weight: 600; color: #4b5563; line-height: 1.4;">Bãi đỗ + đỗ xe hộ</span>
+                        </div>
+                        <span id="summary-final-price" style="font-size: 18px; font-weight: 800; color: #13b47e; white-space: nowrap;">--</span>
+                    </div>
+                </div>
+
+                <div style="margin-top: 16px;">
+                    <button type="button" id="btn-next-step" style="width: 100%; padding: 14px; background: #13b47e; color: #fff; border: none; border-radius: 8px; font-size: 15px; font-weight: 700; cursor: pointer; transition: background 0.2s;">
+                        Đặt ngay
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer-v3" style="margin-top:80px;">
+        <div class="footer-v3-bottom">
+            <p>Bản quyền © 2026 thuộc ParkChung. Chungxe</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="/customer/js/config.js"></script>
+    <script src="/customer/js/utils.js"></script>
+    <script type="module" src="/customer/js/app.js"></script>
+    <script src="/customer/js/valet-offer.js"></script>
+</body>
+
+</html>

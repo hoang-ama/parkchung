@@ -127,7 +127,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     getAuthText('registerSuccessMessage'),
                     getAuthText('registerSuccessTitle'),
                 );
-                window.location.href = 'login.html';
+                window.location.href = '/customer/login.html';
             } catch (error) {
                 if (formError) {
                     formError.textContent = `${getAuthText('registerFailedPrefix')}: ${error.message}`;
@@ -139,21 +139,62 @@ document.addEventListener('DOMContentLoaded', () => {
     // login
     const loginForm = document.getElementById('login-form');
     if (loginForm) {
+        const submitBtn = document.getElementById('login-submit-btn');
+        const errorBanner = document.getElementById('login-error');
+
+        function showLoginError(message) {
+            if (errorBanner) {
+                errorBanner.textContent = message;
+                errorBanner.classList.add('visible');
+            } else {
+                alert(message);
+            }
+        }
+
+        function clearLoginError() {
+            if (errorBanner) {
+                errorBanner.textContent = '';
+                errorBanner.classList.remove('visible');
+            }
+        }
+
+        loginForm.querySelector('#email')?.addEventListener('input', clearLoginError);
+        loginForm.querySelector('#password')?.addEventListener('input', clearLoginError);
+
         loginForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            const email = e.target.email.value;
+            clearLoginError();
+            const email = e.target.email.value.trim();
             const password = e.target.password.value;
+
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.textContent = 'Đang đăng nhập...';
+            }
+
             try {
                 const data = await api.login(email, password);
                 localStorage.setItem('userToken', data.token);
                 localStorage.setItem('userData', JSON.stringify({ fullName: data.fullName, email: data.email, phone: data.phone }));
-                await window.customModal.success(
-                    getAuthText('loginSuccessMessage', { fullName: data.fullName }),
-                    getAuthText('loginSuccessTitle'),
-                );
-                window.location.href = 'index.html';
+
+                if (window.customModal) {
+                    await window.customModal.success(
+                        getAuthText('loginSuccessMessage', { fullName: data.fullName }),
+                        getAuthText('loginSuccessTitle'),
+                    );
+                }
+
+                // Redirect back if came from somewhere
+                const params = new URLSearchParams(window.location.search);
+                const redirectTo = params.get('redirect');
+                window.location.href = redirectTo || '/customer/index.html';
             } catch (error) {
-                alert(`${getAuthText('loginFailedPrefix')}: ${error.message}`);
+                showLoginError(`${getAuthText('loginFailedPrefix')}: ${error.message}`);
+            } finally {
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Đăng nhập';
+                }
             }
         });
     }

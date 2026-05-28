@@ -1,5 +1,8 @@
 // File: server/src/server.js
-// Restart trigger
+const dns = require('dns');
+// Set Google & Cloudflare DNS to bypass local querySrv ECONNREFUSED errors for Atlas
+dns.setServers(['8.8.8.8', '1.1.1.1']);
+
 const app = require('./app');
 const config = require('./config');
 const connectDB = require('./config/database');

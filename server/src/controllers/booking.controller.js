@@ -50,7 +50,7 @@ const prepareBookingData = (booking) => {
  * @access  Public
  */
 exports.createGuestBooking = async (req, res) => {
-    const { spot, startTime, endTime, fullName, email, phoneNumber, paymentMethod } = req.body;
+    const { spot, startTime, endTime, fullName, email, phoneNumber, paymentMethod, bookingType, valetDetails, services } = req.body;
 
     if (!fullName || !email || !phoneNumber) {
         return res.status(400).json({ message: 'Full name, email and phone number are required.' });
@@ -98,10 +98,26 @@ exports.createGuestBooking = async (req, res) => {
         return res.status(409).json({ message: 'This parking spot is already booked for the selected time slot.' });
     }
 
-    const totalPrice = calculatePrice(parsedStartTime, parsedEndTime, parkingSpot.hourlyRate);
+    let totalPrice;
+    if (bookingType === 'valet') {
+        const diffMs = parsedEndTime.getTime() - parsedStartTime.getTime();
+        const days = Math.max(1, Math.ceil(diffMs / (24 * 60 * 60 * 1000)));
+        totalPrice = days * 30000;
+    } else {
+        totalPrice = calculatePrice(parsedStartTime, parsedEndTime, parkingSpot.hourlyRate);
+    }
+
+    // Add selected services to totalPrice
+    if (Array.isArray(services) && services.length > 0) {
+        const servicesPrice = services.reduce((sum, s) => sum + (s.price || 0), 0);
+        totalPrice += servicesPrice;
+    }
 
     try {
-        // Create booking with guest fields (same as logged-in user but with guest info instead of user ref)
+        const upperPaymentMethod = (paymentMethod || 'CASH').toUpperCase();
+        const paymentMethodValue = Object.values(PAYMENT_METHODS).includes(upperPaymentMethod) ? upperPaymentMethod : PAYMENT_METHODS.CASH;
+
+        // Create booking with guest fields
         const bookingData = {
             spot,
             startTime: parsedStartTime,
@@ -112,30 +128,45 @@ exports.createGuestBooking = async (req, res) => {
             guestEmail: email,
             guestPhoneNumber: phoneNumber,
             phoneNumber: phoneNumber,
-            paymentMethod: paymentMethod === PAYMENT_METHODS.CASH ? PAYMENT_METHODS.CASH : PAYMENT_METHODS.CASH,
+            paymentMethod: paymentMethodValue,
             paymentStatus: BOOKING_PAYMENT_STATUS.UNPAID,
+            bookingType: bookingType || 'standard',
+            valetDetails: bookingType === 'valet' ? valetDetails : undefined,
+            services: Array.isArray(services) ? services : []
         };
 
-        // Handle Cash Payment for Guest - confirm immediately
-        if (paymentMethod === PAYMENT_METHODS.CASH) {
+        // Confirm immediately for cash, bank transfer, momo, domestic card, vnpay, pay later
+        const instantConfirmMethods = [
+            PAYMENT_METHODS.CASH,
+            PAYMENT_METHODS.BANK_TRANSFER,
+            PAYMENT_METHODS.DOMESTIC_CARD,
+            PAYMENT_METHODS.VNPAY,
+            PAYMENT_METHODS.MOMO,
+            PAYMENT_METHODS.PAY_LATER
+        ];
+        if (instantConfirmMethods.includes(bookingData.paymentMethod)) {
             bookingData.status = 'confirmed';
         }
 
         const booking = new Booking(bookingData);
         const createdBooking = await booking.save();
 
-        // Send Emails if Confirmed (Cash)
+        // Send Emails if Confirmed (Cash) - run asynchronously (no await) to avoid blocking response
         if (createdBooking.status === 'confirmed') {
             try {
                 await ensureBookingPopulated(createdBooking);
                 const emailData = prepareBookingData(createdBooking);
 
-                // Send Customer Confirmation
-                await brevoService.sendBookingEmail(emailData, 'bookingConfirm');
+                // Send Customer Confirmation asynchronously
+                brevoService.sendBookingEmail(emailData, 'bookingConfirm').catch(err => 
+                    console.error('Failed to send customer confirmation email asynchronously:', err)
+                );
 
-                // Send Partner Confirmation
+                // Send Partner Confirmation asynchronously
                 if (emailData.partnerEmail) {
-                    await brevoService.sendEmailPartner(emailData, 'partnerConfirm');
+                    brevoService.sendEmailPartner(emailData, 'partnerConfirm').catch(err =>
+                        console.error('Failed to send partner confirmation email asynchronously:', err)
+                    );
                 }
 
                 // Schedule Review Email
@@ -144,13 +175,15 @@ exports.createGuestBooking = async (req, res) => {
                 const delayMs = bookingEndTime.getTime() - now.getTime();
 
                 if (delayMs > 0) {
-                    setTimeout(async () => {
-                        try {
-                            await brevoService.sendReviewEmail(emailData);
-                        } catch (e) { console.error(e); }
+                    setTimeout(() => {
+                        brevoService.sendReviewEmail(emailData).catch(err => 
+                            console.error('Failed to send scheduled review email:', err)
+                        );
                     }, delayMs);
                 } else {
-                    try { await brevoService.sendReviewEmail(emailData); } catch (e) { console.error(e); }
+                    brevoService.sendReviewEmail(emailData).catch(err => 
+                        console.error('Failed to send immediate review email:', err)
+                    );
                 }
 
             } catch (emailError) {
@@ -204,7 +237,7 @@ exports.getLeadStatus = async (req, res) => {
  * @access  Private
  */
 exports.createBooking = async (req, res) => {
-    const { spot, startTime, endTime, phoneNumber } = req.body;
+    const { spot, startTime, endTime, phoneNumber, bookingType, valetDetails, services } = req.body;
 
     if (phoneNumber && !isValidVNPhone(phoneNumber)) {
         return res.status(400).json({ message: VN_PHONE_ERROR_MSG });
@@ -248,9 +281,35 @@ exports.createBooking = async (req, res) => {
         return res.status(409).json({ message: 'This parking spot is already booked for the selected time slot.' });
     }
 
-    const totalPrice = calculatePrice(parsedStartTime, parsedEndTime, parkingSpot.hourlyRate);
+    let totalPrice;
+    if (bookingType === 'valet') {
+        const diffMs = parsedEndTime.getTime() - parsedStartTime.getTime();
+        const days = Math.max(1, Math.ceil(diffMs / (24 * 60 * 60 * 1000)));
+        totalPrice = days * 30000;
+    } else {
+        totalPrice = calculatePrice(parsedStartTime, parsedEndTime, parkingSpot.hourlyRate);
+    }
+
+    // Add selected services to totalPrice
+    if (Array.isArray(services) && services.length > 0) {
+        const servicesPrice = services.reduce((sum, s) => sum + (s.price || 0), 0);
+        totalPrice += servicesPrice;
+    }
 
     try {
+        const upperPaymentMethod = (req.body.paymentMethod || 'CASH').toUpperCase();
+        const paymentMethodValue = Object.values(PAYMENT_METHODS).includes(upperPaymentMethod) ? upperPaymentMethod : PAYMENT_METHODS.CASH;
+
+        const instantConfirmMethods = [
+            PAYMENT_METHODS.CASH,
+            PAYMENT_METHODS.BANK_TRANSFER,
+            PAYMENT_METHODS.DOMESTIC_CARD,
+            PAYMENT_METHODS.VNPAY,
+            PAYMENT_METHODS.MOMO,
+            PAYMENT_METHODS.PAY_LATER
+        ];
+        const isConfirmed = instantConfirmMethods.includes(paymentMethodValue);
+
         const booking = new Booking({
             user: req.user._id,
             spot,
@@ -258,25 +317,32 @@ exports.createBooking = async (req, res) => {
             endTime: parsedEndTime,
             totalPrice,
             phoneNumber,
-            status: 'confirmed', // Cash bookings are confirmed immediately
+            status: isConfirmed ? 'confirmed' : 'pending',
             paymentStatus: BOOKING_PAYMENT_STATUS.UNPAID,
-            paymentMethod: PAYMENT_METHODS.CASH,
+            paymentMethod: paymentMethodValue,
+            bookingType: bookingType || 'standard',
+            valetDetails: bookingType === 'valet' ? valetDetails : undefined,
+            services: Array.isArray(services) ? services : []
         });
 
         const createdBooking = await booking.save();
 
-        // Send Emails for Cash Payment (Confirmed status)
-        if (booking.status === 'confirmed' && booking.paymentMethod === PAYMENT_METHODS.CASH) {
+        // Send Emails for Confirmed booking immediately - run asynchronously (no await) to avoid blocking response
+        if (createdBooking.status === 'confirmed' && createdBooking.paymentMethod !== PAYMENT_METHODS.PAYPAL) {
             try {
                 await ensureBookingPopulated(createdBooking);
                 const bookingData = prepareBookingData(createdBooking);
 
-                // Send Customer Confirmation
-                await brevoService.sendBookingEmail(bookingData, 'bookingConfirm');
+                // Send Customer Confirmation asynchronously
+                brevoService.sendBookingEmail(bookingData, 'bookingConfirm').catch(err =>
+                    console.error('Failed to send customer confirmation email asynchronously:', err)
+                );
 
-                // Send Partner Confirmation
+                // Send Partner Confirmation asynchronously
                 if (bookingData.partnerEmail) {
-                    await brevoService.sendEmailPartner(bookingData, 'partnerConfirm');
+                    brevoService.sendEmailPartner(bookingData, 'partnerConfirm').catch(err =>
+                        console.error('Failed to send partner confirmation email asynchronously:', err)
+                    );
                 } else {
                     console.warn(`Skipping partner email for booking ${createdBooking._id}: Partner email not found.`);
                 }
@@ -287,27 +353,22 @@ exports.createBooking = async (req, res) => {
                 const delayMs = endTime.getTime() - now.getTime();
 
                 if (delayMs > 0) {
-                    setTimeout(async () => {
-                        try {
-                            console.log(`Sending scheduled review email for booking ${createdBooking._id} after parking duration ended...`);
-                            await brevoService.sendReviewEmail(bookingData);
-                        } catch (reviewError) {
-                            console.error(`Failed to send scheduled review email for booking ${createdBooking._id}:`, reviewError);
-                        }
+                    setTimeout(() => {
+                        console.log(`Sending scheduled review email for booking ${createdBooking._id} after parking duration ended...`);
+                        brevoService.sendReviewEmail(bookingData).catch(reviewError =>
+                            console.error(`Failed to send scheduled review email for booking ${createdBooking._id}:`, reviewError)
+                        );
                     }, delayMs);
                     console.log(`Review email scheduled for booking ${createdBooking._id} at ${endTime.toISOString()}`);
                 } else {
                     // If booking ended (e.g. testing with past time or very short duration), send immediately
-                    try {
-                        await brevoService.sendReviewEmail(bookingData);
-                    } catch (reviewError) {
-                        console.error(`Failed to send immediate review email for booking ${createdBooking._id}:`, reviewError);
-                    }
+                    brevoService.sendReviewEmail(bookingData).catch(reviewError =>
+                        console.error(`Failed to send immediate review email for booking ${createdBooking._id}:`, reviewError)
+                    );
                 }
 
             } catch (emailError) {
                 console.error('Failed to send confirmation emails for cash booking:', emailError);
-                // Don't fail the request if email fails, just log it
             }
         }
 
@@ -346,10 +407,20 @@ exports.estimatePrice = async (req, res) => {
  */
 exports.getMyBookings = async (req, res) => {
     try {
-        const bookings = await Booking.find({ user: req.user._id })
-            .populate('spot', 'address')
+        const userEmail = req.user.email;
+
+        // Find bookings: either logged-in user OR guest bookings with matching email
+        const bookings = await Booking.find({
+            $or: [
+                { user: req.user._id },
+                { guestEmail: userEmail, user: { $exists: false } },
+                { guestEmail: userEmail, user: null }
+            ]
+        })
+            .populate('spot', 'address name')
             .populate('user', 'fullName email')
-            .populate('payment');
+            .populate('payment')
+            .sort({ createdAt: -1 });
 
         // Auto-cancel pending bookings with past start times
         const now = new Date();
@@ -376,6 +447,7 @@ exports.getMyBookings = async (req, res) => {
         res.status(500).json({ message: 'Server error fetching bookings', error: error.message });
     }
 };
+
 
 /**
  * @desc    Get booking and payment info (authorized user or guest with paymentId)
@@ -407,6 +479,32 @@ exports.getBookingPaymentStatus = async (req, res) => {
         return res.status(500).json({ message: 'Failed to fetch booking payment status', error: error.message });
     }
 };
+
+/**
+ * @desc    Get booking details by ID
+ * @route   GET /api/bookings/:bookingId
+ * @access  Public (Guest) / Private (User)
+ */
+exports.getBookingById = async (req, res) => {
+    const { bookingId } = req.params;
+    try {
+        const booking = await Booking.findById(bookingId).populate('spot', 'address name');
+        if (!booking) {
+            return res.status(404).json({ message: 'Booking not found' });
+        }
+
+        if (booking.user) {
+            if (!req.user || (req.user._id.toString() !== booking.user.toString() && req.user.role !== 'admin')) {
+                return res.status(403).json({ message: 'Not authorized to view this booking' });
+            }
+        }
+
+        return res.json({ booking });
+    } catch (error) {
+        return res.status(500).json({ message: 'Failed to fetch booking', error: error.message });
+    }
+};
+
 
 /**
  * @desc    Cancel a booking
@@ -475,15 +573,21 @@ exports.cancelBooking = async (req, res) => {
             phoneNumber: booking.phoneNumber || booking.guestPhoneNumber || ''
         };
 
-        // Send cancellation emails
+        // Send cancellation emails asynchronously (no await)
         try {
-            await brevoService.sendBookingEmail(bookingData, 'bookingCancel');
+            brevoService.sendBookingEmail(bookingData, 'bookingCancel').catch(err =>
+                console.error('Failed to send booking cancel email asynchronously:', err)
+            );
             if (partnerEmail) {
-                await brevoService.sendEmailPartner(bookingData, 'partnerCancel');
+                brevoService.sendEmailPartner(bookingData, 'partnerCancel').catch(err =>
+                    console.error('Failed to send partner cancel email asynchronously:', err)
+                );
             }
 
             // Also send review request email when customer cancels
-            await brevoService.sendReviewEmail(bookingData);
+            brevoService.sendReviewEmail(bookingData).catch(err =>
+                console.error('Failed to send review email asynchronously:', err)
+            );
         } catch (emailError) {
             console.error('Failed to send cancellation emails:', emailError);
             // Don't fail the cancellation if email fails
@@ -543,8 +647,10 @@ exports.requestReview = async (req, res) => {
             phoneNumber: booking.phoneNumber || booking.guestPhoneNumber || ''
         };
 
-        // Send review request email
-        await brevoService.sendReviewEmail(bookingData);
+        // Send review request email asynchronously (no await)
+        brevoService.sendReviewEmail(bookingData).catch(err =>
+            console.error('Failed to send review request email asynchronously:', err)
+        );
 
         return res.json({
             message: 'Review request email sent successfully',

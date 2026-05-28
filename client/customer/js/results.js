@@ -2,69 +2,683 @@
 
 import { api } from './apiService.js';
 
-// Pagination state
+let mapInstance = null;
+let centerMarker = null;
+let radiusCircle = null;
+let mapMarkers = [];
+
+let searchCoords = null; // { lat, lng } sau khi geocode
+let currentRadius = 1000; // Ban đầu 1km
+let selectedSpotId = null;
+
 let allSpots = [];
-let filteredSpots = []; // Spots after filtering
+let filteredSpots = [];
 let currentPage = 1;
 const spotsPerPage = 6;
-
-// Filter state
+let currentSort = 'recommend'; // recommend, price, distance
 let activeFilters = {
     vehicleTypes: [],
     bookingTypes: [],
     paymentMethods: []
 };
 
+// Helper function to get spot image from database or default placeholder
+function getSpotImageUrl(spot) {
+    if (spot && spot.images && spot.images.length > 0 && spot.images[0]) {
+        return spot.images[0];
+    }
+    return '/assets/image/Spot Image Coming Soon.png';
+}
+window.getSpotImageUrl = getSpotImageUrl; // Make it available globally for inline onerror calls
+
 document.addEventListener('DOMContentLoaded', async () => {
-    const resultsGrid = document.getElementById('results-grid');
-    if (!resultsGrid) return; // Only run if on results.html page
+    const mapEl = document.getElementById('leaflet-map');
+    if (!mapEl) return; // Chỉ chạy khi ở trang results.html
 
+    // Cấu hình các bộ chọn ngày Flatpickr ở kết quả
+    const now = new Date();
+    const defaultStart = new Date(Math.ceil(now.getTime() / (30 * 60 * 1000)) * (30 * 60 * 1000));
+    const defaultEnd = new Date(defaultStart.getTime() + 24 * 60 * 60 * 1000); // 1 ngày đỗ
+
+    flatpickr("#results-start-time", {
+        enableTime: true,
+        dateFormat: "d.m.y H:i",
+        time_24hr: true,
+        defaultDate: defaultStart
+    });
+
+    flatpickr("#results-end-time", {
+        enableTime: true,
+        dateFormat: "d.m.y H:i",
+        time_24hr: true,
+        defaultDate: defaultEnd
+    });
+
+    // 1. Khởi tạo Leaflet Map (Tọa độ mặc định: Hồ Hoàn Kiếm, Hà Nội)
+    initLeafletMap(21.0285, 105.8542);
+
+    // 2. Phân tích tham số URL và thực hiện tìm kiếm ban đầu
     const params = new URLSearchParams(window.location.search);
-    const criteria = {
-        q: params.get('q'),
-        startTime: params.get('startTime'),
-        endTime: params.get('endTime')
-    };
+    const locationQuery = params.get('q') || params.get('dropoff') || '';
+    const startTime = params.get('startTime') || defaultStart.toISOString();
+    const endTime = params.get('endTime') || defaultEnd.toISOString();
 
-    await loadAndDisplaySpots(criteria, resultsGrid, params);
+    // Điền lại các giá trị vào input
+    const locationInput = document.getElementById('results-location-input');
+    if (locationInput) locationInput.value = locationQuery;
+
+    // Gán dữ liệu ngày giờ vào picker text
+    document.getElementById('results-start-time').value = formatDateToVietnameseString(new Date(startTime));
+    document.getElementById('results-end-time').value = formatDateToVietnameseString(new Date(endTime));
+
+    // Thực hiện chu trình tìm kiếm
+    if (locationQuery) {
+        await executeNewSearch(locationQuery, startTime, endTime);
+    } else {
+        // Nếu không có địa điểm, hiển thị toàn bộ
+        await loadAllSpotsFallback();
+    }
+
+    // 3. Đăng ký các trình lắng nghe sự kiện
+    setupEventListeners();
     setupFilterListeners();
 });
 
-async function loadAndDisplaySpots(criteria, container, params) {
-    if (!container) return;
-    container.innerHTML = '<p>Loading...</p>';
+// --- KHỞI TẠO BẢN ĐỒ ---
+function initLeafletMap(lat, lng) {
+    if (mapInstance) return;
+    
+    mapInstance = L.map('leaflet-map', {
+        zoomControl: false
+    }).setView([lat, lng], 14);
 
+    // Dùng cartodb basemaps đơn giản, sáng và hiện đại rất hợp ParkChung
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>',
+        subdomains: 'abcd',
+        maxZoom: 20
+    }).addTo(mapInstance);
+
+    L.control.zoom({ position: 'bottomright' }).addTo(mapInstance);
+}
+
+// --- THỰC HIỆN TÌM KIẾM MỚI ---
+async function executeNewSearch(query, startTime, endTime) {
     try {
-        const searchParams = Object.fromEntries(params.entries());
-        const spots = await api.searchSpots(searchParams);
+        showLoadingState();
 
-        container.innerHTML = '';
-
-        if (spots.length === 0) {
-            container.innerHTML = '<p class="no-results" data-i18n="no_results">Sorry, no available parking spots were found for your criteria.</p>';
-            return;
+        // Bước 1: Gọi API Geocoding để lấy tọa độ
+        const geocodeRes = await fetch(`${API_URL}/spots/geocode?q=${encodeURIComponent(query)}`);
+        if (!geocodeRes.ok) {
+            throw new Error('Không thể phân tích vị trí này');
         }
 
-        // Store all spots in state
-        allSpots = spots;
-        filteredSpots = spots; // Initially, all spots are shown
+        const coords = await geocodeRes.json();
+        searchCoords = { lat: coords.lat, lng: coords.lng };
 
-        // Update results count
-        updateResultsCount();
+        // Di chuyển tâm bản đồ tới điểm tìm kiếm
+        mapInstance.setView([searchCoords.lat, searchCoords.lng], 14);
 
-        // Display first page
-        displaySpots(params);
+        // Vẽ pin đỏ ở vị trí tâm
+        if (centerMarker) mapInstance.removeLayer(centerMarker);
+        const redIcon = L.icon({
+            iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
+            shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+            iconSize: [25, 41],
+            iconAnchor: [12, 41],
+            popupAnchor: [1, -34],
+            shadowSize: [41, 41]
+        });
+        centerMarker = L.marker([searchCoords.lat, searchCoords.lng], { icon: redIcon }).addTo(mapInstance);
 
-        // Apply i18n if available
-        if (window.__applyI18n) window.__applyI18n();
+        // Bước 2: Thuật toán tăng bán kính (Radius Expansion)
+        currentRadius = 1000; // Khởi đầu 1km
+        let spots = [];
+        
+        while (currentRadius <= 10000) {
+            console.log(`[SEARCH] Quét bán kính ${currentRadius}m...`);
+            const searchParams = {
+                lat: searchCoords.lat,
+                lng: searchCoords.lng,
+                radius: currentRadius,
+                startTime,
+                endTime
+            };
+            
+            spots = await api.searchSpots(searchParams);
+            if (spots && spots.length > 0) {
+                break; // Tìm thấy ít nhất một kết quả, dừng tăng bán kính
+            }
+            currentRadius += 1000; // Tăng thêm 1km
+        }
 
-    } catch (error) {
-        container.innerHTML = `<p class="no-results" style="color: red;">Error: ${error.message}</p>`;
-        console.error('Error loading spots:', error);
+        allSpots = spots || [];
+        
+        // Vẽ vòng tròn bán kính trên bản đồ
+        if (radiusCircle) mapInstance.removeLayer(radiusCircle);
+        radiusCircle = L.circle([searchCoords.lat, searchCoords.lng], {
+            radius: currentRadius,
+            color: '#00B484',
+            fillColor: '#00B484',
+            fillOpacity: 0.12,
+            weight: 1.5
+        }).addTo(mapInstance);
+
+        // Fit bound bản đồ cho khít vòng tròn
+        mapInstance.fitBounds(radiusCircle.getBounds(), { padding: [20, 20] });
+
+        // Áp dụng bộ lọc và sắp xếp
+        applyFiltersAndSort();
+
+    } catch (err) {
+        showErrorState(err.message);
     }
 }
 
-// Setup filter event listeners
+// Fallback load all if no query is given
+async function loadAllSpotsFallback() {
+    try {
+        showLoadingState();
+        // Lấy tất cả bãi đỗ xe đã phê duyệt
+        const spots = await api.searchSpots({
+            startTime: new Date().toISOString(),
+            endTime: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
+        });
+        allSpots = spots || [];
+        applyFiltersAndSort();
+    } catch (err) {
+        showErrorState(err.message);
+    }
+}
+
+// --- RENDER BẢN ĐỒ VÀ BONG BÓNG GIÁ ---
+function renderMapMarkers() {
+    // Xóa các marker cũ
+    mapMarkers.forEach(m => mapInstance.removeLayer(m));
+    mapMarkers = [];
+
+    filteredSpots.forEach(spot => {
+        if (!spot.location || !spot.location.coordinates) return;
+        const [lng, lat] = spot.location.coordinates;
+
+        // Custom marker bong bóng giá
+        const priceText = spot.hourlyRate ? `${(spot.hourlyRate / 1000).toFixed(0)}k` : 'Call';
+        const isActive = spot._id === selectedSpotId;
+        const activeClass = isActive ? 'active' : '';
+
+        const bubbleIcon = L.divIcon({
+            className: 'custom-leaflet-div-icon',
+            html: `<div class="price-marker-bubble ${activeClass}">${priceText}đ</div>`,
+            iconSize: [60, 30],
+            iconAnchor: [30, 15]
+        });
+
+        const marker = L.marker([lat, lng], { icon: bubbleIcon }).addTo(mapInstance);
+        marker.on('click', () => {
+            selectSpot(spot._id);
+        });
+
+        mapMarkers.push(marker);
+    });
+
+    if (mapMarkers.length > 0) {
+        const group = L.featureGroup(mapMarkers);
+        mapInstance.fitBounds(group.getBounds().pad(0.15));
+    }
+}
+
+// --- RENDER DANH SÁCH CARD TRÁI ---
+function renderListPanel() {
+    const listContainer = document.getElementById('results-scroll-container');
+    listContainer.innerHTML = '';
+
+    if (filteredSpots.length === 0) {
+        listContainer.innerHTML = `
+            <div style="text-align: center; padding: 40px 20px; color: #6b7280;">
+                <i class="fa-solid fa-circle-info" style="font-size: 32px; margin-bottom: 12px; color: #9ca3af;"></i>
+                <p style="font-weight: 600;">Không tìm thấy bãi đỗ xe nào phù hợp trong khu vực quét.</p>
+            </div>
+        `;
+        return;
+    }
+
+    // Phân trang
+    const totalPages = Math.ceil(filteredSpots.length / spotsPerPage);
+    const startIndex = (currentPage - 1) * spotsPerPage;
+    const endIndex = startIndex + spotsPerPage;
+    const spotsToDisplay = filteredSpots.slice(startIndex, endIndex);
+
+    spotsToDisplay.forEach(spot => {
+        const distance = calculateHaversineDistance(
+            searchCoords ? searchCoords.lat : 21.0285,
+            searchCoords ? searchCoords.lng : 105.8542,
+            spot.location.coordinates[1],
+            spot.location.coordinates[0]
+        );
+        const walkTime = Math.round(distance * 12);
+
+        const card = document.createElement('div');
+        card.className = `spot-card-v3 ${spot._id === selectedSpotId ? 'selected-card' : ''}`;
+        
+        const imageUrl = getSpotImageUrl(spot);
+        const rating = spot.ggRating ? spot.ggRating.toFixed(1) : '5.0';
+
+        card.innerHTML = `
+            <div class="spot-card-image-wrapper">
+                <img src="${imageUrl}" alt="${spot.name}" onerror="this.onerror=null; this.src='/assets/image/Spot Image Coming Soon.png';">
+            </div>
+            <div class="spot-card-details-wrapper">
+                <div class="spot-card-top-row">
+                    <div class="spot-card-rating">
+                        <i class="fa-solid fa-star"></i>
+                        <span>${rating}</span>
+                    </div>
+                    <div class="spot-card-price-block">
+                        <div class="spot-card-price-value">${spot.hourlyRate.toLocaleString('vi-VN')}đ</div>
+                        <div class="spot-card-price-unit">/tiếng</div>
+                    </div>
+                </div>
+                <div class="spot-card-title">${spot.name || spot.address}</div>
+                <div class="spot-card-meta-info">
+                    <span>🚶 ${walkTime} phút</span>
+                    <span>📍 ${distance.toFixed(1)} km</span>
+                </div>
+                <div class="spot-card-actions">
+                    <button class="btn-card-detail" data-id="${spot._id}">Chi tiết</button>
+                    <button class="btn-card-book" data-id="${spot._id}">Đặt ngay</button>
+                </div>
+            </div>
+        `;
+
+        // Click vào card để xem chi tiết và zoom bản đồ tới điểm đó
+        card.addEventListener('click', (e) => {
+            if (e.target.tagName !== 'BUTTON') {
+                selectSpot(spot._id, true);
+            }
+        });
+
+        // Đăng ký nút Detail và Book
+        card.querySelector('.btn-card-detail').addEventListener('click', () => {
+            selectSpot(spot._id, true);
+        });
+
+        card.querySelector('.btn-card-book').addEventListener('click', () => {
+            navigateToBookingConfig(spot._id);
+        });
+
+        listContainer.appendChild(card);
+    });
+
+    renderPagination(totalPages);
+}
+
+// --- RENDER POPUP CHI TIẾT ĐÈ LÊN BẢN ĐỒ ---
+function showDetailPopup(spot) {
+    const popupPanel = document.getElementById('detail-popup-panel');
+    popupPanel.innerHTML = '';
+
+    const pageLayout = document.getElementById('results-page-layout');
+    const isGridMode = pageLayout.classList.contains('grid-mode');
+
+    // Manage backdrop overlay for grid mode
+    let backdrop = document.getElementById('popup-modal-backdrop');
+    if (isGridMode) {
+        if (!backdrop) {
+            backdrop = document.createElement('div');
+            backdrop.id = 'popup-modal-backdrop';
+            backdrop.className = 'popup-modal-backdrop-v3';
+            document.body.appendChild(backdrop);
+        }
+        backdrop.style.display = 'block';
+    } else {
+        if (backdrop) backdrop.style.display = 'none';
+    }
+
+    const imageUrl = getSpotImageUrl(spot);
+    const distance = searchCoords ? calculateHaversineDistance(
+        searchCoords.lat, searchCoords.lng, spot.location.coordinates[1], spot.location.coordinates[0]
+    ) : 0;
+    const walkTime = Math.round(distance * 12);
+    
+    // Giả sử đỗ 2h để tính dự toán
+    const estHours = 2;
+    const totalPrice = spot.hourlyRate * estHours;
+
+    popupPanel.innerHTML = `
+        <div class="popup-carousel-header">
+            <img class="popup-carousel-image" src="${imageUrl}" onerror="this.onerror=null; this.src='/assets/image/Spot Image Coming Soon.png';">
+            <div class="popup-slots-badge">Còn ${spot.numberOfSlots || 5} chỗ trống</div>
+            <button class="popup-btn-close" id="popup-btn-close"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <div class="popup-nav-tabs" id="popup-nav-tabs">
+            <button class="popup-tab active" data-tab="overview">Tổng quan</button>
+            <button class="popup-tab" data-tab="reviews">Đánh giá</button>
+        </div>
+        <div class="popup-scroll-content" id="popup-scroll-content">
+            <!-- Dynamic Content Area -->
+        </div>
+        <div class="popup-sticky-bottom">
+            <button class="btn-popup-book-now" id="btn-popup-book-now">
+                <i class="fa-solid fa-circle-check"></i>
+                Đặt chỗ ngay
+            </button>
+        </div>
+    `;
+
+    popupPanel.style.display = 'flex';
+
+    const contentArea = document.getElementById('popup-scroll-content');
+
+    // Render Overview Tab Contents
+    function renderOverviewTab() {
+        const spotName = spot.name || spot.address || 'Bãi đỗ xe';
+        const params = new URLSearchParams(window.location.search);
+        const startTimeParam = params.get('startTime') || '';
+        const endTimeParam = params.get('endTime') || '';
+        const startDate = startTimeParam ? new Date(startTimeParam) : new Date();
+        const endDate = endTimeParam ? new Date(endTimeParam) : new Date(Date.now() + 2*60*60*1000);
+        const durationMs = endDate - startDate;
+        const durationHours = Math.max(1, Math.ceil(durationMs / (1000 * 60 * 60)));
+        const estimatedTotal = spot.hourlyRate * durationHours;
+
+        contentArea.innerHTML = `
+            <div class="popup-title-section">
+                <h3>${spotName}</h3>
+                <p><i class="fa-solid fa-location-dot font-primary"></i> Cách ${Math.round(distance * 1000)}m · <i class="fa-solid fa-person-walking"></i> ${walkTime} phút đi bộ</p>
+            </div>
+
+            <div class="popup-description-box" style="background:#f2f4f6;border-radius:8px;padding:16px 20px;margin:0;">
+                <div style="font-size:13px;font-weight:700;color:#191c1e;margin-bottom:6px;font-family:'Manrope',sans-serif;">Giới thiệu</div>
+                <p style="font-size:13px;color:#545f73;line-height:1.5;margin:0;">${spot.description || 'Bãi đỗ xe tiêu chuẩn. Có bảo vệ và camera an ninh. Phù hợp với nhiều loại phương tiện.'}</p>
+            </div>
+
+            <div class="popup-pricing-section">
+                <div style="font-size:16px;font-weight:700;color:#191c1e;margin-bottom:12px;font-family:'Manrope',sans-serif;">Loại xe & Giá vé</div>
+                <div class="popup-pricing-grid">
+                    <div class="popup-pricing-card" style="background:#fff;border:1px solid #e5e7eb;border-radius:8px;padding:16px 20px;">
+                        <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+                            <i class="fa-solid fa-car" style="color:#00B484;"></i>
+                            <span style="font-size:13px;font-weight:700;color:#191c1e;">Ô tô</span>
+                        </div>
+                        <div style="font-size:20px;font-weight:700;color:#191c1e;">${spot.hourlyRate ? spot.hourlyRate.toLocaleString('vi-VN') + 'đ' : 'Liên hệ'}</div>
+                        <div style="font-size:11px;color:#8e9ca9;">/tiếng</div>
+                    </div>
+                    <div class="popup-pricing-card" style="background:#fff;border:1px solid #e5e7eb;border-radius:8px;padding:16px 20px;">
+                        <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+                            <i class="fa-solid fa-motorcycle" style="color:#00B484;"></i>
+                            <span style="font-size:13px;font-weight:700;color:#191c1e;">Xe máy</span>
+                        </div>
+                        <div style="font-size:20px;font-weight:700;color:#191c1e;">${spot.hourlyRate ? Math.round(spot.hourlyRate * 0.4).toLocaleString('vi-VN') + 'đ' : 'Liên hệ'}</div>
+                        <div style="font-size:11px;color:#8e9ca9;">/tiếng</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="popup-payment-section">
+                <div style="font-size:16px;font-weight:700;color:#191c1e;margin-bottom:12px;font-family:'Manrope',sans-serif;">Phương thức thanh toán</div>
+                <div style="display:flex;gap:12px;flex-wrap:wrap;">
+                    <div style="display:flex;align-items:center;gap:10px;padding:10px 16px;border:1px solid #bdc9c1;border-radius:4px;background:#fff;">
+                        <i class="fa-solid fa-money-bill-wave" style="color:#545f73;"></i>
+                        <span style="font-size:13px;font-weight:600;color:#191c1e;">Tiền mặt</span>
+                    </div>
+                    <div style="display:flex;align-items:center;gap:10px;padding:10px 16px;border:1px solid #bdc9c1;border-radius:4px;background:#fff;">
+                        <i class="fa-brands fa-paypal" style="color:#003087;"></i>
+                        <span style="font-size:13px;font-weight:600;color:#191c1e;">PayPal</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="popup-amenities-section">
+                <div style="font-size:16px;font-weight:700;color:#191c1e;margin-bottom:12px;font-family:'Manrope',sans-serif;">Dịch vụ đi kèm</div>
+                <div class="popup-amenities-grid">
+                    <div class="popup-amenity-item" style="padding:10px 16px;border:1px solid #bdc9c1;border-radius:4px;background:#fff;">
+                        <div style="width:20px;text-align:center;"><i class="fa-solid fa-bolt" style="color:#545f73;"></i></div>
+                        <span class="popup-amenity-text" style="font-size:13px;font-weight:600;color:#191c1e;">Trạm sạc xe điện (EV)</span>
+                    </div>
+                    <div class="popup-amenity-item" style="padding:10px 16px;border:1px solid #bdc9c1;border-radius:4px;background:#fff;">
+                        <div style="width:20px;text-align:center;"><i class="fa-solid fa-car-burst" style="color:#545f73;"></i></div>
+                        <span class="popup-amenity-text" style="font-size:13px;font-weight:600;color:#191c1e;">Rửa xe cao cấp</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Booking Summary Box (Đơn hàng của bạn) -->
+            <div class="popup-booking-summary-box">
+                <div style="font-size:14px;font-weight:700;color:#00B484;text-align:center;margin-bottom:16px;letter-spacing:0.5px;">ĐƠN HÀNG CỦA BẠN</div>
+                <div style="border:1px solid #8e9ca9;border-radius:4px;padding:16px;">
+                    <div style="display:flex;justify-content:space-between;margin-bottom:10px;">
+                        <span style="font-size:13px;color:#8e9ca9;font-weight:600;">Địa điểm:</span>
+                        <span style="font-size:13px;font-weight:700;color:#111;text-align:right;max-width:60%;">${spotName}</span>
+                    </div>
+                    <div style="display:flex;justify-content:space-between;margin-bottom:10px;">
+                        <span style="font-size:13px;color:#8e9ca9;font-weight:600;">Đỗ từ:</span>
+                        <span style="font-size:13px;font-weight:600;color:#111;">${startDate.toLocaleString('vi-VN',{hour:'2-digit',minute:'2-digit',day:'2-digit',month:'2-digit',year:'numeric'})}</span>
+                    </div>
+                    <div style="display:flex;justify-content:space-between;margin-bottom:10px;">
+                        <span style="font-size:13px;color:#8e9ca9;font-weight:600;">Lấy xe:</span>
+                        <span style="font-size:13px;font-weight:600;color:#111;">${endDate.toLocaleString('vi-VN',{hour:'2-digit',minute:'2-digit',day:'2-digit',month:'2-digit',year:'numeric'})}</span>
+                    </div>
+                    <div style="display:flex;justify-content:space-between;padding-top:10px;border-top:1px solid #e5e7eb;">
+                        <span style="font-size:14px;color:#8e9ca9;font-weight:700;">Bãi đỗ (${durationHours} tiếng)</span>
+                        <span style="font-size:15px;font-weight:800;color:#111;">${estimatedTotal.toLocaleString('vi-VN')}đ</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="popup-total-box" style="border:1px solid #8e9ca9;border-radius:4px;padding:12px 16px;">
+                <div style="font-size:14px;font-weight:700;color:#00B484;text-align:center;margin-bottom:10px;">TỔNG TIỀN</div>
+                <div style="display:flex;justify-content:space-between;align-items:center;">
+                    <span style="font-size:14px;color:#8e9ca9;font-weight:700;">Bãi đỗ (${durationHours} tiếng)</span>
+                    <span style="font-size:18px;font-weight:800;color:#00B484;">${estimatedTotal.toLocaleString('vi-VN')}đ</span>
+                </div>
+            </div>
+        `;
+    }
+
+    // Render Reviews Tab Contents
+    function renderReviewsTab() {
+        contentArea.innerHTML = `
+            <div class="popup-reviews-header-v3">
+                <div class="reviews-rating-big">
+                    <span class="rating-big-value">4.5</span>
+                    <span class="rating-big-label">trên 5.0</span>
+                </div>
+                <div class="reviews-rating-details">
+                    <span class="rating-count-label">4.5 <i class="fa-solid fa-star" style="color: #2DC989;"></i> (10 lượt đánh giá)</span>
+                    <div class="rating-stars-bars">
+                        <div class="stars-bar-item"><span>5 <i class="fa-solid fa-star"></i></span><div class="bar-bg"><div class="bar-fill" style="width: 80%;"></div></div></div>
+                        <div class="stars-bar-item"><span>4 <i class="fa-solid fa-star"></i></span><div class="bar-bg"><div class="bar-fill" style="width: 15%;"></div></div></div>
+                        <div class="stars-bar-item"><span>3 <i class="fa-solid fa-star"></i></span><div class="bar-bg"><div class="bar-fill" style="width: 5%;"></div></div></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="popup-section-title" style="margin-top: 10px;">Lượt đánh giá</div>
+
+            <div class="reviews-list-container-v3">
+                <div class="review-item-v3">
+                    <div class="review-item-user-row">
+                        <div class="review-user-avatar">MN</div>
+                        <div class="review-user-info-v3">
+                            <span class="review-user-name">Minh Nguyen</span>
+                            <div class="review-stars-row">
+                                <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
+                                <span class="review-time-v3">hôm qua</span>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="review-text-content-v3">Bãi đỗ xe sạch sẽ, bảo vệ nhiệt tình. Dễ tìm thấy chỗ đậu xe vào buổi sáng.</p>
+                </div>
+
+                <div class="review-item-v3">
+                    <div class="review-item-user-row">
+                        <div class="review-user-avatar">MN</div>
+                        <div class="review-user-info-v3">
+                            <span class="review-user-name">Minh Nguyen</span>
+                            <div class="review-stars-row">
+                                <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
+                                <span class="review-time-v3">2 ngày trước</span>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="review-text-content-v3">Bãi đỗ xe sạch sẽ, bảo vệ nhiệt tình. Dễ tìm thấy chỗ đậu xe vào buổi sáng.</p>
+                </div>
+            </div>
+        `;
+    }
+
+    // Initial load
+    renderOverviewTab();
+
+    // Tab switching event registration
+    const tabButtons = document.getElementById('popup-nav-tabs').querySelectorAll('.popup-tab');
+    tabButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+            tabButtons.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            
+            const activeTab = btn.dataset.tab;
+            if (activeTab === 'reviews') {
+                renderReviewsTab();
+            } else {
+                renderOverviewTab();
+            }
+        });
+    });
+
+    // Close popup
+    document.getElementById('popup-btn-close').addEventListener('click', () => {
+        popupPanel.style.display = 'none';
+        if (backdrop) backdrop.style.display = 'none';
+        selectedSpotId = null;
+        renderMapMarkers();
+        renderListPanel();
+    });
+
+    // Bấm đặt chỗ
+    document.getElementById('btn-popup-book-now').addEventListener('click', () => {
+        if (backdrop) backdrop.style.display = 'none';
+        navigateToBookingConfig(spot._id);
+    });
+}
+
+// --- TIẾN HÀNH CHỌN SPOT ---
+function selectSpot(spotId, panTo = false) {
+    selectedSpotId = spotId;
+    
+    // Tìm bãi đỗ tương ứng
+    const spot = allSpots.find(s => s._id === spotId);
+    if (!spot) return;
+
+    if (panTo && mapInstance) {
+        const [lng, lat] = spot.location.coordinates;
+        mapInstance.setView([lat, lng], 15);
+    }
+
+    renderMapMarkers();
+    renderListPanel();
+    showDetailPopup(spot);
+}
+
+// --- SETUP EVENT LISTENERS ---
+function setupEventListeners() {
+    // 1. Autocomplete tìm kiếm
+    const locationInput = document.getElementById('results-location-input');
+    const suggestionsBox = document.getElementById('results-suggestions-box');
+    let debounceTimer;
+
+    locationInput.addEventListener('input', () => {
+        clearTimeout(debounceTimer);
+        const query = locationInput.value.trim();
+        if (query.length < 2) {
+            suggestionsBox.style.display = 'none';
+            return;
+        }
+
+        debounceTimer = setTimeout(async () => {
+            try {
+                const response = await fetch(`${API_URL}/spots/autocomplete?q=${encodeURIComponent(query)}`);
+                const data = await response.json();
+                
+                suggestionsBox.innerHTML = '';
+                if (data.length === 0) {
+                    suggestionsBox.style.display = 'none';
+                    return;
+                }
+
+                data.forEach(item => {
+                    const itemDiv = document.createElement('div');
+                    itemDiv.className = 'suggestion-item-v3';
+                    itemDiv.textContent = item.address;
+                    itemDiv.onmousedown = (e) => {
+                        e.preventDefault();
+                        locationInput.value = item.name || item.address;
+                        suggestionsBox.style.display = 'none';
+                        triggerSearchExecution();
+                    };
+                    suggestionsBox.appendChild(itemDiv);
+                });
+                suggestionsBox.style.display = 'block';
+
+            } catch (err) {
+                console.error('Error autocomplete results:', err);
+            }
+        }, 300);
+    });
+
+    locationInput.addEventListener('blur', () => {
+        setTimeout(() => { suggestionsBox.style.display = 'none'; }, 200);
+    });
+
+    // 2. Nhấn Enter để execute geocoding và search
+    locationInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            suggestionsBox.style.display = 'none';
+            triggerSearchExecution();
+        }
+    });
+
+    document.getElementById('btn-search-execute').addEventListener('click', triggerSearchExecution);
+
+    // 3. Layout Switcher
+    const layoutToggle = document.getElementById('layout-toggle-container');
+    const pageLayout = document.getElementById('results-page-layout');
+    
+    layoutToggle.querySelectorAll('.toggle-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            layoutToggle.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            
+            const mode = btn.dataset.mode;
+            if (mode === 'grid') {
+                pageLayout.classList.remove('map-mode');
+                pageLayout.classList.add('grid-mode');
+            } else {
+                pageLayout.classList.remove('grid-mode');
+                pageLayout.classList.add('map-mode');
+                if (mapInstance) {
+                    setTimeout(() => mapInstance.invalidateSize(), 200);
+                }
+            }
+            currentPage = 1;
+            renderListPanel();
+        });
+    });
+
+    // 4. Sắp xếp
+    document.querySelectorAll('.sort-tab-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.sort-tab-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            currentSort = btn.dataset.sort;
+            currentPage = 1;
+            applyFiltersAndSort();
+        });
+    });
+}
+
+// Setup sidebar filter listeners
 function setupFilterListeners() {
     // Vehicle type filters
     document.querySelectorAll('input[name="vehicleType"]').forEach(checkbox => {
@@ -74,7 +688,8 @@ function setupFilterListeners() {
             } else {
                 activeFilters.vehicleTypes = activeFilters.vehicleTypes.filter(v => v !== e.target.value);
             }
-            applyFilters();
+            currentPage = 1;
+            applyFiltersAndSort();
         });
     });
 
@@ -86,7 +701,8 @@ function setupFilterListeners() {
             } else {
                 activeFilters.bookingTypes = activeFilters.bookingTypes.filter(v => v !== e.target.value);
             }
-            applyFilters();
+            currentPage = 1;
+            applyFiltersAndSort();
         });
     });
 
@@ -98,7 +714,8 @@ function setupFilterListeners() {
             } else {
                 activeFilters.paymentMethods = activeFilters.paymentMethods.filter(v => v !== e.target.value);
             }
-            applyFilters();
+            currentPage = 1;
+            applyFiltersAndSort();
         });
     });
 
@@ -118,14 +735,29 @@ function setupFilterListeners() {
                 paymentMethods: []
             };
 
-            applyFilters();
+            currentPage = 1;
+            applyFiltersAndSort();
         });
     }
 }
 
-// Apply filters to spots
-function applyFilters() {
-    filteredSpots = allSpots.filter(spot => {
+function triggerSearchExecution() {
+    const query = document.getElementById('results-location-input').value.trim();
+    const startTimeStr = document.getElementById('results-start-time').value;
+    const endTimeStr = document.getElementById('results-end-time').value;
+
+    const startDate = parseVietnameseDateString(startTimeStr);
+    const endDate = parseVietnameseDateString(endTimeStr);
+
+    if (!query || !startDate || !endDate) return;
+
+    executeNewSearch(query, startDate.toISOString(), endDate.toISOString());
+}
+
+// --- BỘ LỌC VÀ SẮP XẾP ---
+function applyFiltersAndSort() {
+    // 1. Lọc bãi đỗ xe theo filter sidebar trước
+    let filtered = allSpots.filter(spot => {
         // Vehicle type filter
         if (activeFilters.vehicleTypes.length > 0) {
             const hasMatchingVehicle = activeFilters.vehicleTypes.some(type =>
@@ -153,257 +785,141 @@ function applyFilters() {
         return true;
     });
 
-    // Reset to first page when filters change
-    currentPage = 1;
-
-    // Update results count
-    updateResultsCount();
-
-    // Re-display spots
-    const params = new URLSearchParams(window.location.search);
-    displaySpots(params);
-}
-
-// Update results count display
-function updateResultsCount() {
-    const countEl = document.getElementById('results-count');
-    if (countEl) {
-        const total = allSpots.length;
-        const filtered = filteredSpots.length;
-
-        if (filtered === total) {
-            countEl.textContent = `Showing ${total} parking spot${total !== 1 ? 's' : ''}`;
-        } else {
-            countEl.textContent = `Showing ${filtered} of ${total} parking spot${total !== 1 ? 's' : ''}`;
-        }
-    }
-}
-
-function displaySpots(params) {
-    const resultsGrid = document.getElementById('results-grid');
-    resultsGrid.innerHTML = '';
-
-    // Check if there are any filtered spots
-    if (filteredSpots.length === 0) {
-        resultsGrid.innerHTML = '<p class="no-results">No parking spots match your selected filters.</p>';
-        return;
+    // 2. Áp dụng sắp xếp
+    if (currentSort === 'price') {
+        filtered.sort((a, b) => a.hourlyRate - b.hourlyRate);
+    } else if (currentSort === 'distance' || currentSort === 'recommend') {
+        // Sắp xếp khoảng cách tăng dần
+        filtered.sort((a, b) => {
+            const distA = searchCoords ? calculateHaversineDistance(
+                searchCoords.lat, searchCoords.lng, a.location.coordinates[1], a.location.coordinates[0]
+            ) : 0;
+            const distB = searchCoords ? calculateHaversineDistance(
+                searchCoords.lat, searchCoords.lng, b.location.coordinates[1], b.location.coordinates[0]
+            ) : 0;
+            return distA - distB;
+        });
     }
 
-    // Calculate pagination
-    const totalPages = Math.ceil(filteredSpots.length / spotsPerPage);
-    const startIndex = (currentPage - 1) * spotsPerPage;
-    const endIndex = startIndex + spotsPerPage;
-    const spotsToDisplay = filteredSpots.slice(startIndex, endIndex);
-
-    // Display spots for current page
-    spotsToDisplay.forEach((spot, index) => {
-        const startTime = params.get('startTime');
-        const endTime = params.get('endTime');
-
-        const spotCard = document.createElement('a');
-        spotCard.href = `spot-details.html?id=${spot._id}&arrival=${encodeURIComponent(startTime)}&leaving=${encodeURIComponent(endTime)}`;
-        spotCard.className = 'spot-card';
-        spotCard.style.animationDelay = `${index * 100}ms`;
-
-        const imageUrl = spot.images && spot.images.length > 0
-            ? spot.images[0]
-            : '/assets/image/Spot Image Coming Soon.png';
-
-        spotCard.innerHTML = `
-            <img src="${imageUrl}" alt="${spot.address}" class="spot-card__image" onerror="this.onerror=null; this.src='/assets/image/Spot Image Coming Soon.png';">
-            <div class="spot-card__content">
-                <h3>${spot.address}</h3>
-                <div class="spot-card__info">
-                    <span class="spot-card__info-price">${spot.hourlyRate.toLocaleString('vi-VN')} VND / hour</span>
-                </div>
-                <div class="spot-card__cta" data-i18n="book_now">Book Now</div>
-            </div>
-        `;
-
-        resultsGrid.appendChild(spotCard);
-    });
-
-    // Add pagination controls
-    if (totalPages > 1) {
-        const paginationContainer = createPaginationControls(totalPages, params);
-        resultsGrid.appendChild(paginationContainer);
-    }
-
-    // Apply i18n if available
-    if (window.__applyI18n) window.__applyI18n();
+    filteredSpots = filtered;
+    renderMapMarkers();
+    renderListPanel();
 }
 
-function createPaginationControls(totalPages, params) {
-    const paginationDiv = document.createElement('div');
-    paginationDiv.className = 'pagination-controls';
-    paginationDiv.style.cssText = `
+// --- TIỆN ÍCH TÍNH TOÁN ---
+function calculateHaversineDistance(lat1, lon1, lat2, lon2) {
+    const R = 6371; // Bán kính trái đất (km)
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLon = (lon2 - lon1) * Math.PI / 180;
+    const a = 
+        Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+        Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * 
+        Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return R * c;
+}
+
+// Chuyển sang trang booking-config
+function navigateToBookingConfig(spotId) {
+    const startTimeStr = document.getElementById('results-start-time').value;
+    const endTimeStr = document.getElementById('results-end-time').value;
+    const startDate = parseVietnameseDateString(startTimeStr);
+    const endDate = parseVietnameseDateString(endTimeStr);
+
+    let detailUrl = `/customer/booking-config?spotId=${spotId}&startTime=${encodeURIComponent(startDate.toISOString())}&endTime=${encodeURIComponent(endDate.toISOString())}`;
+    window.location.href = detailUrl;
+}
+
+function formatDateToVietnameseString(date) {
+    const d = String(date.getDate()).padStart(2, '0');
+    const m = String(date.getMonth() + 1).padStart(2, '0');
+    const y = String(date.getFullYear()).substring(2);
+    const h = String(date.getHours()).padStart(2, '0');
+    const min = String(date.getMinutes()).padStart(2, '0');
+    return `${d}.${m}.${y} ${h}:${min}`;
+}
+
+// Hỗ trợ loading state
+function showLoadingState() {
+    document.getElementById('results-scroll-container').innerHTML = `
+        <div style="text-align: center; padding: 40px 20px; color: #6b7280;">
+            <i class="fa-solid fa-spinner fa-spin" style="font-size: 32px; margin-bottom: 12px; color: #00B484;"></i>
+            <p style="font-weight: 600;">Đang quét tìm kiếm bãi đỗ...</p>
+        </div>
+    `;
+}
+
+function showErrorState(msg) {
+    document.getElementById('results-scroll-container').innerHTML = `
+        <div style="text-align: center; padding: 40px 20px; color: #dc2626;">
+            <i class="fa-solid fa-triangle-exclamation" style="font-size: 32px; margin-bottom: 12px;"></i>
+            <p style="font-weight: 600;">Lỗi: ${msg}</p>
+        </div>
+    `;
+}
+
+function renderPagination(totalPages) {
+    const pag = document.getElementById('results-pagination');
+    pag.innerHTML = '';
+    if (totalPages <= 1) return;
+
+    pag.style.cssText = `
         display: flex;
         justify-content: center;
         align-items: center;
-        gap: 10px;
-        margin-top: 40px;
-        padding: 20px;
-        grid-column: 1 / -1;
+        gap: 8px;
+        padding: 16px 20px;
+        background: #ffffff;
+        border-top: 1px solid #e5e7eb;
     `;
 
-    // Previous button
-    const prevButton = document.createElement('button');
-    prevButton.textContent = '← Previous';
-    prevButton.disabled = currentPage === 1;
-    prevButton.style.cssText = `
-        padding: 12px 24px;
-        background: ${currentPage === 1 ? '#e0e0e0' : 'var(--primary)'};
-        color: ${currentPage === 1 ? '#999' : 'white'};
-        border: none;
-        border-radius: 8px;
-        font-weight: 600;
-        font-size: 14px;
-        cursor: ${currentPage === 1 ? 'not-allowed' : 'pointer'};
-        transition: all 0.3s ease;
-        font-family: 'Montserrat', sans-serif;
-    `;
-    prevButton.addEventListener('click', () => {
+    const prev = document.createElement('button');
+    prev.textContent = '←';
+    prev.disabled = currentPage === 1;
+    prev.style.cssText = 'padding: 6px 12px; border: 1px solid #e5e7eb; border-radius: 4px; background: transparent; cursor: pointer;';
+    prev.addEventListener('click', () => {
         if (currentPage > 1) {
             currentPage--;
-            displaySpots(params);
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            renderListPanel();
         }
     });
-    if (currentPage > 1) {
-        prevButton.addEventListener('mouseenter', (e) => {
-            e.target.style.background = 'var(--primary-dark)';
-            e.target.style.transform = 'translateY(-2px)';
+    pag.appendChild(prev);
+
+    for (let i = 1; i <= totalPages; i++) {
+        const btn = document.createElement('button');
+        btn.textContent = i;
+        btn.style.cssText = `width: 28px; height: 28px; border: 1px solid #e5e7eb; border-radius: 50%; background: ${currentPage === i ? '#00B484' : 'transparent'}; color: ${currentPage === i ? '#ffffff' : '#333333'}; font-weight: 700; cursor: pointer;`;
+        btn.addEventListener('click', () => {
+            currentPage = i;
+            renderListPanel();
         });
-        prevButton.addEventListener('mouseleave', (e) => {
-            e.target.style.background = 'var(--primary)';
-            e.target.style.transform = 'translateY(0)';
-        });
+        pag.appendChild(btn);
     }
 
-    // Page numbers
-    const pageNumbersDiv = document.createElement('div');
-    pageNumbersDiv.style.cssText = `
-        display: flex;
-        gap: 8px;
-        align-items: center;
-    `;
-
-    // Helper function to create page button
-    const createPageButton = (pageNum) => {
-        const pageButton = document.createElement('button');
-        pageButton.textContent = pageNum;
-        pageButton.style.cssText = `
-            width: 40px;
-            height: 40px;
-            padding: 8px;
-            background: ${pageNum === currentPage ? 'var(--primary)' : '#f0f0f0'};
-            color: ${pageNum === currentPage ? 'white' : '#333'};
-            border: 2px solid ${pageNum === currentPage ? 'var(--primary)' : '#ddd'};
-            border-radius: 50%;
-            font-weight: ${pageNum === currentPage ? '700' : '600'};
-            font-size: 14px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-family: 'Montserrat', sans-serif;
-            box-shadow: ${pageNum === currentPage ? '0 4px 15px rgba(19, 180, 126, 0.3)' : 'none'};
-        `;
-        pageButton.addEventListener('click', () => {
-            currentPage = pageNum;
-            displaySpots(params);
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        });
-        if (pageNum !== currentPage) {
-            pageButton.addEventListener('mouseenter', (e) => {
-                e.target.style.background = '#e0e0e0';
-                e.target.style.transform = 'scale(1.1)';
-            });
-            pageButton.addEventListener('mouseleave', (e) => {
-                e.target.style.background = '#f0f0f0';
-                e.target.style.transform = 'scale(1)';
-            });
-        }
-        return pageButton;
-    };
-
-    // Helper function to create ellipsis
-    const createEllipsis = () => {
-        const ellipsis = document.createElement('span');
-        ellipsis.textContent = '...';
-        ellipsis.style.cssText = `
-            padding: 0 8px;
-            color: #666;
-            font-weight: 600;
-            font-size: 14px;
-        `;
-        return ellipsis;
-    };
-
-    // Truncated pagination logic
-    const showPages = new Set();
-
-    // Always show first 3 pages
-    for (let i = 1; i <= Math.min(3, totalPages); i++) {
-        showPages.add(i);
-    }
-
-    // Always show last 3 pages
-    for (let i = Math.max(1, totalPages - 2); i <= totalPages; i++) {
-        showPages.add(i);
-    }
-
-    // Show current page and neighbors (current - 1, current, current + 1)
-    for (let i = Math.max(1, currentPage - 1); i <= Math.min(totalPages, currentPage + 1); i++) {
-        showPages.add(i);
-    }
-
-    // Convert to sorted array and render with ellipsis
-    const sortedPages = Array.from(showPages).sort((a, b) => a - b);
-
-    sortedPages.forEach((pageNum, index) => {
-        // Add ellipsis if there's a gap
-        if (index > 0 && pageNum - sortedPages[index - 1] > 1) {
-            pageNumbersDiv.appendChild(createEllipsis());
-        }
-        pageNumbersDiv.appendChild(createPageButton(pageNum));
-    });
-
-    // Next button
-    const nextButton = document.createElement('button');
-    nextButton.textContent = 'Next →';
-    nextButton.disabled = currentPage === totalPages;
-    nextButton.style.cssText = `
-        padding: 12px 24px;
-        background: ${currentPage === totalPages ? '#e0e0e0' : 'var(--primary)'};
-        color: ${currentPage === totalPages ? '#999' : 'white'};
-        border: none;
-        border-radius: 8px;
-        font-weight: 600;
-        font-size: 14px;
-        cursor: ${currentPage === totalPages ? 'not-allowed' : 'pointer'};
-        transition: all 0.3s ease;
-        font-family: 'Montserrat', sans-serif;
-    `;
-    nextButton.addEventListener('click', () => {
+    const next = document.createElement('button');
+    next.textContent = '→';
+    next.disabled = currentPage === totalPages;
+    next.style.cssText = 'padding: 6px 12px; border: 1px solid #e5e7eb; border-radius: 4px; background: transparent; cursor: pointer;';
+    next.addEventListener('click', () => {
         if (currentPage < totalPages) {
             currentPage++;
-            displaySpots(params);
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            renderListPanel();
         }
     });
-    if (currentPage < totalPages) {
-        nextButton.addEventListener('mouseenter', (e) => {
-            e.target.style.background = 'var(--primary-dark)';
-            e.target.style.transform = 'translateY(-2px)';
-        });
-        nextButton.addEventListener('mouseleave', (e) => {
-            e.target.style.background = 'var(--primary)';
-            e.target.style.transform = 'translateY(0)';
-        });
+    pag.appendChild(next);
+}
+
+// Helpers for date string parsing (duplicated here for independence)
+function parseVietnameseDateString(dateString) {
+    if (!dateString) return null;
+    const parts = dateString.match(/(\d{2})[./](\d{2})[./](\d{2,4}) (\d{2}):(\d{2})/);
+    if (!parts) return null;
+    const day = parts[1], month = parts[2];
+    let year = parts[3];
+    const hours = parts[4], minutes = parts[5];
+    if (year.length === 2) {
+        year = '20' + year;
     }
-
-    paginationDiv.appendChild(prevButton);
-    paginationDiv.appendChild(pageNumbersDiv);
-    paginationDiv.appendChild(nextButton);
-
-    return paginationDiv;
+    const isoString = `${year}-${month}-${day}T${hours}:${minutes}:00`;
+    return new Date(isoString);
 }

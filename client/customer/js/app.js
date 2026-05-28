@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const nav = document.querySelector('header nav');
+    const nav = document.querySelector('.header-nav') || document.querySelector('header nav');
     const userData = JSON.parse(localStorage.getItem('userData') || 'null');
     let currentLang = localStorage.getItem('lang') || 'vi';
 
@@ -11,7 +11,7 @@ document.addEventListener('DOMContentLoaded', () => {
             welcome: 'Welcome',
             logout: 'Logout',
             login: 'Login',
-            tagline: 'Save time. Save money. Save Earth',
+            tagline: 'Smart Parking Here',
             nav_home: 'Home',
             nav_available: 'Available Spots',
             tab_hourly: 'Hourly/Daily',
@@ -21,13 +21,14 @@ document.addEventListener('DOMContentLoaded', () => {
             label_from: 'From',
             label_until: 'Until',
             btn_show_spaces: 'Show parking spaces',
-            why_title: 'Why Parkchung',
+            why_title: 'Why ParkChung',
+            why_subtitle: 'We offer smart parking solutions to save your time, secure your budget, and provide absolute peace of mind.',
             benefit_time_title: 'Save Time',
-            benefit_time_desc: 'Book your parking spot in advance, no more endless searching.',
+            benefit_time_desc: 'No worries about risks, your vehicle is protected in a closely monitored area.',
             benefit_price_title: 'Transparent Pricing',
-            benefit_price_desc: 'Clear pricing, no surprises when you book.',
+            benefit_price_desc: 'Book in advance, no more endless searching.',
             benefit_safe_title: 'Safe Parking',
-            benefit_safe_desc: 'Secure spots monitored with security systems.',
+            benefit_safe_desc: 'Clear pricing, no surprises when you book.',
             locations_title: 'Featured Locations',
             loc_airports: 'Airports',
             loc_city: 'City Centers',
@@ -39,8 +40,8 @@ document.addEventListener('DOMContentLoaded', () => {
             carpark_desc: 'Maximise yield from underused car parks and vacant land, or transform payments with the favourite parking app.',
             carpark_cta: 'Learn about our solutions',
             press_title: 'The press talks about us',
-            footer_contact: 'CONTACT',
-            footer_brand: 'Parkchung, online parking platform',
+            footer_contact: 'PARKCHUNG INFORMATION',
+            footer_brand: 'Smart Parking Here',
             footer_intro: 'INTRODUCTION',
             footer_subscribe_text: 'Subscribe to receive promotions',
             ph_email: 'Enter your email...',
@@ -55,7 +56,7 @@ document.addEventListener('DOMContentLoaded', () => {
             sup_listing: 'Parking Listing Guide',
             sup_faq: 'FAQs',
             sup_blog: 'Blog',
-            footer_copy: 'Copyright © 2025 by Parkchung. All rights reserved.',
+            footer_copy: 'Copyright © 2026 ParkChung. All rights reserved.',
             ph_location: 'Enter a place or postcode',
             results_title: 'Available Parking Spots',
             results_desc: 'Choose the best spot for you and book in seconds.',
@@ -190,7 +191,7 @@ document.addEventListener('DOMContentLoaded', () => {
             welcome: 'Xin chào',
             logout: 'Đăng xuất',
             login: 'Đăng nhập',
-            tagline: 'Tiết kiệm thời gian. Tiết kiệm chi phí. Bảo vệ Trái Đất',
+            tagline: 'Smart Parking Here',
             nav_home: 'Trang chủ',
             nav_available: 'Chỗ trống',
             tab_hourly: 'Theo giờ/Ngày',
@@ -200,13 +201,14 @@ document.addEventListener('DOMContentLoaded', () => {
             label_from: 'Từ',
             label_until: 'Đến',
             btn_show_spaces: 'Hiển thị chỗ đỗ',
-            why_title: 'Vì sao chọn Parkchung',
+            why_title: 'Vì sao chọn ParkChung',
+            why_subtitle: 'Chúng tôi mang đến giải pháp đỗ xe thông minh, giúp bạn tiết kiệm thời gian, an tâm về chi phí và yên tâm tuyệt đối khi gửi xe.',
             benefit_time_title: 'Tiết kiệm thời gian',
-            benefit_time_desc: 'Đặt chỗ trước, không còn mất công tìm kiếm.',
-            benefit_price_title: 'Giá minh bạch',
-            benefit_price_desc: 'Giá rõ ràng, không phụ phí bất ngờ.',
+            benefit_time_desc: 'Không lo rủi ro, phương tiện được bảo vệ trong khu vực giám sát chặt chẽ',
+            benefit_price_title: 'Giá cả minh bạch',
+            benefit_price_desc: 'Đặt chỗ trước, không còn mất công tìm kiếm.',
             benefit_safe_title: 'Bãi đỗ an toàn',
-            benefit_safe_desc: 'Khu đỗ an ninh, được giám sát.',
+            benefit_safe_desc: 'Giá rõ ràng, không phát sinh phụ phí bất ngờ.',
             locations_title: 'Địa điểm nổi bật',
             loc_airports: 'Sân bay',
             loc_city: 'Trung tâm thành phố',
@@ -218,8 +220,8 @@ document.addEventListener('DOMContentLoaded', () => {
             carpark_desc: 'Tối đa hóa công suất bãi đỗ và tối ưu thanh toán với ứng dụng ưa thích.',
             carpark_cta: 'Tìm hiểu giải pháp',
             press_title: 'Báo chí nói về chúng tôi',
-            footer_contact: 'LIÊN HỆ',
-            footer_brand: 'Parkchung, nền tảng đặt chỗ đỗ xe trực tuyến',
+            footer_contact: 'THÔNG TIN PARKCHUNG',
+            footer_brand: 'Smart Parking Here',
             footer_intro: 'GIỚI THIỆU',
             footer_subscribe_text: 'Đăng ký nhận khuyến mãi',
             ph_email: 'Nhập email của bạn...',
@@ -234,7 +236,7 @@ document.addEventListener('DOMContentLoaded', () => {
             sup_listing: 'Hướng dẫn đăng bãi',
             sup_faq: 'Câu hỏi thường gặp',
             sup_blog: 'Blog',
-            footer_copy: 'Bản quyền © 2025 thuộc Parkchung. Bảo lưu mọi quyền.',
+            footer_copy: 'Bản quyền © 2026 thuộc Parkchung. Bảo lưu mọi quyền.',
             ph_location: 'Nhập địa điểm hoặc mã bưu chính',
             results_title: 'Chỗ đỗ xe khả dụng',
             results_desc: 'Chọn chỗ phù hợp và đặt trong vài giây.',
@@ -392,23 +394,68 @@ document.addEventListener('DOMContentLoaded', () => {
         about_how_title: 'How do we do it?',
         about_how_para1: 'Even the most complex problems have a suitable solution. Parkchung doesn\'t just rent cars; it creates innovative products within the existing ecosystem.',
         about_how_para2: 'We leverage technology to provide a comprehensive travel solution by connecting customers with self-drive car rental service providers. Parkchung\'s mission is to offer a platform where customers can easily rent their desired car, while car owners can attract customers and conduct business conveniently.',
-        about_how_para3: 'The company focuses on simplifying the car rental process, offering transaction support tools from price comparison to online payment, car rental insurance, reduced procedures, and many other utilities for both customers and car-providing partners.'
+        about_how_para3: 'The company focuses on simplifying the car rental process, offering transaction support tools from price comparison to online payment, car rental insurance, reduced procedures, and many other utilities for both customers and car-providing partners.',
+        
+        // V3 HOMEPAGE REDESIGN
+        becomeHost: 'Become a Partner <i class="fas fa-chevron-down" style="font-size: 0.7rem; margin-left: 3px; vertical-align: middle; color: #2DC989;"></i>',
+        hero_title: 'Optimize your journey with smart parking pre-booking',
+        label_dropoff: 'DROP OFF AT',
+        label_pickup: 'PICK UP AT',
+        why_subtitle: 'We provide smart parking solutions, helping you save time, be peace of mind about costs, and feel absolutely secure when parking.',
+        eco_title: 'ParkChung Ecosystem',
+        eco_coop_title: 'Partner with ParkChung – Optimize parking revenue',
+        eco_f1: 'Turn your vacant parking spaces into daily passive income sources',
+        eco_f2: 'Manage bookings and track transparent revenues directly on the app',
+        eco_f3: 'Instantly connect with a network of active drivers looking for parking',
+        eco_cta: 'Learn more',
+        quote_text: 'Giải pháp đỗ xe càng thuận tiện, hành trình càng trở nên dễ dàng và chúng ta càng gắn kết với nhau hơn.',
+        quote_author_name: 'BRANNAN COADY',
+        quote_author_title: 'CEO',
+        press_title: 'What the press says about us',
+        press_badge: 'PRESS',
+        press_subtitle: 'What journalists say about our solution. We are proud to share the journey.',
+        press_read_article: 'Read Article ↗',
+        press_article1_source: 'UNDP VIETNAM · VIETCHALLENGE 2019',
+        press_article2_source: 'UNDP VIETNAM · VIETCHALLENGE 2019',
+        press_article3_source: 'UNDP VIETNAM · VIETCHALLENGE 2019',
+        press_article1_title: 'Chúc mừng 12 startup chính thức bước vào giai đoạn đào tạo chuyên sâu của Chương trình ươm tạo Việt Nam - Nhật Bản!',
+        press_article2_title: 'Chúc mừng 12 startup chính thức bước vào giai đoạn đào tạo chuyên sâu của Chương trình ươm tạo Việt Nam - Nhật Bản!',
+        press_article3_title: 'Chúc mừng 12 startup chính thức bước vào giai đoạn đào tạo chuyên sâu của Chương trình ươm tạo Việt Nam - Nhật Bản!',
+        review_1_text: 'Việc đỗ xe tại Nhà ga số 5 sân bay Nội Bài quá đỗi dễ dàng. Cực kỳ dễ tìm và siêu RẺ! Chắc chắn tôi sẽ tiếp tục sử dụng dịch vụ! Cảm ơn.',
+        review_2_text: 'Việc đỗ xe tại Nhà ga số 5 sân bay Nội Bài quá đỗi dễ dàng. Cực kỳ dễ tìm và siêu RẺ! Chắc chắn tôi sẽ tiếp tục sử dụng dịch vụ! Cảm ơn.',
+        review_3_text: 'Việc đỗ xe tại Nhà ga số 5 sân bay Nội Bài quá đỗi dễ dàng. Cực kỳ dễ tìm và siêu RẺ! Chắc chắn tôi sẽ tiếp tục sử dụng dịch vụ! Cảm ơn.',
+        review_4_text: 'Việc đỗ xe tại Nhà ga số 5 sân bay Nội Bài quá đỗi dễ dàng. Cực kỳ dễ tìm và siêu RẺ! Chắc chắn tôi sẽ tiếp tục sử dụng dịch vụ! Cảm ơn.',
+        review_5_text: 'Việc đỗ xe tại Nhà ga số 5 sân bay Nội Bài quá đỗi dễ dàng. Cực kỳ dễ tìm và siêu RẺ! Chắc chắn tôi sẽ tiếp tục sử dụng dịch vụ! Cảm ơn.',
+        review_1_author: 'Phong Anh',
+        review_2_author: 'Phong Anh',
+        review_3_author: 'Phong Anh',
+        review_4_author: 'Phong Anh',
+        review_5_author: 'Phong Anh',
+        review_1_role: 'Service User',
+        review_2_role: 'Service User',
+        review_3_role: 'Service User',
+        review_4_role: 'Service User',
+        review_5_role: 'Service User',
+        footer_subscribe_text: 'Subscribe to promotions',
+        footer_follow_us: 'FOLLOW US',
+        footer_contact: 'PARKCHUNG INFORMATION',
+        footer_copy: 'Copyright © 2026 ParkChung. All rights reserved.'
     });
 
     Object.assign(t.vi, {
         my_profile: 'Hồ sơ của tôi',
         billed_as: 'Tính phí theo',
         billing_info: 'Đặt chỗ được tính theo block 1 giờ (tối thiểu 1 giờ).',
-        footer_about: 'Về chúng tôi',
+        footer_about: 'About us',
         about_footer_address_1: 'Địa chỉ: Nhà Cựu sinh viên BK,',
         about_footer_address_2: 'Trường Đại học Bách khoa Hà Nội,',
         about_footer_address_3: 'Số 1 Đại Cồ Việt, Hà Nội',
-        pol_terms_service: 'Điều khoản dịch vụ',
-        pol_insurance: 'Chính sách bảo hiểm và trách nhiệm',
-        pol_dispute: 'Chính sách giải quyết tranh chấp',
-        pol_security: 'Chính sách an ninh',
-        pol_driver: 'Điều khoản tài xế và chính sách đặt chỗ',
-        pol_supplier: 'Điều khoản và chính sách nhà cung cấp',
+        pol_terms_service: 'Terms of Service',
+        pol_insurance: 'Insurance & Liability Policy',
+        pol_dispute: 'Dispute Resolution Policy',
+        pol_security: 'Security Policy',
+        pol_driver: 'Driver Terms & Booking Policies',
+        pol_supplier: 'Supplier Terms & Policies',
         terms_prefix: 'Nhấn nút bên dưới đồng nghĩa bạn đã đọc và đồng ý với',
         terms_link: 'Điều khoản & Điều kiện',
         about_page_title: 'Về chúng tôi',
@@ -423,34 +470,83 @@ document.addEventListener('DOMContentLoaded', () => {
         about_how_title: 'Chúng tôi thực hiện như thế nào?',
         about_how_para1: 'Ngay cả những bài toán phức tạp nhất cũng có lời giải phù hợp. Parkchung không chỉ cho thuê xe mà còn tạo ra những sản phẩm đổi mới trong hệ sinh thái sẵn có.',
         about_how_para2: 'Chúng tôi tận dụng công nghệ để cung cấp giải pháp di chuyển toàn diện bằng cách kết nối khách hàng với các đơn vị cung cấp dịch vụ cho thuê xe tự lái. Parkchung hướng tới một nền tảng nơi khách hàng dễ dàng thuê đúng chiếc xe mong muốn, còn chủ xe có thể tiếp cận khách hàng và kinh doanh thuận tiện.',
-        about_how_para3: 'Công ty tập trung đơn giản hóa quy trình thuê xe, cung cấp các công cụ hỗ trợ giao dịch từ so sánh giá, thanh toán trực tuyến, bảo hiểm thuê xe, tinh gọn thủ tục đến nhiều tiện ích khác cho cả khách hàng lẫn đối tác cung cấp xe.'
+        about_how_para3: 'Công ty tập trung đơn giản hóa quy trình thuê xe, cung cấp các công cụ hỗ trợ giao dịch từ so sánh giá, thanh toán trực tuyến, bảo hiểm thuê xe, tinh gọn thủ tục đến nhiều tiện ích khác cho cả khách hàng lẫn đối tác cung cấp xe.',
+        
+        // V3 HOMEPAGE REDESIGN
+        becomeHost: 'Trở thành chủ bãi đậu xe <i class="fas fa-chevron-down" style="font-size: 0.7rem; margin-left: 3px; vertical-align: middle; color: #2DC989;"></i>',
+        hero_title: 'Tối ưu hóa hành trình với giải pháp đặt trước bãi đỗ thông minh',
+        label_dropoff: 'GIAO XE TẠI',
+        label_pickup: 'ĐIỂM TRẢ XE',
+        why_subtitle: 'Chúng tôi mang đến giải pháp đỗ xe thông minh, giúp bạn tiết kiệm thời gian, an tâm về chi phí và yên tâm tuyệt đối khi gửi xe.',
+        eco_title: 'Hệ sinh thái của ParkChung',
+        eco_coop_title: 'Hợp tác cùng ParkChung – Tối ưu thu nhập bãi đỗ',
+        eco_f1: 'Biến những vị trí đỗ xe trống thành nguồn thu nhập thụ động mỗi ngày',
+        eco_f2: 'Quản lý đặt chỗ và theo dõi doanh thu minh bạch ngay trên ứng dụng',
+        eco_f3: 'Tiếp cận tức thì mạng lưới tài xế đang tìm kiếm chỗ đỗ',
+        eco_cta: 'Tìm hiểu ngay',
+        quote_text: 'Giải pháp đỗ xe càng thuận tiện, hành trình càng trở nên dễ dàng và chúng ta càng gắn kết với nhau hơn.',
+        quote_author_name: 'BRANNAN COADY',
+        quote_author_title: 'CEO',
+        press_title: 'Báo chí nói gì về chúng tôi',
+        press_badge: 'BÁO CHÍ',
+        press_subtitle: 'Cảm nhận của các nhà báo về giải pháp của chúng tôi. Chúng tôi tự hào được chia sẻ hành trình.',
+        press_read_article: 'Đọc bài viết ↗',
+        press_article1_source: 'UNDP VIETNAM · VIETCHALLENGE 2019',
+        press_article2_source: 'UNDP VIETNAM · VIETCHALLENGE 2019',
+        press_article3_source: 'UNDP VIETNAM · VIETCHALLENGE 2019',
+        press_article1_title: 'Chúc mừng 12 startup chính thức bước vào giai đoạn đào tạo chuyên sâu của Chương trình ươm tạo Việt Nam - Nhật Bản!',
+        press_article2_title: 'Chúc mừng 12 startup chính thức bước vào giai đoạn đào tạo chuyên sâu của Chương trình ươm tạo Việt Nam - Nhật Bản!',
+        press_article3_title: 'Chúc mừng 12 startup chính thức bước vào giai đoạn đào tạo chuyên sâu của Chương trình ươm tạo Việt Nam - Nhật Bản!',
+        review_1_text: 'Việc đỗ xe tại Nhà ga số 5 sân bay Nội Bài quá đỗi dễ dàng. Cực kỳ dễ tìm và siêu RẺ! Chắc chắn tôi sẽ tiếp tục sử dụng dịch vụ! Cảm ơn.',
+        review_2_text: 'Việc đỗ xe tại Nhà ga số 5 sân bay Nội Bài quá đỗi dễ dàng. Cực kỳ dễ tìm và siêu RẺ! Chắc chắn tôi sẽ tiếp tục sử dụng dịch vụ! Cảm ơn.',
+        review_3_text: 'Việc đỗ xe tại Nhà ga số 5 sân bay Nội Bài quá đỗi dễ dàng. Cực kỳ dễ tìm và siêu RẺ! Chắc chắn tôi sẽ tiếp tục sử dụng dịch vụ! Cảm ơn.',
+        review_4_text: 'Việc đỗ xe tại Nhà ga số 5 sân bay Nội Bài quá đỗi dễ dàng. Cực kỳ dễ tìm và siêu RẺ! Chắc chắn tôi sẽ tiếp tục sử dụng dịch vụ! Cảm ơn.',
+        review_5_text: 'Việc đỗ xe tại Nhà ga số 5 sân bay Nội Bài quá đỗi dễ dàng. Cực kỳ dễ tìm và siêu RẺ! Chắc chắn tôi sẽ tiếp tục sử dụng dịch vụ! Cảm ơn.',
+        review_1_author: 'Phong Anh',
+        review_2_author: 'Phong Anh',
+        review_3_author: 'Phong Anh',
+        review_4_author: 'Phong Anh',
+        review_5_author: 'Phong Anh',
+        review_1_role: 'Người sử dụng dịch vụ',
+        review_2_role: 'Người sử dụng dịch vụ',
+        review_3_role: 'Người sử dụng dịch vụ',
+        review_4_role: 'Người sử dụng dịch vụ',
+        review_5_role: 'Người sử dụng dịch vụ',
+        footer_subscribe_text: 'Đăng ký nhận khuyến mãi',
+        footer_follow_us: 'THEO DÕI CHÚNG TÔI',
+        footer_contact: 'THÔNG TIN PARKCHUNG',
+        footer_brand: 'Smart Parking Here',
+        footer_policies: 'CHÍNH SÁCH',
+        footer_copy: 'Bản quyền © 2026 thuộc Parkchung. Bảo lưu mọi quyền.'
     });
 
     function renderNav() {
         const dict = t[currentLang] || t.en;
+        const langFlag = currentLang === 'vi'
+            ? 'https://flagcdn.com/w40/vn.png'
+            : 'https://flagcdn.com/w40/gb.png';
         const langSwitcher = `
-            <span style="margin: 0 10px;">|</span>
-            <button id="lang-en" style="background:none;border:none;color:${currentLang === 'en' ? '#13b47e' : '#555'};font-weight:${currentLang === 'en' ? '700' : '500'};cursor:pointer;">EN</button>
-            <span style="color:#aaa;">/</span>
-            <button id="lang-vi" style="background:none;border:none;color:${currentLang === 'vi' ? '#13b47e' : '#555'};font-weight:${currentLang === 'vi' ? '700' : '500'};cursor:pointer;">VI</button>
+            <div class="lang-switcher" id="lang-switcher-nav">
+                <img src="${langFlag}" alt="${currentLang.toUpperCase()}" class="lang-flag" />
+                <span class="lang-arrow">▼</span>
+            </div>
         `;
 
         if (userData) {
             nav.innerHTML = `
-            <a href="${window.HOST_URL}/login" style="text-decoration: none; color: #13b47e; font-weight: 500;">${dict.becomeHost}</a>
-            <a href="my-bookings.html" style="text-decoration: none; color: #13b47e; font-weight: 500; margin-left: 15px;">${dict.myBookings}</a>
-            <a href="my-profile.html" style="text-decoration: none; color: #13b47e; font-weight: 500; margin-left: 15px;">${dict.my_profile}</a>
-            <span style="margin: 0 15px;">|</span>
-            <span>${dict.welcome}, ${userData.fullName}!</span>
-            <a href="#" id="logout-btn" style="margin-left: 15px; text-decoration: none; color: #e74c3c; font-weight: 500;">${dict.logout}</a>
-            ${langSwitcher}
+                <a href="${window.HOST_URL}/login" class="nav-link become-host-link">${dict.becomeHost}</a>
+                <a href="/customer/my-bookings" class="nav-link">${dict.myBookings}</a>
+                <a href="/customer/my-profile" class="nav-link">${dict.my_profile}</a>
+                <span class="nav-link" style="cursor:default;">${dict.welcome}, ${userData.fullName}!</span>
+                <a href="#" id="logout-btn" class="btn-nav btn-nav-outline" style="border-color:#e74c3c;color:#e74c3c;">${dict.logout}</a>
+                ${langSwitcher}
             `;
         } else {
             nav.innerHTML = `
-            <a href="${window.HOST_URL}/login">${dict.becomeHost}</a>
-            <a href="register.html">${dict.registerText}</a>
-            <a href="login.html">${dict.login}</a>
-            ${langSwitcher}
+                <a href="${window.HOST_URL}/login" class="nav-link become-host-link">${dict.becomeHost}</a>
+                <a href="/customer/login.html" class="btn-nav btn-nav-primary">${dict.login}</a>
+                <a href="/customer/register.html" class="nav-link register-link" style="color: #2DC989; font-weight: 500; font-family: 'Montserrat Alternates', sans-serif; font-size: 16px; margin-left: 12px;">${dict.registerText}</a>
+                ${langSwitcher}
             `;
         }
 
@@ -460,14 +556,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 e.preventDefault();
                 localStorage.removeItem('userToken');
                 localStorage.removeItem('userData');
-                window.location.href = 'index.html';
+                window.location.href = '/customer/index.html';
             });
         }
 
-        const langEnBtn = document.getElementById('lang-en');
-        const langViBtn = document.getElementById('lang-vi');
-        if (langEnBtn) langEnBtn.addEventListener('click', () => setLanguage('en'));
-        if (langViBtn) langViBtn.addEventListener('click', () => setLanguage('vi'));
+        const langSwitcherEl = document.getElementById('lang-switcher-nav');
+        if (langSwitcherEl) {
+            langSwitcherEl.addEventListener('click', () => {
+                setLanguage(currentLang === 'vi' ? 'en' : 'vi');
+            });
+        }
 
         applyTranslations(dict);
         window.__applyI18n = () => applyTranslations(t[currentLang] || t.en);

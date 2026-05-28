@@ -1,296 +1,355 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 
 <head>
     <meta charset="UTF-8">
-    <title>Payment Result - ParkChung</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kết quả thanh toán - ParkChung</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="/customer/css/styles.css">
     <link rel="icon" type="image/png" href="/assets/logo/favicon.png" />
-    <link rel="stylesheet" href="css/styles.css" />
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap"
-        rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+
     <style>
-        /* Payment Result Page Styles */
         body {
-            background: linear-gradient(135deg, #13b47e 0%, #1f6f35 100%);
+            background-color: #f8fafc;
             min-height: 100vh;
+            display: flex;
+            flex-direction: column;
         }
 
-        header {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-        }
-
-        .bookings-main {
-            max-width: 800px;
+        .payment-result-main {
+            max-width: 650px;
             margin: 40px auto;
-            padding: 20px;
+            padding: 0 16px;
+            flex: 1;
+            width: 100%;
         }
 
-        .bookings-header {
+        .result-card {
+            background: #ffffff;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
+            border: 1px solid #e2e8f0;
+            padding: 40px 30px;
             text-align: center;
-            margin-bottom: 30px;
-        }
-
-        .bookings-header h2 {
-            color: #ffffff;
-            font-size: 2.5em;
-            font-weight: 700;
-            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-            margin-bottom: 20px;
-        }
-
-        .home-button {
-            display: inline-block;
-            padding: 12px 28px;
-            background: rgba(255, 255, 255, 0.2);
-            color: #ffffff;
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            border-radius: 50px;
-            text-decoration: none;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            backdrop-filter: blur(10px);
-        }
-
-        .home-button:hover {
-            background: rgba(255, 255, 255, 0.3);
-            border-color: rgba(255, 255, 255, 0.5);
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-        }
-
-        .booking-card {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(20px);
-            border-radius: 24px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-            padding: 50px 40px;
-            text-align: center;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            animation: slideUp 0.6s ease-out;
+            animation: slideUp 0.5s ease-out-back;
         }
 
         @keyframes slideUp {
             from {
                 opacity: 0;
-                transform: translateY(30px);
+                transform: translateY(20px);
             }
-
             to {
                 opacity: 1;
                 transform: translateY(0);
             }
         }
 
-        .booking-card__icon {
-            width: 100px;
-            height: 100px;
-            margin: 0 auto 30px;
-            background: linear-gradient(135deg, #13b47e 0%, #1f6f35 100%);
+        .result-icon-container {
+            width: 80px;
+            height: 80px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 10px 30px rgba(19, 180, 126, 0.4);
-            animation: pulse 2s ease-in-out infinite;
+            margin: 0 auto 20px;
+            font-size: 40px;
         }
 
-        @keyframes pulse {
-
-            0%,
-            100% {
-                transform: scale(1);
-                box-shadow: 0 10px 30px rgba(19, 180, 126, 0.4);
-            }
-
-            50% {
-                transform: scale(1.05);
-                box-shadow: 0 15px 40px rgba(19, 180, 126, 0.6);
-            }
+        .result-icon-container.success {
+            background-color: #f0fdf4;
+            color: #13b47e;
+            border: 2px solid #13b47e;
         }
 
-        .booking-card__icon i {
-            font-size: 48px;
-            color: #ffffff;
+        .result-icon-container.pending {
+            background-color: #fef3c7;
+            color: #d97706;
+            border: 2px solid #d97706;
         }
 
-        .booking-card__details h3 {
-            font-size: 2em;
+        .result-icon-container.failed {
+            background-color: #fef2f2;
+            color: #ef4444;
+            border: 2px solid #ef4444;
+        }
+
+        .result-title {
+            font-size: 22px;
+            font-weight: 800;
+            color: #0f172a;
+            margin-bottom: 10px;
+            letter-spacing: -0.5px;
+        }
+
+        .result-desc {
+            color: #64748b;
+            font-size: 13.5px;
+            line-height: 1.5;
+            margin-bottom: 24px;
+            max-width: 480px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .summary-title {
+            font-size: 14px;
             font-weight: 700;
-            color: #2d3748;
-            margin-bottom: 15px;
-        }
-
-        .booking-card__details p {
-            font-size: 1.1em;
-            color: #718096;
-            margin-bottom: 25px;
-            line-height: 1.6;
-        }
-
-        #payment-booking-summary {
-            background: linear-gradient(135deg, #f6f8fb 0%, #e9ecef 100%);
-            border-radius: 16px;
-            padding: 25px;
-            margin: 25px 0;
-            border-left: 4px solid #13b47e;
+            color: #334155;
             text-align: left;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
-        .payment-actions {
+        .summary-box {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: left;
+            margin-bottom: 24px;
+        }
+
+        .summary-item {
             display: flex;
-            gap: 15px;
-            flex-wrap: wrap;
-            margin-top: 30px;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            font-size: 13.5px;
+            border-bottom: 1px dashed #e2e8f0;
         }
 
-        .submit-button {
+        .summary-item:last-child {
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+
+        .summary-item:first-child {
+            padding-top: 0;
+        }
+
+        .summary-item-label {
+            color: #64748b;
+            font-weight: 500;
+        }
+
+        .summary-item-value {
+            color: #0f172a;
+            font-weight: 700;
+            text-align: right;
+        }
+
+        .summary-item-value.price {
+            color: #13b47e;
+            font-size: 15px;
+        }
+
+        .summary-item-value .status-badge {
+            padding: 3px 8px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .status-badge.confirmed, .status-badge.paid {
+            background-color: #dcfce7;
+            color: #166534;
+        }
+
+        .status-badge.pending {
+            background-color: #fef3c7;
+            color: #92400e;
+        }
+
+        .status-badge.failed, .status-badge.cancelled {
+            background-color: #fee2e2;
+            color: #991b1b;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+        }
+
+        .btn-action {
             flex: 1;
-            min-width: 180px;
-            padding: 16px 32px;
-            font-size: 1.05em;
-            font-weight: 600;
-            border: none;
-            border-radius: 50px;
+            padding: 12px 20px;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 700;
             cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-            font-family: 'Montserrat', sans-serif;
+            transition: all 0.2s;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
         }
 
-        #refresh-status {
-            background: linear-gradient(135deg, #13b47e 0%, #1f6f35 100%);
-            color: #ffffff;
+        .btn-action-primary {
+            background-color: #13b47e;
+            color: white;
         }
 
-        #refresh-status:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(19, 180, 126, 0.4);
+        .btn-action-primary:hover {
+            background-color: #0ea36b;
         }
 
-        #view-bookings {
-            background: linear-gradient(135deg, #2d3748 0%, #4a5568 100%);
-            color: #ffffff;
+        .btn-action-secondary {
+            background-color: #f1f5f9;
+            color: #334155;
+            border: 1px solid #e2e8f0;
         }
 
-        #view-bookings:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(45, 55, 72, 0.4);
+        .btn-action-secondary:hover {
+            background-color: #e2e8f0;
         }
 
-        /* Success state */
-        .payment-success .booking-card__icon {
-            background: linear-gradient(135deg, #00b894 0%, #00cec9 100%);
-            box-shadow: 0 10px 30px rgba(0, 184, 148, 0.4);
-        }
-
-        .payment-success #payment-status-heading {
-            color: #00b894;
-        }
-
-        /* Error state */
-        .payment-error .booking-card__icon {
-            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
-            box-shadow: 0 10px 30px rgba(231, 76, 60, 0.4);
-        }
-
-        .payment-error #payment-status-heading {
-            color: #e74c3c;
-        }
-
-        /* Loading animation */
-        .loading .booking-card__icon i {
-            animation: spin 1.5s linear infinite;
-        }
-
-        @keyframes spin {
-            from {
-                transform: rotate(0deg);
-            }
-
-            to {
-                transform: rotate(360deg);
-            }
-        }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            .bookings-main {
-                padding: 15px;
-                margin: 20px auto;
-            }
-
-            .bookings-header h2 {
-                font-size: 2em;
-            }
-
-            .booking-card {
-                padding: 35px 25px;
-            }
-
-            .booking-card__icon {
-                width: 80px;
-                height: 80px;
-            }
-
-            .booking-card__icon i {
-                font-size: 36px;
-            }
-
-            .booking-card__details h3 {
-                font-size: 1.6em;
-            }
-
-            .payment-actions {
+        @media (max-width: 480px) {
+            .action-buttons {
                 flex-direction: column;
             }
+        }
 
-            .submit-button {
-                width: 100%;
-            }
+        /* ===== HEADER REDESIGN ===== */
+        .header-v3 {
+            background: #0b1a17 !important; /* Dark teal background matching Figma */
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.15);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .header-logo-text .header-brand {
+            color: #ffffff !important;
+            font-size: 18px !important;
+            font-weight: 700 !important;
+        }
+        
+        .header-logo-text .header-tagline {
+            color: #13b47e !important;
+            font-size: 10px !important;
+            font-weight: 500 !important;
+        }
+        
+        .header-nav {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        
+        .header-nav .nav-link {
+            color: #ffffff !important;
+            font-size: 13px !important;
+            font-weight: 500;
+            text-decoration: none;
+        }
+        
+        .btn-nav-figma {
+            background: #13b47e;
+            color: #ffffff !important;
+            font-size: 13px !important;
+            font-weight: 600;
+            padding: 8px 16px;
+            border-radius: 6px;
+            text-decoration: none;
+            transition: background 0.2s;
+        }
+        
+        .btn-nav-figma:hover {
+            background: #0ea36b;
+        }
+        
+        .lang-selector-figma {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            cursor: pointer;
+        }
+        
+        .flag-icon-figma {
+            width: 20px;
+            height: 14px;
+            border-radius: 2px;
+            object-fit: cover;
         }
     </style>
 </head>
 
 <body>
-    <header>
-        <div class="logo">
-            <a href="index.html" style="display: flex; align-items: center; text-decoration: none; color: inherit;">
-                <img src="/assets/logo/logo.svg" alt="Parkchung Logo" />
-                <div>
-                    <h1>PARKCHUNG</h1>
-                    <p class="tagline">Save time. Save money. Save Earth</p>
+    <header class="header-v3">
+        <div class="header-inner">
+            <a href="/customer/index.html" class="header-logo">
+                <img src="/assets/logo/logo.svg" alt="ParkChung Logo" />
+                <div class="header-logo-text">
+                    <span class="header-brand">PARKCHUNG</span>
+                    <span class="header-tagline">Smart Parking Here</span>
                 </div>
             </a>
+            <nav class="header-nav" id="main-nav">
+                <a href="/customer/register.html" class="nav-link">Trở thành chủ bãi đậu xe <i class="fas fa-chevron-down" style="font-size: 10px; margin-left: 4px;"></i></a>
+                <a href="/customer/login.html" class="btn-nav-figma">Đăng nhập</a>
+                <a href="/customer/register.html" class="btn-nav-figma">Đăng ký</a>
+                <div class="lang-selector-figma">
+                    <img src="https://flagcdn.com/w20/vn.png" alt="VN" class="flag-icon-figma">
+                    <i class="fas fa-chevron-down" style="font-size: 9px; color: #fff; margin-left: 2px;"></i>
+                </div>
+            </nav>
         </div>
     </header>
 
-    <main class="bookings-main">
-        <div class="bookings-header">
-            <h2>Payment Status</h2>
-            <a href="index.html" class="nav-button home-button">← Back to Home</a>
-        </div>
-        <div class="booking-card loading" id="payment-result-card">
-            <div class="booking-card__icon">
-                <i class="fas fa-receipt"></i>
+    <main class="payment-result-main">
+        <div class="result-card" id="payment-result-card">
+            <div class="result-icon-container success" id="result-icon-box" style="border-radius: 16px; width: 64px; height: 64px; background: #f0fdf4; border: 1.5px solid #13b47e; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px;">
+                <i class="fas fa-check" id="result-icon" style="color: #13b47e; font-size: 28px;"></i>
             </div>
-            <div class="booking-card__details">
-                <h3 id="payment-status-heading">Checking your payment...</h3>
-                <p id="payment-status-description">We are verifying the latest updates from PayPal.</p>
-                <div id="payment-booking-summary"></div>
-                <div class="payment-actions">
-                    <button id="refresh-status" class="submit-button">Refresh Status</button>
-                    <button id="view-bookings" class="submit-button">Go to My Bookings</button>
-                </div>
+            
+            <h1 class="result-title" id="payment-status-heading" style="font-size:22px; font-weight:800; color:#1a1a2e; margin-bottom:8px;">Thanh toán thành công!</h1>
+            <p class="result-desc" id="payment-status-description" style="font-size:13.5px; color:#475569; margin-bottom:20px; line-height:1.5;">
+                Cảm ơn bạn đã sử dụng dịch vụ của ParkChung. Vé của bạn đã được xác nhận.
+            </p>
+
+            <div class="info-alert-box" style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; padding:12px 16px; display:flex; align-items:center; gap:10px; margin-bottom:24px; text-align:left;">
+                <span style="font-size:16px;">ℹ️</span>
+                <span style="font-size:12.5px; color:#475569; font-weight:500;">Thông tin vé đã được gửi đến số điện thoại và email đăng ký của bạn.</span>
+            </div>
+
+            <div class="summary-title" style="font-size: 14px; font-weight: 700; color: #334155; text-align: left; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.5px;">Chi tiết đặt chỗ</div>
+            <div class="summary-box" id="payment-booking-summary">
+                <!-- Stays dynamic -->
+                <div style="text-align: center; color: #94a3b8; padding: 10px 0;">Đang tải thông tin...</div>
+            </div>
+
+            <div class="action-buttons-layout" style="display:flex; flex-direction:column; gap:12px; align-items:center; width:100%;">
+                <button id="view-bookings" class="btn-action-primary" style="width:100%; padding:14px; background:#13b47e; color:white; border:none; border-radius:10px; font-size:14px; font-weight:700; cursor:pointer; text-align:center;">
+                    Đăng nhập để xem vé của bạn &rarr;
+                </button>
+                <a href="/customer/index.html" class="link-back-home" style="color:#64748b; font-size:13.5px; font-weight:600; text-decoration:none; margin-top:4px;">
+                    Về trang chủ
+                </a>
             </div>
         </div>
     </main>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js" defer></script>
-    <script src="js/config.js"></script>
-    <script src="js/payment-result.js" type="module"></script>
+    <footer class="footer" style="margin-top: 80px; padding: 40px 0; background: #0f172a; color: #94a3b8; font-size: 13px; border-top: 1px solid #1e293b;">
+        <div class="container" style="max-width: 1200px; margin: 0 auto; padding: 0 16px; text-align: center;">
+            <p>&copy; 2026 ParkChung. Tất cả quyền lợi được bảo lưu.</p>
+        </div>
+    </footer>
+
+    <script src="/customer/js/config.js"></script>
+    <script src="/customer/js/payment-result.js" type="module"></script>
 </body>
 
 </html>

@@ -12,8 +12,14 @@ router.post(
     spotController.createSpot
 );
 
+// Route to convert search query to lat/lng coordinates
+router.get('/geocode', spotController.geocodeAddress);
+
 // Route to get address suggestions (autocomplete)
 router.get('/autocomplete', spotController.getAutocompleteSuggestions);
+
+// Route to calculate valet price preview
+router.get('/valet-price', spotController.calculateValetPrice);
 
 // Route to find parking spots
 router.get('/search', spotController.searchSpots);

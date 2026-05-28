@@ -1,6 +1,11 @@
 const PAYMENT_METHODS = Object.freeze({
     PAYPAL: 'PAYPAL',
     CASH: 'CASH',
+    BANK_TRANSFER: 'BANK_TRANSFER',
+    DOMESTIC_CARD: 'DOMESTIC_CARD',
+    VNPAY: 'VNPAY',
+    MOMO: 'MOMO',
+    PAY_LATER: 'PAY_LATER',
 });
 
 const PAYMENT_STATUSES = Object.freeze({
