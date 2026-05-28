@@ -24,10 +24,6 @@ router.get('/valet-price', spotController.calculateValetPrice);
 // Route to find parking spots
 router.get('/search', spotController.searchSpots);
 
-// Temporary debug route for production DB inspection
-router.get('/db-debug', spotController.debugDb);
-router.get('/debug-log', spotController.debugLog);
-
 // Route to get details of a specific parking spot
 router.get('/:id', spotController.getSpotById);
 

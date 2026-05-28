@@ -372,37 +372,3 @@ exports.geocodeAddress = async (req, res) => {
         res.status(500).json({ message: 'Lỗi server trong quá trình phân tích địa điểm', error: error.message });
     }
 };
-
-exports.debugDb = async (req, res) => {
-    try {
-        const mongoose = require('mongoose');
-        const ParkingSpot = mongoose.model('ParkingSpot');
-        const count = await ParkingSpot.countDocuments();
-        const spots = await ParkingSpot.find({}).limit(5);
-        res.json({
-            connectionHost: mongoose.connection.host,
-            databaseName: mongoose.connection.name,
-            totalSpots: count,
-            firstFiveSpots: spots.map(s => ({ id: s._id, name: s.name, status: s.status, isActive: s.isActive }))
-        });
-    } catch (err) {
-        res.status(500).json({ error: err.message });
-    }
-};
-
-exports.debugLog = async (req, res) => {
-    try {
-        const fs = require('fs');
-        const path = require('path');
-        const logPath = path.join(__dirname, '../../public/pm2-status.txt');
-        if (fs.existsSync(logPath)) {
-            const content = fs.readFileSync(logPath, 'utf8');
-            res.header('Content-Type', 'text/plain; charset=utf-8');
-            res.send(content);
-        } else {
-            res.status(404).send('Log file not found at: ' + logPath);
-        }
-    } catch (err) {
-        res.status(500).send('Error reading log: ' + err.message);
-    }
-};
