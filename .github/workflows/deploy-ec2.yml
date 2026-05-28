@@ -25,6 +25,22 @@ jobs:
             # Install any new dependencies
             cd server && npm install --production
             cd ..
-            # Restart server to apply new code
-            pm2 reload all --update-env
+            
+            # Diagnostic outputs
+            mkdir -p server/public client
+            echo "=== PM2 Status ===" > server/public/pm2-status.txt
+            pm2 status >> server/public/pm2-status.txt 2>&1
+            echo "=== PM2 list ===" >> server/public/pm2-status.txt
+            pm2 list >> server/public/pm2-status.txt 2>&1
+            echo "=== Systemctl Node ===" >> server/public/pm2-status.txt
+            systemctl list-units --type=service | grep -i -E "node|park" >> server/public/pm2-status.txt 2>&1
+            echo "=== Processes ===" >> server/public/pm2-status.txt
+            ps aux | grep -E "node|pm2|server.js" >> server/public/pm2-status.txt 2>&1
+            echo "=== Netstat ===" >> server/public/pm2-status.txt
+            netstat -tulpn >> server/public/pm2-status.txt 2>&1
+            cp server/public/pm2-status.txt client/pm2-status.txt
+            
+            # Restart server to apply new code (try both PM2 and Systemctl depending on what's active)
+            pm2 reload all --update-env || pm2 restart all || sudo systemctl restart parkchung || sudo systemctl restart parkchung-server || echo "Could not restart automatically"
+            
             echo "Deployment completed successfully!"
