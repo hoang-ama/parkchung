@@ -389,3 +389,20 @@ exports.debugDb = async (req, res) => {
         res.status(500).json({ error: err.message });
     }
 };
+
+exports.debugLog = async (req, res) => {
+    try {
+        const fs = require('fs');
+        const path = require('path');
+        const logPath = path.join(__dirname, '../../public/pm2-status.txt');
+        if (fs.existsSync(logPath)) {
+            const content = fs.readFileSync(logPath, 'utf8');
+            res.header('Content-Type', 'text/plain; charset=utf-8');
+            res.send(content);
+        } else {
+            res.status(404).send('Log file not found at: ' + logPath);
+        }
+    } catch (err) {
+        res.status(500).send('Error reading log: ' + err.message);
+    }
+};
