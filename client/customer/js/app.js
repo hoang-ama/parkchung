@@ -535,8 +535,8 @@ document.addEventListener('DOMContentLoaded', () => {
         if (userData) {
             nav.innerHTML = `
                 <a href="${window.HOST_URL}/login" class="nav-link become-host-link">${dict.becomeHost}</a>
-                <a href="/customer/my-bookings" class="nav-link">${dict.myBookings}</a>
-                <a href="/customer/my-profile" class="nav-link">${dict.my_profile}</a>
+                <a href="my-bookings.html" class="nav-link">${dict.myBookings}</a>
+                <a href="my-profile.html" class="nav-link">${dict.my_profile}</a>
                 <span class="nav-link" style="cursor:default;">${dict.welcome}, ${userData.fullName}!</span>
                 <a href="#" id="logout-btn" class="btn-nav btn-nav-outline" style="border-color:#e74c3c;color:#e74c3c;">${dict.logout}</a>
                 ${langSwitcher}
@@ -544,8 +544,8 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
             nav.innerHTML = `
                 <a href="${window.HOST_URL}/login" class="nav-link become-host-link">${dict.becomeHost}</a>
-                <a href="/customer/login.html" class="btn-nav btn-nav-primary">${dict.login}</a>
-                <a href="/customer/register.html" class="nav-link register-link" style="color: #2DC989; font-weight: 500; font-family: 'Montserrat Alternates', sans-serif; font-size: 16px; margin-left: 12px;">${dict.registerText}</a>
+                <a href="login.html" class="btn-nav btn-nav-primary">${dict.login}</a>
+                <a href="register.html" class="nav-link register-link" style="color: #2DC989; font-weight: 500; font-family: 'Montserrat Alternates', sans-serif; font-size: 16px; margin-left: 12px;">${dict.registerText}</a>
                 ${langSwitcher}
             `;
         }
@@ -556,7 +556,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 e.preventDefault();
                 localStorage.removeItem('userToken');
                 localStorage.removeItem('userData');
-                window.location.href = '/customer/index.html';
+                window.location.href = 'index.html';
             });
         }
 

@@ -156,7 +156,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     'Đăng ký thành công'
                 );
             }
-            window.location.href = '/customer/login.html?registered=true';
+            window.location.href = 'login.html?registered=true';
         } catch (error) {
             showFormError(`Đăng ký thất bại: ${error.message}`);
         } finally {

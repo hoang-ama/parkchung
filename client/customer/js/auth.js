@@ -127,7 +127,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     getAuthText('registerSuccessMessage'),
                     getAuthText('registerSuccessTitle'),
                 );
-                window.location.href = '/customer/login.html';
+                window.location.href = 'login.html';
             } catch (error) {
                 if (formError) {
                     formError.textContent = `${getAuthText('registerFailedPrefix')}: ${error.message}`;
@@ -187,7 +187,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Redirect back if came from somewhere
                 const params = new URLSearchParams(window.location.search);
                 const redirectTo = params.get('redirect');
-                window.location.href = redirectTo || '/customer/index.html';
+                window.location.href = redirectTo || 'index.html';
             } catch (error) {
                 showLoginError(`${getAuthText('loginFailedPrefix')}: ${error.message}`);
             } finally {
