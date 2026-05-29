@@ -76,24 +76,22 @@ document.addEventListener('DOMContentLoaded', () => {
                 div.textContent = item.address;
                 div.className = 'suggestion-item';
                 // Use onmousedown instead of onclick to prevent race condition with blur event
-                // mousedown fires BEFORE blur, ensuring navigation happens before suggestions are hidden
+                // mousedown fires BEFORE blur, ensuring input is filled before suggestions are hidden
                 div.onmousedown = (e) => {
                     e.preventDefault(); // Prevent blur from interfering
-                    // Pass startTime and endTime so spot-details shows correct availability
-                    const startVal = startInput ? startInput.value : '';
-                    const endVal = endInput ? endInput.value : '';
-                    const startDate = startVal ? parseVietnameseDateString(startVal) : null;
-                    const endDate = endVal ? parseVietnameseDateString(endVal) : null;
-                    
-                    const params = new URLSearchParams({ id: item.id });
-                    if (startDate) params.set('arrival', startDate.toISOString());
-                    if (endDate) params.set('leaving', endDate.toISOString());
-                    
-                    window.location.href = `spot-details.html?${params.toString()}`;
+                    // Chỉ điền địa chỉ vào input, KHÔNG redirect ngay
+                    // Người dùng có thể xem lại giờ/ngày rồi bấm "Hiển thị chỗ đỗ"
+                    locationInput.value = item.address;
+                    suggestionsBox.style.display = 'none';
+                    // Tự động mở bộ chọn thời gian bắt đầu (Flatpickr)
+                    if (startPicker) {
+                        setTimeout(() => startPicker.open(), 50);
+                    }
                 };
                 suggestionsBox.appendChild(div);
             });
         };
+
 
         // Render Standard Category
         if (standardSpots.length > 0) {
