@@ -479,17 +479,18 @@ function createTicketCard(booking, state) {
     const button = card.querySelector('.ticket-btn');
     if (button) {
         button.addEventListener('click', (e) => {
+            e.stopPropagation(); // Prevent card click listener from firing
             const action = e.target.dataset.action;
             const bId = e.target.dataset.bookingId;
 
             if (action === 'qr') {
-                showQrCodeModal(ticketId);
+                window.location.href = `ticket-details.html?id=${bId}`;
             } else if (action === 'pay') {
                 handlePayNow(bId);
             } else if (action === 'extend') {
                 window.location.href = `index.html`; // Extend redirects to search for booking
             } else if (action === 'details') {
-                window.location.href = `spot-details.html?id=${booking.spot?._id}`;
+                window.location.href = `ticket-details.html?id=${bId}`;
             } else if (action === 'rebook') {
                 window.location.href = `index.html`;
             } else if (action === 'review') {
@@ -497,6 +498,13 @@ function createTicketCard(booking, state) {
             }
         });
     }
+
+    // Click card body to open ticket details (premium experience)
+    card.addEventListener('click', (e) => {
+        if (!e.target.closest('.ticket-btn')) {
+            window.location.href = `ticket-details.html?id=${booking._id}`;
+        }
+    });
 
     return card;
 }

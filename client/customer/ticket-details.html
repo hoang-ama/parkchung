@@ -1,0 +1,805 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chi tiết Vé đỗ xe | Parkchung</title>
+    <!-- Leaflet Map CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+    <style>
+        /* Base Reset & Variables */
+        :root {
+            --primary: #2DC989;
+            --primary-dark: #1f9e68;
+            --primary-light: rgba(45, 201, 137, 0.1);
+            --dark-bg: #11222c;
+            --light-bg: #f4f5f8;
+            --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: "Montserrat", "Inter", sans-serif;
+            background-color: var(--light-bg);
+            color: #2d3748;
+            min-height: 100vh;
+            line-height: 1.5;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        button {
+            font-family: inherit;
+            border: none;
+            outline: none;
+            cursor: pointer;
+        }
+
+        /* ======= HEADER ======= */
+        header {
+            background-color: var(--dark-bg);
+            padding: 12px 0;
+            color: #ffffff;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-container {
+            max-width: 1440px;
+            margin: 0 auto;
+            padding: 0 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .header-logo img {
+            height: 32px;
+        }
+
+        .header-logo-text {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header-brand {
+            font-size: 20px;
+            font-weight: 800;
+            letter-spacing: 1px;
+            color: #ffffff;
+        }
+
+        .header-tagline {
+            font-size: 10px;
+            color: #8892b0;
+            font-weight: 500;
+        }
+
+        .header-nav {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+        }
+
+        .become-host-link {
+            font-size: 14px;
+            font-weight: 600;
+            color: #e2e8f0;
+            transition: var(--transition);
+        }
+
+        .become-host-link:hover {
+            color: var(--primary);
+        }
+
+        .my-account-btn {
+            background-color: var(--primary);
+            color: #ffffff;
+            font-size: 14px;
+            font-weight: 700;
+            padding: 8px 18px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 10px rgba(45, 201, 137, 0.3);
+            transition: var(--transition);
+        }
+
+        .my-account-btn:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-1px);
+        }
+
+        .logout-link {
+            font-size: 14px;
+            font-weight: 600;
+            color: #cbd5e0;
+            transition: var(--transition);
+        }
+
+        .logout-link:hover {
+            color: #fc8181;
+        }
+
+        /* Language Switcher */
+        .lang-switcher {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 12px;
+            transition: var(--transition);
+        }
+
+        .lang-switcher:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .lang-flag {
+            width: 20px;
+            height: 14px;
+            object-fit: cover;
+            border-radius: 2px;
+        }
+
+        .lang-arrow {
+            font-size: 8px;
+            color: #a0aec0;
+        }
+
+        /* ======= DASHBOARD LAYOUT ======= */
+        .dashboard-container {
+            max-width: 1440px;
+            margin: 40px auto;
+            padding: 0 40px;
+            display: flex;
+            gap: 40px;
+        }
+
+        /* Left Sidebar */
+        aside.sidebar-v3 {
+            width: 260px;
+            background: #ffffff;
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: var(--card-shadow);
+            align-self: flex-start;
+        }
+
+        .sidebar-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 18px;
+            font-size: 15px;
+            font-weight: 600;
+            color: #718096;
+            border-radius: 12px;
+            margin-bottom: 8px;
+            transition: var(--transition);
+        }
+
+        .sidebar-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .sidebar-item i {
+            font-size: 18px;
+        }
+
+        .sidebar-item:hover {
+            color: var(--primary);
+            background: var(--primary-light);
+        }
+
+        .sidebar-item.active {
+            background: var(--primary);
+            color: #ffffff;
+            box-shadow: 0 4px 12px rgba(45, 201, 137, 0.25);
+        }
+
+        /* Right Content Panel */
+        main.main-content-v3 {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Content Header */
+        .content-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14.5px;
+            font-weight: 700;
+            color: var(--primary);
+            transition: var(--transition);
+        }
+
+        .back-btn:hover {
+            color: var(--primary-dark);
+            transform: translateX(-4px);
+        }
+
+        .ticket-title-group {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .ticket-id-header {
+            font-size: 28px;
+            font-weight: 800;
+            color: #1a202c;
+        }
+
+        .ticket-id-header span {
+            color: var(--primary);
+        }
+
+        .status-badge-header {
+            font-size: 12px;
+            font-weight: 700;
+            padding: 6px 14px;
+            border-radius: 20px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Status Badge Colors */
+        .status-badge-header.state-upcoming {
+            background: #feebc8;
+            color: #dd6b20;
+        }
+        .status-badge-header.state-active {
+            background: #c6f6d5;
+            color: #22543d;
+        }
+        .status-badge-header.state-completed {
+            background: #e2e8f0;
+            color: #4a5568;
+        }
+        .status-badge-header.state-cancelled {
+            background: #fed7d7;
+            color: #9b2c2c;
+        }
+
+        /* Loading / Error state container */
+        .loading-container {
+            background: #ffffff;
+            border-radius: 16px;
+            box-shadow: var(--card-shadow);
+            padding: 80px 40px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .loading-icon {
+            font-size: 48px;
+            color: var(--primary);
+            margin-bottom: 20px;
+        }
+
+        /* ======= FIGMA TICKET DESIGN ======= */
+        .ticket-container {
+            display: flex;
+            background: #ffffff;
+            border-radius: 24px;
+            box-shadow: var(--card-shadow);
+            overflow: hidden;
+            position: relative;
+            min-height: 480px;
+            border: 1px solid #e2e8f0;
+        }
+
+        /* Ticket Left: Cuống vé (QR side) */
+        .ticket-stub {
+            width: 340px;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            border-right: 2px dashed #edf2f7;
+            position: relative;
+            flex-shrink: 0;
+            background: #fafbfe;
+        }
+
+        /* Ticket rip round notches at top/bottom border junction */
+        .ticket-container::before, .ticket-container::after {
+            content: '';
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            background: var(--light-bg);
+            border-radius: 50%;
+            left: 325px; /* Half stub width minus circle radius */
+            z-index: 10;
+            box-sizing: border-box;
+            border: 1px solid #e2e8f0;
+        }
+
+        .ticket-container::before {
+            top: -16px;
+        }
+
+        .ticket-container::after {
+            bottom: -16px;
+        }
+
+        .ticket-stub-id {
+            font-size: 20px;
+            font-weight: 800;
+            color: #1a202c;
+            margin-bottom: 20px;
+            letter-spacing: 0.5px;
+        }
+
+        .qr-wrapper {
+            position: relative;
+            background: #ffffff;
+            border-radius: 16px;
+            padding: 16px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.04);
+            border: 1.5px solid #edf2f7;
+            margin-bottom: 20px;
+            width: 192px;
+            height: 192px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .qr-wrapper img {
+            width: 160px;
+            height: 160px;
+            object-fit: contain;
+        }
+
+        /* QR Overlay for used/completed ticket */
+        .qr-used-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(2px);
+            border-radius: 16px;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            z-index: 5;
+        }
+
+        .qr-used-overlay.show {
+            display: flex;
+        }
+
+        .qr-used-badge {
+            background: #718096;
+            color: #ffffff;
+            font-size: 13px;
+            font-weight: 700;
+            padding: 8px 18px;
+            border-radius: 20px;
+            letter-spacing: 0.5px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        .qr-instruction {
+            font-size: 11px;
+            font-weight: 600;
+            color: #a0aec0;
+            margin-bottom: 30px;
+            line-height: 1.4;
+            max-width: 220px;
+        }
+
+        /* Spot positions box */
+        .stub-positions {
+            width: 100%;
+            background: #ffffff;
+            border-radius: 12px;
+            padding: 16px;
+            border: 1px solid #edf2f7;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .position-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .position-label {
+            color: #a0aec0;
+            text-transform: uppercase;
+        }
+
+        .position-val {
+            color: #2d3748;
+            font-weight: 700;
+        }
+
+        /* Ticket Right: Thân vé (Details side) */
+        .ticket-body {
+            flex-grow: 1;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .details-section-title {
+            font-size: 12px;
+            font-weight: 800;
+            color: var(--primary);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-bottom: 24px;
+        }
+
+        .spot-name-header {
+            font-size: 22px;
+            font-weight: 800;
+            color: #1a202c;
+            margin-bottom: 18px;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 16px;
+            margin-bottom: 30px;
+        }
+
+        .info-block {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+        }
+
+        .info-block-icon {
+            font-size: 18px;
+            color: #a0aec0;
+            margin-top: 2px;
+            width: 20px;
+            text-align: center;
+        }
+
+        .info-block-content {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .info-block-label {
+            font-size: 10px;
+            font-weight: 700;
+            color: #a0aec0;
+            text-transform: uppercase;
+            margin-bottom: 2px;
+        }
+
+        .info-block-val {
+            font-size: 14.5px;
+            font-weight: 700;
+            color: #2d3748;
+        }
+
+        /* Price group */
+        .price-group {
+            border-top: 1px solid #edf2f7;
+            padding-top: 16px;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .price-label {
+            font-size: 13px;
+            font-weight: 700;
+            color: #718096;
+        }
+
+        .price-val {
+            font-size: 24px;
+            font-weight: 800;
+            color: #2d3748;
+        }
+
+        /* Button row */
+        .action-row {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 30px;
+        }
+
+        .action-btn {
+            flex: 1;
+            padding: 14px 20px;
+            font-size: 14px;
+            font-weight: 700;
+            border-radius: 12px;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: var(--transition);
+        }
+
+        .action-btn-primary {
+            background-color: var(--primary);
+            color: #ffffff;
+            box-shadow: 0 4px 12px rgba(45, 201, 137, 0.2);
+        }
+
+        .action-btn-primary:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-1px);
+        }
+
+        .action-btn-secondary {
+            background-color: #ffffff;
+            border: 2.5px solid var(--primary);
+            color: var(--primary);
+        }
+
+        .action-btn-secondary:hover {
+            background-color: var(--primary-light);
+            transform: translateY(-1px);
+        }
+
+        .action-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        /* Map frame at bottom of ticket details */
+        .mini-map-wrapper {
+            height: 140px;
+            border-radius: 14px;
+            overflow: hidden;
+            border: 1px solid #edf2f7;
+            position: relative;
+        }
+
+        #leaflet-mini-map {
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 1024px) {
+            .dashboard-container {
+                flex-direction: column;
+                padding: 0 20px;
+                margin: 20px auto;
+            }
+
+            aside.sidebar-v3 {
+                width: 100%;
+                display: flex;
+                flex-direction: row;
+                justify-content: space-around;
+                padding: 12px;
+            }
+
+            .sidebar-item {
+                margin-bottom: 0;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .ticket-container {
+                flex-direction: column;
+            }
+
+            .ticket-stub {
+                width: 100%;
+                border-right: none;
+                border-bottom: 2px dashed #edf2f7;
+                padding: 30px;
+            }
+
+            .ticket-container::before, .ticket-container::after {
+                display: none; /* Hide notches in column layout */
+            }
+
+            .ticket-body {
+                padding: 30px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Header Section -->
+    <header>
+        <div class="header-container">
+            <div class="header-logo">
+                <a href="index.html">
+                    <img src="/assets/logo/logo.svg" alt="ParkChung" />
+                </a>
+                <div class="header-logo-text">
+                    <span class="header-brand">PARKCHUNG</span>
+                    <span class="header-tagline" data-i18n="logo_slogan">Seamless Smart Parking, Safe & Easy</span>
+                </div>
+            </div>
+            <nav class="header-nav" id="customer-nav">
+                <!-- Loaded dynamically by JS -->
+            </nav>
+        </div>
+    </header>
+
+    <!-- Dashboard Main Layout -->
+    <div class="dashboard-container">
+        <!-- Left Sidebar Navigation -->
+        <aside class="sidebar-v3">
+            <a href="my-bookings.html" class="sidebar-item active">
+                <i class="fas fa-home"></i> <span data-i18n="nav_home">Trang chủ</span>
+            </a>
+            <a href="#" class="sidebar-item" id="sidebar-help">
+                <i class="fas fa-question-circle"></i> <span data-i18n="nav_help">Hỗ trợ & trợ giúp</span>
+            </a>
+            <a href="my-profile.html" class="sidebar-item">
+                <i class="fas fa-user"></i> <span data-i18n="my_profile">Tài khoản</span>
+            </a>
+        </aside>
+
+        <!-- Right Main Panel -->
+        <main class="main-content-v3">
+            <!-- Header section of content -->
+            <div class="content-header" style="flex-direction: column; align-items: flex-start; gap: 12px; margin-bottom: 24px;">
+                <a href="my-bookings.html" class="back-btn">
+                    <i class="fas fa-arrow-left"></i> Quay lại Đơn hàng của tôi
+                </a>
+                <div class="ticket-title-group">
+                    <h1 class="ticket-id-header" id="ticket-title">Chi tiết vé <span>#Loading...</span></h1>
+                    <span class="status-badge-header" id="ticket-status-badge">Đang tải...</span>
+                </div>
+            </div>
+
+            <!-- Ticket Wrapper Container -->
+            <div id="ticket-display-area">
+                <!-- Loading state -->
+                <div class="loading-container" id="loading-state">
+                    <i class="fas fa-spinner fa-spin loading-icon"></i>
+                    <p style="font-weight: 600; color: #718096;">Đang tải thông tin vé...</p>
+                </div>
+
+                <!-- Main ticket UI (Hidden initially) -->
+                <div class="ticket-container" id="ticket-card-ui" style="display: none;">
+                    <!-- 1. Cuống vé bên trái (QR & Slot Location) -->
+                    <div class="ticket-stub">
+                        <div class="ticket-stub-id" id="ticket-stub-code">#Loading</div>
+                        
+                        <!-- QR Code Area -->
+                        <div class="qr-wrapper">
+                            <img id="ticket-qr-img" src="" alt="Mã QR Vé">
+                            
+                            <!-- Used Ticket Overlay -->
+                            <div class="qr-used-overlay" id="qr-used-overlay">
+                                <span class="qr-used-badge">ĐÃ SỬ DỤNG</span>
+                            </div>
+                        </div>
+
+                        <div class="qr-instruction">Quét mã tại cổng để ra/vào bãi đỗ</div>
+
+                        <!-- Spot positions (Mocked layout coordinates matching Figma) -->
+                        <div class="stub-positions">
+                            <div class="position-row">
+                                <span class="position-label">Khu vực</span>
+                                <span class="position-val" id="ticket-pos-building">Tòa nhà A</span>
+                            </div>
+                            <div class="position-row">
+                                <span class="position-label">Hầm</span>
+                                <span class="position-val" id="ticket-pos-floor">Hầm B1</span>
+                            </div>
+                            <div class="position-row">
+                                <span class="position-label">Vị trí</span>
+                                <span class="position-val" id="ticket-pos-slot">Vị trí A-10</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 2. Thân vé bên phải (Details, Map & Actions) -->
+                    <div class="ticket-body">
+                        <div>
+                            <div class="details-section-title">Thông tin chi tiết</div>
+                            <div class="spot-name-header" id="ticket-spot-name">Vincom Center Đồng Khởi</div>
+                            
+                            <div class="info-grid">
+                                <div class="info-block">
+                                    <i class="far fa-clock info-block-icon"></i>
+                                    <div class="info-block-content">
+                                        <span class="info-block-label">Thời gian đỗ</span>
+                                        <span class="info-block-val" id="ticket-time-range">14:00 - 29/05/2024</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="info-block" id="ticket-car-plate-block" style="display: none;">
+                                    <i class="fas fa-car-side info-block-icon"></i>
+                                    <div class="info-block-content">
+                                        <span class="info-block-label">Biển số xe</span>
+                                        <span class="info-block-val" id="ticket-car-plate">Loading...</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <!-- Payment fee -->
+                            <div class="price-group">
+                                <span class="price-label">Tổng tiền</span>
+                                <span class="price-val" id="ticket-total-price">45.000đ</span>
+                            </div>
+
+                            <!-- Buttons -->
+                            <div class="action-row">
+                                <button class="action-btn action-btn-primary" id="btn-primary-action">Hủy đặt chỗ</button>
+                                <button class="action-btn action-btn-secondary" id="btn-secondary-action">Chỉ đường</button>
+                            </div>
+
+                            <!-- Mini map panel -->
+                            <div class="mini-map-wrapper">
+                                <div id="leaflet-mini-map"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="js/config.js?v=5"></script>
+    <script src="js/ticket-details.js?v=5"></script>
+</body>
+
+</html>

@@ -492,7 +492,7 @@ exports.getBookingPaymentStatus = async (req, res) => {
 exports.getBookingById = async (req, res) => {
     const { bookingId } = req.params;
     try {
-        const booking = await Booking.findById(bookingId).populate('spot', 'address name');
+        const booking = await Booking.findById(bookingId).populate('spot', 'address name location');
         if (!booking) {
             return res.status(404).json({ message: 'Booking not found' });
         }

@@ -45,9 +45,13 @@ const setViewBookings = () => {
                 window.location.href = 'login.html';
             });
         } else {
-            bookingsBtn.innerHTML = 'Xem lịch sử đặt chỗ →';
+            bookingsBtn.innerHTML = 'Xem chi tiết vé xe →';
             bookingsBtn.addEventListener('click', () => {
-                window.location.href = 'my-bookings.html';
+                if (bookingId) {
+                    window.location.href = `ticket-details.html?id=${bookingId}`;
+                } else {
+                    window.location.href = 'my-bookings.html';
+                }
             });
         }
     }
