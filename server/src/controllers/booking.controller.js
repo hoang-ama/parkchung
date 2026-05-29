@@ -157,6 +157,9 @@ exports.createGuestBooking = async (req, res) => {
                 await ensureBookingPopulated(createdBooking);
                 const emailData = prepareBookingData(createdBooking);
 
+                console.log(`[EMAIL] Sending bookingConfirm to ${emailData.customerEmail} for booking ${createdBooking._id}`);
+                console.log(`[EMAIL] Params: name=${emailData.customerName}, spot=${emailData.spotAddress}, total=${emailData.totalPrice}`);
+
                 // Send Customer Confirmation asynchronously
                 brevoService.sendBookingEmail(emailData, 'bookingConfirm').catch(err => 
                     console.error('Failed to send customer confirmation email asynchronously:', err)
@@ -169,7 +172,8 @@ exports.createGuestBooking = async (req, res) => {
                     );
                 }
 
-                // Schedule Review Email
+                // Schedule Review Email - ONLY send if endTime is in the future
+                // Never send review email immediately on booking creation (avoid confusing customers)
                 const bookingEndTime = new Date(createdBooking.endTime);
                 const now = new Date();
                 const delayMs = bookingEndTime.getTime() - now.getTime();
@@ -180,10 +184,9 @@ exports.createGuestBooking = async (req, res) => {
                             console.error('Failed to send scheduled review email:', err)
                         );
                     }, delayMs);
+                    console.log(`[EMAIL] Review email scheduled for ${bookingEndTime.toISOString()}`);
                 } else {
-                    brevoService.sendReviewEmail(emailData).catch(err => 
-                        console.error('Failed to send immediate review email:', err)
-                    );
+                    console.log(`[EMAIL] Skipping review email - booking endTime already past (${bookingEndTime.toISOString()})`);
                 }
 
             } catch (emailError) {
@@ -333,6 +336,9 @@ exports.createBooking = async (req, res) => {
                 await ensureBookingPopulated(createdBooking);
                 const bookingData = prepareBookingData(createdBooking);
 
+                console.log(`[EMAIL] Sending bookingConfirm to ${bookingData.customerEmail} for booking ${createdBooking._id}`);
+                console.log(`[EMAIL] Params: name=${bookingData.customerName}, spot=${bookingData.spotAddress}, total=${bookingData.totalPrice}`);
+
                 // Send Customer Confirmation asynchronously
                 brevoService.sendBookingEmail(bookingData, 'bookingConfirm').catch(err =>
                     console.error('Failed to send customer confirmation email asynchronously:', err)
@@ -347,7 +353,8 @@ exports.createBooking = async (req, res) => {
                     console.warn(`Skipping partner email for booking ${createdBooking._id}: Partner email not found.`);
                 }
 
-                // Schedule Review Email
+                // Schedule Review Email - ONLY send if endTime is in the future
+                // Never send review email immediately on booking creation
                 const endTime = new Date(booking.endTime);
                 const now = new Date();
                 const delayMs = endTime.getTime() - now.getTime();
@@ -359,12 +366,9 @@ exports.createBooking = async (req, res) => {
                             console.error(`Failed to send scheduled review email for booking ${createdBooking._id}:`, reviewError)
                         );
                     }, delayMs);
-                    console.log(`Review email scheduled for booking ${createdBooking._id} at ${endTime.toISOString()}`);
+                    console.log(`[EMAIL] Review email scheduled for booking ${createdBooking._id} at ${endTime.toISOString()}`);
                 } else {
-                    // If booking ended (e.g. testing with past time or very short duration), send immediately
-                    brevoService.sendReviewEmail(bookingData).catch(reviewError =>
-                        console.error(`Failed to send immediate review email for booking ${createdBooking._id}:`, reviewError)
-                    );
+                    console.log(`[EMAIL] Skipping review email - booking endTime already past (${endTime.toISOString()})`);
                 }
 
             } catch (emailError) {

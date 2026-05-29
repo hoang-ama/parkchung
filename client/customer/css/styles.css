@@ -1063,10 +1063,28 @@ header nav a {
   overflow-y: auto;
 }
 
+/* Suggestions dropdown for pre-booking search */
+.suggestions-box {
+  position: absolute;
+  left: 0;
+  top: 100%;
+  width: 100%;
+  background: #fff;
+  border: 1px solid #e0e0e0;
+  border-top: none;
+  border-radius: 0 0 12px 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  z-index: 9999;
+  max-height: 320px;
+  overflow-y: auto;
+}
+
 .suggestion-item {
   padding: 14px 12px;
   cursor: pointer;
   border-bottom: 1px solid #f0f0f0;
+  font-size: 14px;
+  color: #333;
 }
 
 .suggestion-item:last-child {
@@ -3820,9 +3838,15 @@ header nav a {
 
   /* Suggestions autocomplete positioning on desktop */
   .homepage-container .suggestions-box {
-    top: 76px;
-    border-radius: 12px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+    position: absolute;
+    left: 0;
+    top: 100%;
+    width: 100% !important;
+    z-index: 9999 !important;
+    border-radius: 0 0 13.5px 13.5px;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.18);
+    max-height: 360px;
+    overflow-y: auto;
   }
 
   /* Row 2: Date pickers (2 column) */

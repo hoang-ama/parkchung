@@ -79,10 +79,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 // mousedown fires BEFORE blur, ensuring navigation happens before suggestions are hidden
                 div.onmousedown = (e) => {
                     e.preventDefault(); // Prevent blur from interfering
-                    // Redirect directly to spot details page with the spot ID
-                    // This allows users to select arrival/departure times on the details page
-                    // Note: spot-details.js expects the parameter to be named 'id'
-                    window.location.href = `spot-details.html?id=${item.id}`;
+                    // Pass startTime and endTime so spot-details shows correct availability
+                    const startVal = startInput ? startInput.value : '';
+                    const endVal = endInput ? endInput.value : '';
+                    const startDate = startVal ? parseVietnameseDateString(startVal) : null;
+                    const endDate = endVal ? parseVietnameseDateString(endVal) : null;
+                    
+                    const params = new URLSearchParams({ id: item.id });
+                    if (startDate) params.set('arrival', startDate.toISOString());
+                    if (endDate) params.set('leaving', endDate.toISOString());
+                    
+                    window.location.href = `spot-details.html?${params.toString()}`;
                 };
                 suggestionsBox.appendChild(div);
             });

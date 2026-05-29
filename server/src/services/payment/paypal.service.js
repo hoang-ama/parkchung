@@ -215,7 +215,7 @@ const markPaymentAndBooking = async ({ payment, booking, paymentStatus, bookingS
             const now = new Date();
             const delayMs = endTime.getTime() - now.getTime();
 
-            // Only schedule if endTime is in the future
+            // Only schedule if endTime is in the future - never send immediately on booking creation
             if (delayMs > 0) {
                 setTimeout(() => {
                     console.log(`Sending scheduled review email for booking ${booking._id} after parking duration ended...`);
@@ -224,13 +224,9 @@ const markPaymentAndBooking = async ({ payment, booking, paymentStatus, bookingS
                     });
                 }, delayMs);
 
-                console.log(`Review email scheduled for booking ${booking._id} at ${endTime.toISOString()} (in ${Math.round(delayMs / 1000 / 60)} minutes)`);
+                console.log(`[EMAIL] Review email scheduled for booking ${booking._id} at ${endTime.toISOString()} (in ${Math.round(delayMs / 1000 / 60)} minutes)`);
             } else {
-                console.log(`Booking ${booking._id} has already ended. Sending review email immediately.`);
-                // If the booking has already ended, send review email immediately
-                brevoService.sendReviewEmail(bookingData).catch(reviewError => {
-                    console.error(`Failed to send immediate review email for booking ${booking._id}:`, reviewError.message);
-                });
+                console.log(`[EMAIL] Skipping review email for booking ${booking._id} - endTime already past (${endTime.toISOString()})`);
             }
 
         } else if (bookingStatus === 'cancelled') {
