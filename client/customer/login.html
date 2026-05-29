@@ -657,13 +657,13 @@
 
     <script src="js/custom-modal.js?v=4"></script>
     <script src="js/config.js?v=4"></script>
-    <script type="module" src="js/auth.js?v=4"></script>
+    <script type="module" src="js/auth.js?v=5"></script>
     <script>
         // Show success banner if redirected from registration
         const params = new URLSearchParams(window.location.search);
         if (params.get('registered') === 'true') {
             document.getElementById('register-success').classList.add('visible');
-            window.history.replaceState({}, '', '/customer/login.html');
+            window.history.replaceState({}, '', 'login.html');
         }
 
         // Password toggle
