@@ -81,9 +81,13 @@ const buildSummaryHtml = (booking) => {
 
     const methodLabel = PAYMENT_METHOD_NAMES[booking.paymentMethod] || booking.paymentMethod || 'Không xác định';
 
-    const customerName = booking.fullName || booking.guestFullName || 'Khách hàng';
-    const email = booking.email || booking.guestEmail || 'Không có';
-    const phone = booking.phoneNumber || booking.guestPhoneNumber || 'Không có';
+    // For logged-in user bookings, fullName/email are in localStorage userData, not in booking doc
+    let localUser = {};
+    try { localUser = JSON.parse(localStorage.getItem('userData') || '{}'); } catch(e) {}
+    const customerName = booking.fullName || booking.guestFullName || localUser.fullName || 'Khách hàng';
+    const email = booking.email || booking.guestEmail || localUser.email || 'Không có';
+    const phone = booking.phoneNumber || booking.guestPhoneNumber || localUser.phone || 'Không có';
+    const spotDisplay = booking.spot?.name || booking.spot?.address || 'Bãi đỗ xe';
 
     return `
         <div class="summary-item">
@@ -92,7 +96,7 @@ const buildSummaryHtml = (booking) => {
         </div>
         <div class="summary-item">
             <span class="summary-item-label">Bãi đỗ xe</span>
-            <span class="summary-item-value">${booking.spot?.name || booking.spot?.address || 'Bãi đỗ xe'}</span>
+            <span class="summary-item-value">${spotDisplay}</span>
         </div>
         <div class="summary-item">
             <span class="summary-item-label">Khách hàng</span>

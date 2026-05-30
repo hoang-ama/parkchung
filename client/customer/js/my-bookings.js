@@ -289,11 +289,15 @@ function filterAndDisplayBookings() {
         if (status === 'completed' || status === 'cancelled' || (startTime < now && status === 'pending')) {
             categorized.past.push({ booking, cardState: getPastCardState(booking, now) });
         }
-        // 2. Upcoming Bookings: future bookings which are confirmed
+        // 2. Active: UNPAID bookings always show here so user sees they need to pay
+        else if (paymentStatus === 'unpaid' || paymentStatus === 'pending') {
+            categorized.active.push({ booking, cardState: getActiveCardState(booking, now) });
+        }
+        // 3. Upcoming Bookings: future bookings which are confirmed & paid
         else if (startTime > now && status === 'confirmed') {
             categorized.upcoming.push({ booking, cardState: getUpcomingCardState(booking, now) });
         }
-        // 3. Active Bookings: currently active or unpaid/pending payment
+        // 4. Anything else (currently active parking)
         else {
             categorized.active.push({ booking, cardState: getActiveCardState(booking, now) });
         }
